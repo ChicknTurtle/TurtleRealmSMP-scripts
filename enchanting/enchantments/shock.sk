@@ -1,0 +1,59 @@
+
+options:
+    damage: 4
+    wetDamage: 8
+    chance: 100%
+    radius: 3
+    wetRadius: 6
+    trail: electric_spark
+    particle: dust using dustOption(rgb(255,255,0),1)
+    particle2: white smoke
+    particleAmount: 10
+
+function shock(arrow:entity,shooter:entity,wet:boolean):
+    set {_source} to damage source from lightning_bolt caused by {_shooter} directly by {_arrow}
+    set {_r} to {@radius}
+    set {_damage} to {@damage}
+    if {_wet} is true:
+        set {_r} to {@wetRadius}
+        set {_damage} to {@wetDamage}
+        play sound "turtle:entity.arrow.discharge" with volume 2 at {_arrow}
+        loop 100 times:
+            set {_v} to random vector * 5
+            loop {@particleAmount} times:
+                set {_nv} to {_v} * loop-number-2/{@particleAmount}
+                set {_loc} to location of {_arrow} ~ {_nv}
+                make 2 of {@particle} at {_loc} with extra 0
+    loop entities in radius {_r} of location 0.5 blocks under {_arrow}:
+        loop-entity is a living entity
+        loop-entity is alive
+        loop-entity's gamemode isn't creative
+        chance of {@chance}
+        set {_loc} to {_arrow} ~ vector(0,{_arrow}.getHeight()/2,0)
+        set {_loc2} to loop-entity ~ vector(0,loop-entity.getHeight()/2,0)
+        set {_v} to vector from {_loc} to {_loc2}
+        set {_ray} to raytrace from {_arrow} along {_v} with max distance (vector length of {_v}) with ray size 0.1 while ignoring all entity types
+        set {_hit} to ray trace hit block of {_ray}
+        {_hit} isn't set
+        damage loop-entity by {_damage} with {_source}
+        play sound "turtle:entity.arrow.zap" with volume 0.4 at loop-entity
+        loop {@particleAmount} times:
+            set {_nv} to {_v} * loop-number/{@particleAmount}
+            set {_loc} to location of {_arrow} ~ {_nv}
+            make 2 of {@particle} at {_loc} with extra 0
+            make 1 of {@particle2} at {_loc} with extra 0
+
+on entity shoot bow:
+    set {_e} to enchantment from key "turtle:shock"
+    shot bow is enchanted with {_e}
+    while projectile entity is alive:
+        make 5 of {@trail} at projectile entity with extra 0.1
+        if projectile entity is wet:
+            stop loop
+        if projectile entity is on ground:
+            stop loop
+        wait 1 tick
+    if projectile entity is wet:
+        shock(projectile entity, shooter, true)
+    else:
+        shock(projectile entity, shooter, false)

@@ -1,0 +1,41 @@
+
+import:
+    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+
+Options:
+    BotToken: "<REDACTED>"
+    DiscordChannelID: "1251617201757360149"
+
+on load:
+    set {features::discordlink::name} to "Discord link"
+    set {features::discordlink::desc} to "Links in-game chat with a discord channel"
+    set {features::discordlink::warn} to "If formatting of chat, join/leave, or death messages is disabled,\nthose messages won't show up on discord"
+    set {features::discordlink::icon} to purple dye
+
+function discordSend(msg:string):
+    {features::discordlink::enabled} is true
+    post {_msg} to text channel with id {@DiscordChannelID}
+
+define new bot named "ChatLink": 
+
+    token: {@BotToken}
+
+    intents: default intents
+
+    on ready:
+        {features::discordlink::enabled} is true
+        discordSend("**:white_check_mark: Server Started**")
+
+on message received:
+    {features::discordlink::enabled} is true
+    event-user isn't a discord bot
+    discord id of event-channel is {@DiscordChannelID}
+    set {_c::1} to text component from "%effective name of event-member%:"
+    set {_c::2} to text component from " &f%event-message%"
+    set color format of {_c::1} to rgb(88, 101, 242)
+    set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7%discord name of event-user%"
+    broadcast component merge components {_c::*}
+
+on skript stop:
+    {features::discordlink::enabled} is true
+    discordSend("**:octagonal_sign: Server Stopped**")

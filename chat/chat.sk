@@ -1,0 +1,58 @@
+
+on load:
+    set {features::joinleavemsgs::name} to "Join/leave messages"
+    set {features::customchat::desc} to "Better looking join and leave messages"
+    set {features::joinleavemsgs::icon} to oak door
+    set {features::deathmsgs::name} to "Death messages"
+    set {features::deathmsgs::desc} to "Better looking death messages"
+    set {features::deathmsgs::warn} to "Doesn't work for pets"
+    set {features::deathmsgs::icon} to skeleton skull
+    set {features::customchat::name} to "Custom chat"
+    set {features::customchat::desc} to "Better looking and colorable chat messages\n[item] is replaced with your held item"
+    set {features::customchat::icon} to oak floor sign
+
+on join:
+    {features::joinleavemsgs::enabled} is true
+    set join message to "§a+ §7| &f%player% joined the game"
+    discordSend("**+** %player%")
+
+on leave:
+    {features::joinleavemsgs::enabled} is true
+    set leave message to "§c- §7| &f%player% left the game"
+    discordSend("**-** %player%")
+
+on death of player:
+    {features::deathmsgs::enabled} is true
+    set {_msg} to death message
+    set death message to "§c☠ §7%{_msg}%"
+    gamerule showDeathMessages of world of victim is true
+    discordSend(":skull: %uncolored {_msg}%")
+
+on async chat:
+    {features::customchat::enabled} is true
+    set {_msg} to async chat message
+    # create format
+    set {_p} to player
+    set {_c::1} to text component from "§7%display name of {_p}%"
+    set {_c::2} to text component from "§7: &r"
+    set {_c::3} to colored async chat message
+    set click event of {_c::1} to click event to suggest command "/msg %name of {_p}% "
+    set {_format} to merge components {_c::*}
+
+    # replace [item]
+    if "%{_format}%" contains "[item]":
+        set {_col} to rarity color of player's tool
+        set {_name} to effective name of player's tool
+        set {_c} to text component from "[%{_name}%]"
+        set color format of {_c} to {_col}
+        set hover event of {_c} to hover event showing player's tool
+        component replace "\[item]" with {_c} in {_format}
+
+    # replace bad words
+    loop {-badwords::*}:
+        component replace loop-index with loop-value in {_format}
+
+    # send message
+    set async chat format to {_format}
+    replace "[item]" with "**[%{_name}%]**" in {_msg}
+    discordSend("%player%: %uncolored {_msg}%")

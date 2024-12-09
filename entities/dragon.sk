@@ -1,0 +1,5 @@
+
+on target:
+    target is an ender dragon
+    event-entity is an enderman
+    cancel event

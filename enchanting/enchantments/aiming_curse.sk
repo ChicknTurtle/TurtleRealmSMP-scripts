@@ -1,0 +1,6 @@
+
+on entity shoot bow:
+    set {_e} to enchantment from key "turtle:aiming_curse"
+    shot bow is enchanted with {_e}
+    set {_v} to random vector * 0.1 * shot force
+    add {_v} to velocity of projectile entity

@@ -1,0 +1,9 @@
+
+# Debug pop
+# Makes a small particle and sound at a location, for debugging.
+effect:
+    patterns:
+        [make|play] [a] (debug|pop|debug pop) [effect] [at] %location%
+    trigger:
+        make 1 of flame at block at expr-1 with extra 0
+        play sound "minecraft:block.note_block.xylophone" at expr-1

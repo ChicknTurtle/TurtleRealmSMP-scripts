@@ -1,0 +1,38 @@
+
+# Facing of vector
+# Get the cardinal direction of a vector
+expression:
+    patterns:
+        [the] facing of [vector] %vector%
+        [vector] %vector%'[s] facing
+    get:
+        set {_x} to x of expr-1
+        set {_z} to z of expr-1
+        
+        # determine the dominant axis
+        if abs({_x}) >= abs({_z}):
+            if {_x} > 0:
+                return east
+            else:
+                return west
+        else:
+            if {_z} > 0:
+                return south
+            else:
+                return north
+
+# Vector of direction
+# Get a vector from a cardinal direction
+expression:
+    patterns:
+        [the] vector of [direction] %direction%
+        [direction] %direction%'[s] vector
+    get:
+        if expr-1 is north:
+            return vector(0,0,-1)
+        else if expr-1 is south:
+            return vector(0,0,1)
+        else if expr-1 is east:
+            return vector(1,0,0)
+        else if expr-1 is west:
+            return vector(-1,0,0)

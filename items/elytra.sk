@@ -1,0 +1,7 @@
+###
+on toggle gliding:
+    player is gliding
+    player is on ground
+    # check if space key held using predicate
+    cancel event
+###

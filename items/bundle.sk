@@ -1,0 +1,99 @@
+
+options:
+
+    # Mobs that can be picked up by the bundle
+    AllowedMobs: allay, armadillo, bat, bee, cat, "chicken" parsed as entity type, cow, dolphin, fox, frog, glow squid, goat, mooshroom, ocelot, panda, parrot, pig, polar bear, "rabbit" parsed as entity type, sheep, squid, strider, villager, wolf
+
+    # Baby mobs that can be picked up by the bundle
+    AllowedBabyMobs: camel, donkey, hoglin, horse, mule, sniffer, turtle
+
+
+import:
+    org.bukkit.event.player.PlayerInteractEvent
+
+on PlayerInteractEvent:
+    set {_p} to event.getPlayer()
+    if event.getHand() is off_hand_slot:
+        set {_tool} to {_p}'s offhand tool
+    else:
+        set {_tool} to {_p}'s tool
+    {_tool} is bundle
+    custom nbt of {_tool} has tag "bundled"
+    cancel event
+
+on right click with bundle:
+    if custom nbt of event-item has tag "bundled":
+        cancel event
+    if all:
+        full nbt of event-item doesn't have tag "components;minecraft:bundle_contents"
+        clicked entity is set
+        clicked entity is alive
+        {@AllowedMobs} and {@AllowedBabyMobs} contains clicked entity
+    then:
+        if age of clicked entity >= 0:
+            {@AllowedMobs} doesn't contain clicked entity
+            stop
+        cancel event
+        event.getHand() is hand_slot
+        if spawn egg of clicked entity is set:
+            set {_fill} to (spawn egg of clicked entity) with nbt from "{components:{max_stack_size:1}}"
+        else:
+            set {_fill} to barrier with nbt from "{components:{max_stack_size:1}}"
+        set {_nbt} to nbt of clicked entity
+        set compound tag "bundled" of custom nbt of event-item to {_nbt}
+        set string tag "bundled_type" of custom nbt of event-item to "%type of clicked entity%"
+        if int tag "SleepingX" of full nbt of clicked entity is set:
+            set {_x} to int tag "SleepingX" of full nbt of clicked entity
+            set {_y} to int tag "SleepingY" of full nbt of clicked entity
+            set {_z} to int tag "SleepingZ" of full nbt of clicked entity
+            set {_bedLoc} to location({_x},{_y},{_z})
+            set blockdata tag "occupied" of block at {_bedLoc} to false
+        delete clicked entity
+        set bundle contents of event-item to {_fill}
+        set lore of player's tool to "§8Contains: %type of clicked entity%"
+        # play sound
+        play sound "minecraft:item.bundle.insert" at player
+        # grant advancement
+        if all:
+            clicked entity is a villager
+            age of clicked entity < 0
+        then:
+            grantAdvancement("turtle:adventure/kidnapping", player)
+    else:
+        custom nbt of event-item has tag "bundled"
+        set {_nbt} to compound tag "bundled" of custom nbt of event-item
+        clear bundle contents of event-item
+        # spawn mob
+        delete tag "Pos" of {_nbt}
+        delete tag "Rotation" of {_nbt}
+        delete tag "Motion" of {_nbt}
+        delete tag "FallDistance" of {_nbt}
+        delete tag "UUID" of {_nbt}
+        delete tag "SleepingX" of {_nbt}
+        delete tag "SleepingY" of {_nbt}
+        delete tag "SleepingZ" of {_nbt}
+        set {_loc} to location 1 block above player's location
+        spawn (string tag "bundled_type" of custom nbt of event-item parsed as entity type) at {_loc}:
+            add {_nbt} to full nbt of event-entity
+            set {_size} to event-entity.getBoundingBox().getVolume()
+            set {_force} to max(0.75,1.5-{_size})
+            push event-entity forward with force {_force}
+            add player's velocity to event-entity's velocity
+        # remove nbt
+        delete tag "bundled" of custom nbt of event-item
+        delete tag "bundled_type" of custom nbt of event-item
+        if event.getHand() is hand_slot:
+            clear lore of player's tool
+        else:
+            clear lore of player's offhand tool
+        # play sound
+        play sound "minecraft:item.bundle.drop_contents" at player
+
+on inventory click:
+    if click type is right mouse button:
+        if event-item is bundle:
+            custom nbt of event-item has tag "bundled"
+            cancel event
+        if player's cursor slot is bundle:
+            custom nbt of player's cursor slot has tag "bundled"
+            cancel event

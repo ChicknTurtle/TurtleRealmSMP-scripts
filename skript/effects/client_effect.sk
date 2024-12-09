@@ -1,0 +1,14 @@
+
+# Clientside effect
+effect:
+    patterns:
+        give %entity% client[side] %potioneffect% for %player%
+        (apply|give) client[side] %potioneffect% to %entity% for %player%
+        (remove|clear) client[side] [potion] [effect] [of] %potioneffecttype% from %entity% for %player%
+    trigger:
+        if matched pattern is 1:
+            expr-3.sendPotionEffectChange(expr-1, expr-2)
+        else if matched pattern is 2:
+            expr-3.sendPotionEffectChange(expr-2, expr-1)
+        else:
+            expr-3.sendPotionEffectChangeRemove(expr-2, expr-1)

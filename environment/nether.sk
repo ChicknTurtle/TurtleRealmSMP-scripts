@@ -1,0 +1,7 @@
+
+# ice melts in nether
+on place of ice, packed ice, or blue ice:
+    environment of event-world is nether
+    set event-block to air
+    play sound "minecraft:block.fire.extinguish" with volume 0.5 with pitch (2.6 + (random number between -0.8 and 0.8)) at event-block
+    make 8 of large smoke at event-block with offset vector(0.25, 0.25, 0.25) with extra 0

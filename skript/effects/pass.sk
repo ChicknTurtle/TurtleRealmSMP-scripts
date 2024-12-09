@@ -1,0 +1,9 @@
+
+# Pass
+# Does nothing, useful for placeholders.
+effect:
+    patterns:
+        pass
+        do nothing
+    trigger:
+        exit

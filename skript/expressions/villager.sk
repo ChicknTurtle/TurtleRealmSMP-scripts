@@ -1,0 +1,9 @@
+
+# Villager work station
+# Gets the location of a villager's workstation.
+expression:
+    patterns:
+        (work|job)[ ](station|site) [location] of %entity%
+        %entity%'s (work|job)[ ](station|site) [location]
+    get:
+        return job_site memory of expr-1

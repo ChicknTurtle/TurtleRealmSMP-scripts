@@ -1,0 +1,36 @@
+
+on break:
+    set {_e} to enchantment from key "turtle:harvester"
+    player's tool is enchanted with {_e}
+    player isn't sneaking
+    # sugarcane
+    if event-block is sugar cane:
+        block under event-block isn't sugar cane
+        cancel event
+        stop trigger
+    # crops
+    if event-block is wheat plant:
+        set {_seeds} to wheat seeds
+    else if event-block is carrot plant:
+        set {_seeds} to carrot
+    else if event-block is potato plant:
+        set {_seeds} to potato
+    else if event-block is beetroot plant:
+        set {_seeds} to beetroot seeds
+    else:
+        stop trigger
+    if age of event-block is max age of event-block:
+        cancel item drops
+        set {_drops::*} to drops of event-block using player's tool
+        set event-block to air
+        loop {_drops::*}:
+            loop-value is {_seeds}
+            subtract 1 from item amount of loop-value
+            set event-block to event-block
+            wait 1 tick
+            set age of event-block to 0
+            exit loop
+        player's gamemode isn't creative
+        drop {_drops::*} at event-block
+    else:
+        cancel event

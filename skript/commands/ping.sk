@@ -1,0 +1,27 @@
+
+on load:
+    set {features::commands::name} to "Commands"
+    set {features::commands::desc} to "Simple but useful commands\n/ping /heal /repair /invsee"
+    set {features::commands::warn} to "Commands will still be visible, but not do anything"
+    set {features::commands::icon} to command block
+
+command /ping [<string>]:
+    permission: turtlesmp.member.ping
+    permission message: §cYou don't have permission!
+    trigger:
+        {features::commands::enabled} is true
+        if arg-1 is set:
+            set {_p} to arg-1 parsed as player
+        else:
+            set {_p} to player
+        if {_p} isn't set:
+            send "§cNo player was found for '%arg-1%'"
+            exit
+        if {_p} is player:
+            send "§7Your ping is §3%{_p}'s ping%ms"
+        else:
+            send "§7%{_p}%'s ping is §3%{_p}'s ping%ms"
+
+on tab complete of "/ping", "/skript:ping":
+	set tab completions for position 1 to all players
+			

@@ -1,0 +1,104 @@
+
+local function build_item(feature:string) :: item:
+    # icon
+    if {features::%{_feature}%::icon} is set:
+        set {_icon} to {features::%{_feature}%::icon}
+    if {_icon} isn't set:
+        set {_icon} to cobblestone
+        hide additional tooltip of {_icon}
+    # name
+    if {features::%{_feature}%::name} is set:
+        set {_name} to "%{features::%{_feature}%::name}%"
+    else:
+        set {_name} to "Feature"
+    # desc
+    if {features::%{_feature}%::desc} is set:
+        set {_desc::*} to "%{features::%{_feature}%::desc}%" split by "\n"
+        loop {_desc::*}:
+            set {_desc::%loop-index%} to "§8%{_desc::%loop-index%}%"
+    else:
+        set {_desc::*} to {_}
+    # warn
+    if {features::%{_feature}%::warn} is set:
+        set {_warn::*} to "%{features::%{_feature}%::warn}%" split by "\n"
+        loop {_warn::*}:
+            set {_warn::%loop-index%} to "§e%{_warn::%loop-index%}%"
+    else:
+        set {_warn::*} to {_}
+    # enabled
+    if {features::%{_feature}%::enabled} is set:
+        set {_enabled} to {features::%{_feature}%::enabled}
+    else:
+        set {_enabled} to true
+        set {features::%{_feature}%::enabled} to {_enabled}
+    if {_enabled} is true:
+        set {_enabledtext} to "§aEnabled"
+    else:
+        set {_enabledtext} to "§cDisabled"
+    set {_item} to {_icon} with custom nbt from "{feature:%{_feature}%}"
+    set component item name of {_item} to text component from "§7%{_name}%"
+    set lore of {_item} to {_desc::*} and {_warn::*} and {_enabledtext}
+    return {_item}
+
+local function update_gui(page:integer) :: inventory:
+    set {_totalpages} to ceil((size of indexes of {features::*})/27)
+    loop indexes of {features::*}:
+        add build_item(loop-value) to {_feature-items::*}
+    loop ({_page}-1)*27 times:
+        delete {_feature-items::%loop-value%}
+    set {_gui} to chest inventory with 4 rows named "Features Menu (%{_page}%/%{_totalpages}%)"
+    set {_prevarrow} to tipped arrow of healing
+    if {_page} is 1:
+        set {_prevarrow} to tipped arrow of weakness
+    set {_prev} to {_prevarrow} with name "§7Previous page" with custom nbt from "{gui:featuretoggler,page:%{_page}%,button:prev}"
+    set {_nextarrow} to tipped arrow of luck
+    if {_page} is {_totalpages}:
+        set {_nextarrow} to tipped arrow of weakness
+    set {_next} to {_nextarrow} with name "§7Next page" with custom nbt from "{button:next}"
+    set {_black} to black stained glass pane
+    hide additional tooltip of {_prev}
+    hide additional tooltip of {_next}
+    hide entire tooltip of {_black}
+    set slot 27 of {_gui} to {_prev}
+    set slots 28, 29, 30, 31, 32, 33, 34 of {_gui} to {_black}
+    set slot 35 of {_gui} to {_next}
+    loop {_feature-items::*}:
+        if {_gui} has space for loop-value:
+            add loop-value to {_gui}
+    return {_gui}
+
+command /features:
+    permission: op
+    permission message: §cYou don't have permission!
+    trigger:
+        open update_gui(1) to player
+
+on inventory click:
+    string tag "gui" of custom nbt of slot 27 of top inventory is "featuretoggler"
+    cancel event
+    click type is lmb
+    # toggle feature
+    set {_feature} to string tag "feature" of custom nbt of clicked slot
+    if {_feature} is set:
+        set {_enabled} to {features::%{_feature}%::enabled}
+        if {_enabled} is true:
+            set {features::%{_feature}%::enabled} to false
+        else:
+            set {features::%{_feature}%::enabled} to true
+        set clicked slot to build_item({_feature})
+        play sound "minecraft:block.note_block.hat" with volume 0.25 with pitch 0.5 to player
+    # pages
+    set {_page} to int tag "page" of custom nbt of slot 27 of top inventory
+    set {_totalpages} to ceil((size of indexes of {features::*})/27)
+    # prev page
+    if string tag "button" of custom nbt of custom nbt of clicked slot is "prev":
+        {_page} > 1
+        open update_gui({_page}-1) to player
+    # next page
+    if string tag "button" of custom nbt of custom nbt of clicked slot is "next":
+        {_page} < {_totalpages}
+        open update_gui({_page}+1) to player
+
+on inventory drag:
+    string tag "gui" of custom nbt of slot 27 of top inventory is "featuretoggler"
+    cancel event

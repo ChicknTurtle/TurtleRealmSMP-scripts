@@ -1,0 +1,13 @@
+
+on armor change:
+    set {_e} to enchantment from key "turtle:gliding_curse"
+    player's chestplate is enchanted with {_e}
+    player isn't gliding
+    set player's gliding state to on
+    tailwindBoost(player)
+
+on toggling gliding:
+    player is gliding
+    set {_e} to enchantment from key "turtle:gliding_curse"
+    player's chestplate is enchanted with {_e}
+    cancel event

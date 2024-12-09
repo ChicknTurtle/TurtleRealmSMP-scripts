@@ -1,0 +1,26 @@
+
+# equals
+condition:
+    patterns:
+        %object% [is] equal[s] [to] %object%
+        %object% == %object%
+    check:
+        if expr-1 isn't set:
+            expr-2 isn't set
+            continue
+        if expr-1 is expr-2:
+            continue
+        exit
+
+# not equal
+condition:
+    patterns:
+        %object% (isn't|is not|doesn't|does not) equal[s] [to] %object%
+        %object% !== %object%
+    check:
+        if expr-1 isn't set:
+            expr-2 isn't set
+            exit
+        if expr-1 is expr-2:
+            exit
+        continue

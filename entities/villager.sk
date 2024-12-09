@@ -1,0 +1,9 @@
+
+on entity start pathfinding:
+    event-entity is a villager
+    set {_job} to event-entity's work station
+    if any:
+        world of event-entity isn't world of {_job}
+        distance between event-entity and {_job} > 256
+    then:
+        delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity

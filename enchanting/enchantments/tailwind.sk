@@ -1,0 +1,32 @@
+
+function tailwindBoost(p:player):
+    boolean tag "custom;CanTailwindBoost" of nbt of {_p} isn't false
+    set {_e} to enchantment from key "turtle:tailwind"
+    {_p}'s chestplate is enchanted with {_e}
+    set {_lvl} to level of {_e} of ({_p}'s chestplate)
+    {_p} isn't sneaking
+    # boost
+    set boolean tag "custom;CanTailwindBoost" of nbt of {_p} to false
+    push {_p} forwards with force 0.4 + {_lvl}*0.15
+    push {_p} up with force 0.4 + {_lvl}*0.15
+    play sound "minecraft:entity.wind_charge.wind_burst" with volume 0.4+{_lvl}*0.2 and pitch 0.75 at {_p}
+    make 5 of gust at {_p} with offset vector(0.5, 0.5, 0.5)
+    # damage wings
+    if {_p}'s gamemode isn't creative:
+        loop 6 times:
+            durability of {_p}'s chestplate is more than 1
+            {_p}.damageItemStack(chest_slot,1)
+    # allow boosting again once on ground
+    while {_p} isn't on ground:
+        wait 1 tick
+    set boolean tag "custom;CanTailwindBoost" of nbt of {_p} to true
+
+on join:
+    # restart a loop on join in case it breaks
+    while {_p} isn't on ground:
+        wait 1 tick
+    set boolean tag "custom;CanTailwindBoost" of nbt of {_p} to false
+
+on toggling gliding:
+    player isn't gliding
+    tailwindBoost(player)

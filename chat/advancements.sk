@@ -1,0 +1,121 @@
+
+import:
+    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+
+on load:
+    set {features::advancementmsgs::name} to "Advancement messages"
+    set {features::advancementmsgs::desc} to "Better advancement messages"
+    set {features::advancementmsgs::icon} to gold block
+
+# Display in chat
+on advancement done:
+    {features::advancementmsgs::enabled} is true
+    gamerule announceAdvancements of world of player is true
+    event-advancement.getDisplay().doesAnnounceToChat() is true
+    event.message(null)
+
+    set {_frame} to "%event-advancement.getDisplay().frame()%"
+
+    if {_frame} is "TASK":
+        set {_c} to "§a"
+    else if {_frame} is "GOAL":
+        set {_c} to "§6"
+    else if {_frame} is "CHALLENGE":
+        set {_c} to "§5"
+
+    loop all available advancements:
+        loop-value.getDisplay().doesAnnounceToChat() is true
+        add 1 to {_total}
+        if advancement progress of loop-value of player is done:
+            add 1 to {_completed}
+    
+    set {_amp} to LegacyComponentSerializer.legacyAmpersand()
+    set {_title} to event-advancement.getDisplay().title()
+    set {_title} to {_amp}.serialize({_title})
+    set {_desc} to event-advancement.getDisplay().description()
+    set {_desc} to {_amp}.serialize({_desc})
+
+    set {_c::1} to text component from " &6&l🏆 §f%player% has completed "
+    set {_c::2} to text component from "%{_c}%[%{_title}%]"
+    if {_completed} is {_total}:
+        set {_c::3} to text component from " §6(%{_completed}%/%{_total}%)"
+    else:
+        set {_c::3} to text component from " §7(%{_completed}%/%{_total}%)"
+    set hover event of {_c::2} to hover event showing "%{_c}%%{_title}%%nl%%{_desc}%"
+    broadcast component merge components {_c::*}
+
+    discordSend(":trophy: %player% has completed **[%{_title}%]** *(%{_completed}%/%{_total}%)*")
+
+# Grant advancements
+function grantAdvancement(adv:objects, p:objects):
+    loop {_adv::*}:
+        set {_adv} to loop-value-1
+        if {_adv} isn't an advancement:
+            set {_adv} to {_adv} parsed as advancement
+        {_adv} is set
+        loop {_p::*} where [input is a player]:
+            set {_prog} to advancement progress of {_adv} for loop-value-2
+            loop criteria of {_adv}:
+                award criteria loop-value-3 of {_prog}
+
+on join:
+    set {_order::*} to "minecraft:story/root", "minecraft:husbandry/root", "minecraft:adventure/root", "turtle:combat/root", "minecraft:nether/root", "minecraft:end/root"
+    loop {_order::*}:
+        wait 1 tick
+        grantAdvancement(loop-value, player)
+
+# Porcupine
+on projectile collide:
+    arrows stuck in player >= 15
+    grantAdvancement("turtle:adventure/porcupine", event-entity)
+
+# Big Trouble
+on warden move:
+    grantAdvancement("turtle:adventure/encounter_warden", players in radius 32 of event-entity)
+on spawn of warden:
+    grantAdvancement("turtle:adventure/encounter_warden", players in radius 32 of event-entity)
+
+# Beast Slayer
+on death of warden:
+    grantAdvancement("turtle:adventure/kill_warden", attacker)
+
+# Kidnapping
+# items/bundle.sk
+
+# Wandering Ripoff
+on death of wandering trader:
+    grantAdvancement("turtle:adventure/kill_wandering_trader", attacker)
+
+# Under the Sea
+
+# Bullet Train
+# entities/minecart.sk
+
+# On a Rail
+import:
+    org.bukkit.event.vehicle.VehicleMoveEvent
+on vehicle enter:
+    event-entity is a player
+    event.getVehicle() is a regular minecart
+    set metadata value "cartStart" of player to player's location
+on vehicle exit:
+    event-entity is a player
+    event.getVehicle() is a regular minecart
+    delete metadata value "cartStart" of player
+on VehicleMoveEvent:
+    set {_cart} to event.getVehicle()
+    set {_p} to first element of {_cart}'s passengers
+    metadata value "cartStart" of {_p} is set
+    distance between metadata value "cartStart" of {_p} and {_p}'s location > 1000
+    grantAdvancement("turtle:adventure/on_a_rail", {_p})
+
+import:
+    net.minecraft.world.damagesource.FallLocation
+# Tarzan
+on damage of player:
+    set {_fallLoc} to FallLocation.getCurrentFallLocation(victim.getHandle())
+    set {_id} to {_fallLoc}.id
+    "%{_id}%" is "vines"
+    biome at victim is "jungle" parsed as biome, sparse jungle, or bamboo jungle
+    grantAdvancement("turtle:adventure/tarzan", victim)
+

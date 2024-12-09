@@ -1,0 +1,37 @@
+custom:
+  items:
+    disc_megalovania:
+      base: minecraft:music_disc_cat
+      model: "turtle:music_disc_megalovania"
+      jukebox_song: "turtle:megalovania"
+      recipes:
+        1:
+          type: shaped
+          shape:
+            - 'fff'
+            - 'fxf'
+            - 'fff'
+          ingredients:
+            f: minecraft:disc_fragment_5
+            x: minecraft:soul_torch
+    disc_fly_octo_fly:
+      base: minecraft:music_disc_cat
+      rarity: rare
+      model: "turtle:music_disc_fly_octo_fly"
+      jukebox_song: "turtle:fly_octo_fly"
+      recipes:
+        1:
+          type: shaped
+          shape:
+            - 'fff'
+            - 'fxf'
+            - 'fof'
+          ingredients:
+            f: minecraft:disc_fragment_5
+            x: minecraft:magenta_wool
+            o: minecraft:quartz
+    disc_milky_ways:
+      base: minecraft:music_disc_cat
+      rarity: epic
+      model: "turtle:music_disc_milky_ways"
+      jukebox_song: "turtle:milky_ways"

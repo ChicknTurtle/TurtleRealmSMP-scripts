@@ -1,0 +1,6 @@
+
+# no destroy items
+# cactus + explosions
+on damage of dropped item:
+    damage cause is contact, block explosion, or entity explosion
+    cancel event

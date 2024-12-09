@@ -1,0 +1,17 @@
+
+command /invsee [<string>]:
+    permission: op
+    permission message: §cYou don't have permission!
+    trigger:
+        {features::commands::enabled} is true
+        if arg-1 is set:
+            set {_p} to arg-1 parsed as player
+        else:
+            set {_p} to player
+        if {_p} isn't set:
+            send "§cNo player was found for '%arg-1%'"
+            exit
+        open {_p}'s inventory for player
+
+on tab complete of "/invsee", "/skript:invsee":
+    set tab completions for position 1 to all players

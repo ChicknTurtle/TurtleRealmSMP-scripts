@@ -1,0 +1,28 @@
+
+import:
+    io.papermc.paper.event.entity.EntityToggleSitEvent
+
+on load:
+    set {features::pets::name} to "Pets"
+    set {features::pets::desc} to "Pets cannot be damaged by their owner except while sneaking\nSitting down a pet will make it forget its target"
+    set {features::pets::icon} to bone
+
+# can't attack pets
+on damage:
+    {features::pets::enabled} is true
+    attacker is victim's owner
+    attacker isn't sneaking
+    cancel event
+
+# projectiles pass through pets
+on projectile collide:
+    {features::pets::enabled} is true
+    shooter of event-projectile is event-entity's owner
+    shooter of event-projectile isn't sneaking
+    cancel event
+
+# sit down to forget target
+on EntityToggleSitEvent:
+    {features::pets::enabled} is true
+    event.getSittingState() is true
+    reset target of event.getEntity()

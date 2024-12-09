@@ -1,0 +1,11 @@
+
+# unlock recipes
+on join:
+    loop all recipes:
+        unlock recipe loop-value for player
+
+# drop skull
+on death of player:
+    attacker is player
+    set {_head} to ("%victim%" parsed as offline player)'s skull
+    drop {_head} at victim's location

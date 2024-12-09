@@ -1,0 +1,23 @@
+
+event "input.jump":
+    patterns:
+        [on] [key] (jump|space) [key] (press[ed]|push[ed])
+    event-values: player
+
+import:
+    org.bukkit.event.player.PlayerInputEvent
+
+on PlayerInputEvent:
+    set {_p} to event.getPlayer()
+    set {_input} to event.getInput()
+    set {_event-values::player} to {_p}
+    if {_input}.isJump() isn't metadata value "input.jump" of {_p}:
+        {_input}.isJump() is true
+        call custom event "input.jump" using event-values {_event-values::*}
+    set metadata value "input.jump" of {_p} to {_input}.isJump()
+    set metadata value "input.sneak" of {_p} to {_input}.isSneak()
+    set metadata value "input.sprint" of {_p} to {_input}.isSprint()
+    set metadata value "input.forward" of {_p} to {_input}.isForward()
+    set metadata value "input.backward" of {_p} to {_input}.isBackward()
+    set metadata value "input.left" of {_p} to {_input}.isLeft()
+    set metadata value "input.right" of {_p} to {_input}.isRight()

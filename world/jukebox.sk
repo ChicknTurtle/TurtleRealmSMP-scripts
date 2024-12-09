@@ -1,0 +1,13 @@
+
+on right click on jukebox:
+    long tag "ticks_since_song_started" of nbt of event-block is set
+    block under event-block is hopper
+    inventory of block under event-block has space for slot 0 of inventory of event-block
+    if player is sneaking:
+        if player's tool isn't air:
+            exit trigger
+        if player's offhand tool isn't air:
+            exit trigger
+    cancel event
+    add slot 0 of inventory of event-block to inventory of block under event-block
+    clear slot 0 of inventory of event-block

@@ -1,0 +1,45 @@
+
+on load:
+    set {features::anvil::name} to "Anvil cost/renaming"
+    set {features::anvil::desc} to "Item repair costs do not build up,\nand item renaming is free and can be colored"
+    set {features::anvil::icon} to anvil
+    set {features::anvilrepair::name} to "Anvil repairing"
+    set {features::anvilrepair::desc} to "Use iron blocks to repair anvils"
+    set {features::anvilrepair::icon} to damaged anvil
+
+on anvil prepare:
+    {features::anvil::enabled} is true
+    # no cost stacking
+    reset repair cost of event-item
+    # colored rename
+    set event-slot's name to colored event-item's name
+    # remove rename cost
+    if name of slot 2 of event-inventory isn't set:
+        name of slot 0 of event-inventory isn't set
+        add 1 to repair cost of event-inventory
+    if name of slot 2 of event-inventory isn't name of slot 0 of event-inventory:
+        subtract 1 from repair cost of event-inventory
+    if slot 1 of event-inventory is air:
+        set repair cost of event-inventory to 0
+
+on right click on chipped anvil:
+    {features::anvilrepair::enabled} is true
+    player isn't sneaking
+    player's tool is iron block
+    cancel event
+    set {_facing} to blockdata tag "facing" of event-block
+    set event-block to anvil
+    set blockdata tag "facing" of event-block to {_facing}
+    remove 1 of player's tool from player's tool
+    play sound "minecraft:entity.iron_golem.repair" at event-block
+
+on right click on damaged anvil:
+    {features::anvilrepair::enabled} is true
+    player isn't sneaking
+    player's tool is iron block
+    cancel event
+    set {_facing} to blockdata tag "facing" of event-block
+    set event-block to chipped anvil
+    set blockdata tag "facing" of event-block to {_facing}
+    remove 1 of player's tool from player's tool
+    play sound "minecraft:entity.iron_golem.repair" at event-block
