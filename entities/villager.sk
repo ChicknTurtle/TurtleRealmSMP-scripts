@@ -12,7 +12,14 @@ on entity start pathfinding:
 import:
     java.lang.Integer
 
+on load:
+    set {features::infinitetrading::name} to "Infinite Trading"
+    set {features::infinitetrading::desc} to "Villager trades have infinite stock and no raising demand"
+    set {features::infinitetrading::warn} to "When disabled, previously interacted with villagers will still have infinite trades"
+    set {features::infinitetrading::icon} to emerald
+
 on right click on villager:
+    {features::infinitetrading::enabled} is true
     set {_trades::*} to merchant recipes of event-entity
     loop {_trades::*}:
         loop-value.setMaxUses(Integer.MAX_VALUE)
