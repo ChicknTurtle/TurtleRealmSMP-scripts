@@ -73,6 +73,10 @@ command /features:
     trigger:
         open update_gui(1) to player
 
+# make sure all features are initialized
+on load:
+    update_gui(1)
+
 on inventory click:
     string tag "gui" of custom nbt of slot 27 of top inventory is "featuretoggler"
     cancel event
