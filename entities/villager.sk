@@ -7,3 +7,14 @@ on entity start pathfinding:
         distance between event-entity and {_job} > 256
     then:
         delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity
+
+# infinite trading
+import:
+    java.lang.Integer
+
+on right click on villager:
+    set {_trades::*} to merchant recipes of event-entity
+    loop {_trades::*}:
+        loop-value.setMaxUses(Integer.MAX_VALUE)
+        loop-value.setUses(0)
+        loop-value.setDemand(0)
