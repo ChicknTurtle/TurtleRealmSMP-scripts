@@ -10,4 +10,3 @@ effect:
 
 function str(val:object) :: string:
     return "%{_val}%"
-        

@@ -2,12 +2,10 @@
 on load:
     set {features::commands::name} to "Commands"
     set {features::commands::desc} to "Simple but useful commands\n/ping /heal /repair /invsee"
-    set {features::commands::warn} to "Commands will still be visible, but not do anything"
+    set {features::commands::warn} to "If disabled, commands will still be visible but not do anything"
     set {features::commands::icon} to command block
 
 command /ping [<string>]:
-    permission: turtlesmp.member.ping
-    permission message: §cYou don't have permission!
     trigger:
         {features::commands::enabled} is true
         if arg-1 is set:
