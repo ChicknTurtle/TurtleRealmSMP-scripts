@@ -3,7 +3,7 @@ import:
     net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 
 Options:
-    BotToken: "<REDACTED>"
+    BotToken: "MTEyMjk0ODE2MDYwMDQyNDQ2OQ.GsOKwT.DhhYA_Kt4ZvpWobYJQsZMeb_cw1_2MvJ0BtOXA"
     DiscordChannelID: "1251617201757360149"
 
 on load:
