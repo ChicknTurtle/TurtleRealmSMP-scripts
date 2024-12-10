@@ -1,0 +1,19 @@
+
+local function warp(e:entity):
+    world of {_e} is "world_the_end"
+    set {_loc} to {_e}'s location
+    set {_dest} to location(x-coord of {_loc}, 500, z-coord of {_loc}, "world")
+    play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
+    make 15 of witch at {_loc}
+    teleport {_e} to {_dest}
+
+on damage:
+    damage cause is void
+    cancel event
+    warp(victim)
+
+on spawn of dropped item:
+    while event-entity is alive:
+        wait 1 tick
+        y-coord of event-entity is less than (min height of world of event-entity - 64)
+        warp(event-entity)
