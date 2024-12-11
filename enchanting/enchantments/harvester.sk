@@ -17,6 +17,12 @@ on break:
         set {_seeds} to potato
     else if event-block is beetroot plant:
         set {_seeds} to beetroot seeds
+    else if event-block is nether wart plant:
+        set {_seeds} to nether wart
+    else if event-block is torchflower crop:
+        set {_seeds} to torchflower seeds
+    else if event-block is pitcher crop:
+        set {_seeds} to pitcher pod
     else:
         stop trigger
     if age of event-block is max age of event-block:
