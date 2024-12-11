@@ -3,7 +3,10 @@ options:
     customNamespace: "turtle"
     customItemsFilepath: "plugins/Skript/scripts/custom/yamls"
 
-function getItemFromId(id:string) :: item:
+function compareItems(item1:item,item2:item) :: boolean:
+    return whether string tag "customId" of custom nbt of {_item1} == string tag "customId" of custom nbt of {_item2}
+
+function getItem(id:string) :: item:
     set {_s::*} to {_id} split at ":"
     if {_s::1} = "minecraft":
         set {_i} to itemtype from key (namespaced key of {_id})
@@ -25,12 +28,12 @@ function loadCustomRecipe(id:string, index:string, path:string, yaml:string):
         set {_result} to yaml value "%{_path}%.%{_index}%.result" of {_yaml}
         if {_result} isn't set:
             set {_result} to "%{-customItemNamespace}%:%{_id}%"
-        set {_result} to getItemFromId({_result})
+        set {_result} to getItem({_result})
         # group, shape, ingredients
         set {_group} to yaml value "%{_path}%.%{_index}%.group" of {_yaml}
         set {_shape::*} to yaml list "%{_path}%.%{_index}%.shape" of {_yaml}
         loop yaml node keys "%{_path}%.%{_index}%.ingredients" of {_yaml}:
-            set {_ing::%loop-value%} to getItemFromId(yaml value "%{_path}%.%{_index}%.ingredients.%loop-value%" of {_yaml})
+            set {_ing::%loop-value%} to getItem(yaml value "%{_path}%.%{_index}%.ingredients.%loop-value%" of {_yaml})
         # register
         register shaped recipe:
             id: "%{-customItemNamespace}%:%{_id}%_%{_index}%"
@@ -50,7 +53,7 @@ function loadCustomRecipe(id:string, index:string, path:string, yaml:string):
         set {_result} to yaml value "%{_path}%.%{_index}%.result" of {_yaml}
         if {_result} isn't set:
             set {_result} to "%{-customItemNamespace}%:%{_id}%"
-        set {_result} to getItemFromId({_result})
+        set {_result} to getItem({_result})
         # group, ingredients
         set {_group} to yaml value "%{_path}%.%{_index}%.group" of {_yaml}
         set {_ing::*} to yaml list "%{_path}%.%{_index}%.ingredients" of {_yaml}
@@ -61,12 +64,12 @@ function loadCustomRecipe(id:string, index:string, path:string, yaml:string):
             group: {_group}
             ingredients:
                 loop {_ing::*}:
-                    add getItemFromId(loop-value) to ingredients
+                    add getItem(loop-value) to ingredients
     #broadcast "Loaded recipe %{_index}% of %{_id}% (%{_type}%)"
 
 function loadCustomItem(id:string,yaml:string):
     #! Create Item !#
-    set {_i} to getItemFromId(yaml value "custom.items.%{_id}%.base" of {_yaml})
+    set {_i} to getItem(yaml value "custom.items.%{_id}%.base" of {_yaml})
     set string tag "customId" of custom nbt of {_i} to {_id}
     # name
     set {_name} to yaml value "custom.items.%{_id}%.name" of {_yaml}
@@ -179,12 +182,16 @@ function prepareCustomCraft(recipe:string, inv:inventory) :: boolean:
         if slot loop-iteration of {_inv} isn't air:
             exit loop
         add 1 to {_offset}
-    loop ingredients of recipe {_recipe}:
+    set {_ingredients::*} to ingredients of recipe {_recipe}
+    if size of {_ingredients::*} is 4:
+        amount of slots of {_inv} >= 9
+        set {_ingredients::*} to {_ingredients::1}, {_ingredients::2}, air, {_ingredients::3}, {_ingredients::4}, air, air, air, air
+    loop {_ingredients::*}:
         if loop-iteration > 9 - {_offset}:
             exit loop
         set {_item1} to loop-value
         set {_item2} to slot loop-iteration+{_offset} of {_inv}
-        string tag "customId" of custom nbt of {_item1} !== string tag "customId" of custom nbt of {_item2}
+        compareItems({_item1}, {_item2}) is false
         return false
     return true
 on preparing craft:
