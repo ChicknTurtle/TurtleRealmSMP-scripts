@@ -6,6 +6,8 @@ local function warp(e:entity):
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
     make 15 of witch at {_loc}
     teleport {_e} to {_dest}
+    play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
+    make 15 of witch at {_dest}
 
 on damage:
     damage cause is void
@@ -17,3 +19,12 @@ on spawn of dropped item:
         wait 1 tick
         y-coord of event-entity is less than (min height of world of event-entity - 64)
         warp(event-entity)
+
+on entity added to world:
+    event-entity is a dropped item
+    while chunk at event-entity is loaded:
+        wait 1 tick
+        y-coord of event-entity is less than (min height of world of event-entity - 64)
+        warp(event-entity)
+        if event-entity isn't alive:
+            stop
