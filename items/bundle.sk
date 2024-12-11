@@ -17,11 +17,12 @@ on PlayerInteractEvent:
         set {_tool} to {_p}'s offhand tool
     else:
         set {_tool} to {_p}'s tool
-    {_tool} is bundle
+    compareItems({_tool}, getItem("turtle:mob_bundle")) is true
     custom nbt of {_tool} has tag "bundled"
     cancel event
 
-on right click with bundle:
+on right click:
+    compareItems(event-item, getItem("turtle:mob_bundle")) is true
     if custom nbt of event-item has tag "bundled":
         cancel event
     if all:
@@ -91,9 +92,9 @@ on right click with bundle:
 
 on inventory click:
     if click type is right mouse button:
-        if event-item is bundle:
+        if compareItems(event-item, getItem("turtle:mob_bundle")) is true:
             custom nbt of event-item has tag "bundled"
             cancel event
-        if player's cursor slot is bundle:
+        if compareItems(player's cursor slot, getItem("turtle:mob_bundle")) is true:
             custom nbt of player's cursor slot has tag "bundled"
             cancel event

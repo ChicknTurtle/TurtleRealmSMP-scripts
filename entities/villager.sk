@@ -1,4 +1,5 @@
 
+# forget far away job-sites
 on entity start pathfinding:
     event-entity is a villager
     set {_job} to event-entity's work station
@@ -7,6 +8,15 @@ on entity start pathfinding:
         distance between event-entity and {_job} > 256
     then:
         delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity
+
+# drop emeralds
+import:
+    org.bukkit.entity.Villager
+
+on death:
+    victim is instance of Villager
+    age of victim >= 0
+    drop (random number from 0 to 3) of emerald at victim ~ vector(0.5,0.5,0.5)
 
 # infinite trading
 import:

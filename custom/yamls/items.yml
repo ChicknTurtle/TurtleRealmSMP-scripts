@@ -1,0 +1,21 @@
+custom:
+  items:
+    ravager_hide:
+      base: minecraft:leather
+      name: "Ravager Hide"
+      rarity: uncommon
+      model: "turtle:ravager_hide"
+    mob_bundle:
+      base: minecraft:black_bundle
+      name: "Mob Bundle"
+      rarity: uncommon
+      model: "turtle:mob_bundle"
+      recipes:
+        1:
+          type: shaped
+          shape:
+            - 's'
+            - 'h'
+          ingredients:
+            s: minecraft:string
+            h: turtle:ravager_hide
