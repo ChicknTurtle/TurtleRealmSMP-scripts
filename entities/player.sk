@@ -6,8 +6,15 @@ on join:
     loop all recipes:
         unlock recipe loop-value for player
 
-# drop skull
 on death of player:
-    attacker is player
-    set {_head} to nbt skull of "%victim%"
-    drop {_head} at victim's location
+    # drop skull
+    if attacker is player:
+        set {_head} to nbt skull of "%victim%"
+        drop {_head} at victim's location
+    # invulnerable items
+    set {_loc} to victim's location ~ vector(0,1.32,0)
+    wait 1 tick
+    set {_drops::*} to all dropped items in radius 0.001 of {_loc}
+    {_drops::*} is set
+    loop {_drops::*}:
+        set boolean tag "custom;specialItem" of full nbt of loop-value to true
