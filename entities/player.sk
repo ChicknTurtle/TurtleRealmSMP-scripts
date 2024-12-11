@@ -1,11 +1,13 @@
 
 # unlock recipes
+# send resource pack
 on join:
+    send resource pack "https://download.mc-packs.net/pack/115a6a103aa06f1f65739f5fe563a9d2b97eec98.zip" to player
     loop all recipes:
         unlock recipe loop-value for player
 
 # drop skull
 on death of player:
     attacker is player
-    set {_head} to ("%victim%" parsed as offline player)'s skull
+    set {_head} to nbt skull of "%victim%"
     drop {_head} at victim's location
