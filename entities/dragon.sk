@@ -5,6 +5,11 @@ on target:
     cancel event
 
 on death of ender dragon:
+    set {dragonDefeated} to true
     set {_disc} to getItem("turtle:music_disc_milky_ways")
     drop 1 of {_disc} at victim
     set boolean tag "custom;specialItem" of full nbt of last dropped item to true
+
+on load:
+    if {dragonDefeated} isn't set:
+        set {dragonDefeated} to false
