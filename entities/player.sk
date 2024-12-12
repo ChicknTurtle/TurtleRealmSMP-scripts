@@ -12,9 +12,8 @@ on death of player:
         set {_head} to nbt skull of "%victim%"
         drop {_head} at victim's location
     # invulnerable items
-    set {_loc} to victim's location ~ vector(0,1.32,0)
+    set {_loc} to head location of victim
     wait 1 tick
-    set {_drops::*} to all dropped items in radius 0.001 of {_loc}
-    {_drops::*} is set
-    loop {_drops::*}:
+    loop all dropped items in radius 2 of {_loc}:
+        short tag "Age" of full nbt of loop-value is 0
         set boolean tag "custom;specialItem" of full nbt of loop-value to true
