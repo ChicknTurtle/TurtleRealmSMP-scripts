@@ -1,0 +1,13 @@
+
+on break:
+    # doesn't change creative functionality
+    gamemode of player isn't creative
+    # check if player is using blazing pickaxe
+    compareItems(player's tool, getItem("turtle:blazing_pickaxe")) is true
+    # doesn't work on containers
+    inventory of event-block isn't set
+    clear drops
+    loop drops of event-block using player's tool as player:
+        drop smelted loop-value at event-block's location ~ vector(0.5,0.5,0.5)
+        if smelted loop-value isn't loop-value:
+            draw 5 of flame at event-block with extra 0.05

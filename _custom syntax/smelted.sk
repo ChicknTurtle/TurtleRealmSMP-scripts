@@ -8,7 +8,7 @@ expression:
     get:
         loop all recipes:
             recipe type of recipe loop-value is furnace_recipe
-            ingredients of recipe loop-value contains expr-1
+            ingredients of recipe loop-value contains 1 of expr-1
             set {_result} to result of recipe loop-value
             set item amount of {_result} to item amount of expr-1
             return {_result}

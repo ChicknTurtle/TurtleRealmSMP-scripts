@@ -19,3 +19,21 @@ custom:
           ingredients:
             s: minecraft:string
             h: turtle:ravager_hide
+    blazing_pickaxe:
+      base: minecraft:diamond_pickaxe
+      name: "Blazing Pickaxe"
+      lore:
+        - "Automatically smelts block drops"
+      rarity: uncommon
+      model: "turtle:blazing_pickaxe"
+      recipes:
+        1:
+          type: shaped
+          shape:
+            - 'rpr'
+            - ' s '
+            - ' s '
+          ingredients:
+            r: minecraft:blaze_rod
+            s: minecraft:netherite_scrap
+            p: minecraft:golden_pickaxe
