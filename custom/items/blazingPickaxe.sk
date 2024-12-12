@@ -1,5 +1,7 @@
 
 on break:
+    # ignore if sneaking
+    player isn't sneaking
     # doesn't change creative functionality
     gamemode of player isn't creative
     # check if player is using blazing pickaxe
