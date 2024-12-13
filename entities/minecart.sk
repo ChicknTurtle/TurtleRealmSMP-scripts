@@ -49,12 +49,12 @@ Options:
     # Should detector rails be able to be used as track switchers?
     # The rail will turn in the direction you look.
     # default = true
-    trackSwitcher: true
+    trackSwitcher: false
 
     # Should detector rails be able to turn rails?
     # Recommended to be enabled along with trackSwitcher.
     # default = true
-    detectorNoTurn: true
+    detectorNoTurn: false
 
     # Should copper be used instead of gold to make powered rails?
     # Note: they will still look gold unless you use a resource pack.
