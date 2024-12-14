@@ -1,7 +1,7 @@
 
 # handle custom items in recipes
 # crafting
-function prepareCustomCraft(recipe:string, inv:inventory, offset:number=0) :: boolean:
+local function prepareCustomCraft2(recipe:string, inv:inventory, offset:number) :: boolean:
     ingredients of recipe {_recipe} is set
     loop 9 times:
         if slot loop-iteration of {_inv} isn't air:
@@ -17,21 +17,66 @@ function prepareCustomCraft(recipe:string, inv:inventory, offset:number=0) :: bo
         set {_item1} to loop-value
         set {_item2} to slot loop-iteration+{_offset} of {_inv}
         getId({_item1}) isn't getId({_item2})
-        broadcast "%loop-iteration%, %{_offset}%, %{_item1}%, %{_item2}%"
         return false
     return true
-on preparing craft:
-    if prepareCustomCraft(event-string, event-inventory) is false:
-        set event-slot to air
-on crafter craft:
-    if prepareCustomCraft(event-string, inventory of event-block, -1) is false:
-        set recipe result to air
+
+import:
+    org.bukkit.event.inventory.PrepareItemCraftEvent
+    org.bukkit.inventory.ShapedRecipe
+    org.bukkit.inventory.RecipeChoice
+on PrepareItemCraftEvent:
+    set {_recipe} to event.getRecipe()
+    {_recipe}.getResult() is set
+    set {_inv} to event.getInventory()
+    set {_matrix::*} to ...{_inv}.getMatrix()
+    remove all {_} from {_matrix::*}
+    loop {_matrix::*}:
+        add getId(loop-value) to {_ids::*}
+    if {_recipe} is instance of ShapedRecipe:
+        set {_map::*} to ...{_recipe}.getChoiceMap().values()
+        set {_shape} to length of (join (...{_recipe}.getShape()) by "")
+        loop {_shape} times:
+            set {_materialChoice} to {_map::%loop-iteration%}
+            {_materialChoice} is set
+            add 1 to {_i}
+            set {_choices::*} to ...{_materialChoice}.getChoices()
+            set {_succeeded} to false
+            loop {_choices::*}:
+                if {_materialChoice} is instance of RecipeChoice.ExactChoice:
+                    set {_item} to loop-value-2
+                else:
+                    set {_item} to loop-value-2.asItemType().createItemStack()
+                if getId({_item}) is {_ids::%{_i}%}:
+                    set {_succeeded} to true
+                    exit loop
+            if {_succeeded} isn't true:
+                {_inv}.setResult(air)
+                exit trigger 
+    else:
+        pass
+        #set {_materialChoices::*} to ...{_recipe}.getChoiceList()
+        #set {_succeeded} to false
+        #loop {_materialChoices::*}:
+        #    loop ...loop-value.getChoices():
+        #        if loop-value-1 is instance of RecipeChoice.ExactChoice:
+        #            set {_item} to loop-value-2
+        #        else:
+        #            set {_item} to loop-value-2.asItemType().createItemStack()
+        #        #broadcast("%getId({_item})% : %{_ids::%loop-iteration-1%}%", "comparing")
+        #        if getId({_item}) is {_ids::%loop-iteration-1%}:
+        #            set {_succeeded} to true
+        #            exit loop
+        #    if {_succeeded} isn't true:
+        #        {_inv}.setResult(air)
+        #        #broadcast "failed"
+        #        exit trigger
+
 # smelting
 # cancel custom smelts for now
 import:
     org.bukkit.event.inventory.FurnaceStartSmeltEvent
     java.lang.Integer
-function prepareCustomSmelt(recipe:string, ore:item) :: boolean:
+local function prepareCustomSmelt(recipe:string, ore:item) :: boolean:
     ingredients of recipe {_recipe} is set
     set {_ingredient} to first element of ingredients of recipe {_recipe}
     if compareItems({_ore}, {_ingredient}) is false:

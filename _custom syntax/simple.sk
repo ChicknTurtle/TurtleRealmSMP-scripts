@@ -10,3 +10,16 @@ effect:
 
 function str(val:object) :: string:
     return "%{_val}%"
+
+function broadcast(val:object, name:string={_}):
+    if {_name} is set:
+        broadcast "%{_name}%: %{_val}%"
+    else:
+        broadcast "%{_val}%"
+
+function broadcasts(val:objects, name:string={_}):
+    set {_val} to "%{_val::*}%"
+    if {_name} is set:
+        broadcast "%{_name}%: %{_val}%"
+    else:
+        broadcast "%{_val}%"
