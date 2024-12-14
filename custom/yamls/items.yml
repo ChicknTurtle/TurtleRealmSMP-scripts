@@ -5,11 +5,13 @@ custom:
       name: "Ravager Hide"
       rarity: uncommon
       model: "turtle:ravager_hide"
+      damage_resistant: "#minecraft:is_fire"
     mob_bundle:
       base: minecraft:black_bundle
       name: "Mob Bundle"
       rarity: uncommon
       model: "turtle:mob_bundle"
+      damage_resistant: "#minecraft:is_fire"
       recipes:
         1:
           type: shaped
@@ -26,6 +28,7 @@ custom:
         - "Automatically smelts block drops"
       rarity: uncommon
       model: "turtle:blazing_pickaxe"
+      damage_resistant: "#minecraft:is_fire"
       recipes:
         1:
           type: shaped

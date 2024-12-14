@@ -1,0 +1,58 @@
+
+# handle custom items in recipes
+# crafting
+function prepareCustomCraft(recipe:string, inv:inventory) :: boolean:
+    ingredients of recipe {_recipe} is set
+    loop 9 times:
+        if slot loop-iteration of {_inv} isn't air:
+            exit loop
+        add 1 to {_offset}
+    set {_ingredients::*} to ingredients of recipe {_recipe}
+    if size of {_ingredients::*} is 4:
+        amount of slots of {_inv} >= 9
+        set {_ingredients::*} to {_ingredients::1}, {_ingredients::2}, air, {_ingredients::3}, {_ingredients::4}, air, air, air, air
+    loop {_ingredients::*}:
+        if loop-iteration > 9 - {_offset}:
+            exit loop
+        set {_item1} to loop-value
+        set {_item2} to slot loop-iteration+{_offset} of {_inv}
+        compareItems({_item1}, {_item2}) is false
+        return false
+    return true
+on preparing craft:
+    if prepareCustomCraft(event-string, event-inventory) is false:
+        set event-slot to air
+on crafter craft:
+    if prepareCustomCraft(event-string, inventory of event-block) is false:
+        set recipe result to air
+# smelting
+# cancel custom smelts for now
+import:
+    org.bukkit.event.inventory.FurnaceStartSmeltEvent
+    java.lang.Integer
+function prepareCustomSmelt(recipe:string, ore:item) :: boolean:
+    ingredients of recipe {_recipe} is set
+    set {_ingredient} to first element of ingredients of recipe {_recipe}
+    if compareItems({_ore}, {_ingredient}) is false:
+        return false
+    return true
+on FurnaceStartSmeltEvent:
+    prepareCustomSmelt(event.getRecipe().getKey().asString(), ore slot of event.getBlock()) is false
+    event.setTotalCookTime(Integer.MAX_VALUE)
+on fuel burn:
+    string tag "customId" of custom nbt of (ore slot of event-block) is set
+    cancel event
+# smithing
+import:
+    org.bukkit.event.inventory.PrepareSmithingEvent
+on PrepareSmithingEvent:
+    event.getResult() is set
+    set {_inv} to event.getInventory()
+    set {_item} to {_inv}.getInputEquipment()
+    set {_bases::*} to ...{_inv}.getRecipe().getBase().getChoices()
+    set {_id} to getId({_item})
+    loop {_bases::*}:
+        set {_base} to loop-value.asItemType().createItemStack()
+        {_id} is getId({_base})
+        exit trigger
+    event.setResult(air)

@@ -3,9 +3,16 @@ options:
     customNamespace: "turtle"
     customItemsFilepath: "plugins/Skript/scripts/custom/yamls"
 
+# compare ids
 function compareItems(item1:item,item2:item) :: boolean:
-    return whether string tag "customId" of custom nbt of {_item1} == string tag "customId" of custom nbt of {_item2}
+    return whether getId({_item1}) is getId({_item2})
 
+# item > id
+function getId(item:item) :: string:
+    set {_id} to string tag "customId" of custom nbt of {_item}
+    return "%{@customNamespace}%:%{_id}%" if {_id} is set else raw name of {_item}
+
+# id > item
 function getItem(id:string) :: item:
     set {_s::*} to {_id} split at ":"
     if {_s::1} = "minecraft":
@@ -93,12 +100,13 @@ function loadCustomItem(id:string,yaml:string):
         set string tag "minecraft:item_model" of nbt of {_i} to {_model}
     # durability
     set {_durability} to yaml value "custom.items.%{_id}%.durability" of {_yaml}
+    set {_durability} to {_durability} parsed as number
     if {_durability} is set:
-        set string tag "minecraft:max_durability" of nbt of {_i} to {_durability}
-    # fire resistant
-    set {_fire_resistant} to yaml value "custom.items.%{_id}%.fire_resistant" of {_yaml}
-    if {_fire_resistant} is set:
-        set string tag "minecraft:fire_resistant" of nbt of {_i} to {_fire_resistant}
+        set int tag "minecraft:max_damage" of nbt of {_i} to {_durability}
+    # damage resistant
+    set {_damage_resistant} to yaml value "custom.items.%{_id}%.damage_resistant" of {_yaml}
+    if {_damage_resistant} is set:
+        set string tag "damage_resistant;types" of nbt of {_i} to {_damage_resistant}
     # jukebox song
     set {_jukebox_song} to yaml value "custom.items.%{_id}%.jukebox_song" of {_yaml}
     if {_jukebox_song} is set:
@@ -174,29 +182,3 @@ command /givecustom <text> [<integer=1>]:
             send "§cUnknown custom item: '%arg-1%'"
 on tab complete of "/givecustom" or "/skript:givecustom":
     set tab completions for position 1 to indexes of {-customItems::*}
-
-# handle custom items in recipes
-function prepareCustomCraft(recipe:string, inv:inventory) :: boolean:
-    ingredients of recipe {_recipe} is set
-    loop 9 times:
-        if slot loop-iteration of {_inv} isn't air:
-            exit loop
-        add 1 to {_offset}
-    set {_ingredients::*} to ingredients of recipe {_recipe}
-    if size of {_ingredients::*} is 4:
-        amount of slots of {_inv} >= 9
-        set {_ingredients::*} to {_ingredients::1}, {_ingredients::2}, air, {_ingredients::3}, {_ingredients::4}, air, air, air, air
-    loop {_ingredients::*}:
-        if loop-iteration > 9 - {_offset}:
-            exit loop
-        set {_item1} to loop-value
-        set {_item2} to slot loop-iteration+{_offset} of {_inv}
-        compareItems({_item1}, {_item2}) is false
-        return false
-    return true
-on preparing craft:
-    if prepareCustomCraft(event-string, event-inventory) is false:
-        set event-slot to air
-on crafter craft:
-    if prepareCustomCraft(event-string, inventory of event-block) is false:
-        set recipe result to air
