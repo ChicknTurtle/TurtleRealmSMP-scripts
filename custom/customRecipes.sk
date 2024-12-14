@@ -1,7 +1,7 @@
 
 # handle custom items in recipes
 # crafting
-function prepareCustomCraft(recipe:string, inv:inventory) :: boolean:
+function prepareCustomCraft(recipe:string, inv:inventory, offset:number=0) :: boolean:
     ingredients of recipe {_recipe} is set
     loop 9 times:
         if slot loop-iteration of {_inv} isn't air:
@@ -16,14 +16,15 @@ function prepareCustomCraft(recipe:string, inv:inventory) :: boolean:
             exit loop
         set {_item1} to loop-value
         set {_item2} to slot loop-iteration+{_offset} of {_inv}
-        compareItems({_item1}, {_item2}) is false
+        getId({_item1}) isn't getId({_item2})
+        broadcast "%loop-iteration%, %{_offset}%, %{_item1}%, %{_item2}%"
         return false
     return true
 on preparing craft:
     if prepareCustomCraft(event-string, event-inventory) is false:
         set event-slot to air
 on crafter craft:
-    if prepareCustomCraft(event-string, inventory of event-block) is false:
+    if prepareCustomCraft(event-string, inventory of event-block, -1) is false:
         set recipe result to air
 # smelting
 # cancel custom smelts for now
