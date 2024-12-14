@@ -1,0 +1,36 @@
+
+import:
+    java.lang.StringBuffer
+    java.io.InputStreamReader
+    java.io.BufferedReader
+    java.net.URL
+    java.net.HttpURLConnection
+
+command /catfact:
+    trigger:
+        async run 0 ticks later:
+            set {_url} to new URL("https://catfact.ninja/fact")
+            set {_con} to {_url}.openConnection()
+            {_con}.setRequestMethod("GET")
+            {_con}.setRequestProperty("User-Agent", "Skript/Reflect")
+            {_con}.setConnectTimeout(1000)
+            {_con}.setReadTimeout(1000)
+            set {_responseCode} to {_con}.getResponseCode()
+            if ({_responseCode} is HttpURLConnection.HTTP_OK):
+                set {_stream} to {_con}.getInputStream()
+                set {_reader} to new InputStreamReader({_stream})
+                set {_buffer} to new BufferedReader({_reader})
+                set {_line} to {_buffer}.readLine()
+                while {_line} is set:
+                    add {_line} to {_response::*}
+                    set {_line} to {_buffer}.readLine()
+                {_buffer}.close()
+                {_reader}.close()
+                set {_response} to first element of {_response::*}
+                replace """fact""" with "fact" in {_response}
+                replace """length""" with "length" in {_response}
+                set {_fact} to string tag "fact" of nbt compound from {_response}
+                broadcast " &3🐈 Cat Fact: &7%{_fact}%"
+            else:
+                broadcast {_con}.getErrorStream()
+            {_con}.disconnect()
