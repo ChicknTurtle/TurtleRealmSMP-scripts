@@ -1,0 +1,12 @@
+
+# gamerules
+on load:
+    loop all worlds:
+        set gamerule playersSleepingPercentage of loop-world to 0
+        set gamerule doInsomnia of loop-world to false
+
+# unlock recipes
+# send resource pack
+on join:
+    send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
+    unlock recipes all recipes for player

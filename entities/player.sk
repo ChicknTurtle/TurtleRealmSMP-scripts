@@ -1,19 +1,23 @@
 
-# unlock recipes
-# send resource pack
-on join:
-    send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
-    loop all recipes:
-        unlock recipe loop-value for player
+on load:
+    set {features::dropskull::name} to "Drop Skull"
+    set {features::dropskull::desc} to "When slain by another player, your head will be dropped"
+    set {features::dropskull::icon} to player head
+    set {features::protecteditems::name} to "Protected Items"
+    set {features::protecteditems::desc} to "On death, your items are invulnerable, glow, and will never despawn"
+    set {features::protecteditems::warn} to "When disabled, already protected items will stay protected"
+    set {features::protecteditems::icon} to chest
 
 on death of player:
     # drop skull
-    if attacker is player:
+    if {features::dropskull::enabled} is true:
+        attacker is player
         set {_head} to nbt skull of "%victim%"
         drop {_head} at victim's location
-    # invulnerable items
-    set {_loc} to head location of victim
-    wait 1 tick
-    loop all dropped items in radius 2 of {_loc}:
-        short tag "Age" of full nbt of loop-value is 0
-        set boolean tag "custom;specialItem" of full nbt of loop-value to true
+    # protected items
+    if {features::protecteditems::enabled} is true:
+        set {_loc} to head location of victim
+        wait 1 tick
+        loop all dropped items in radius 2 of {_loc}:
+            short tag "Age" of full nbt of loop-value is 0
+            set boolean tag "custom;specialItem" of full nbt of loop-value to true
