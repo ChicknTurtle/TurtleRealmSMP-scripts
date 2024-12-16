@@ -13,7 +13,6 @@ import:
 on mine of any shulker box:
     player's gamemode isn't creative
     set {_drops::*} to drops of target block using player's tool
-    clear drops
     set {_nbt} to empty nbt compound
     set compound tag "components" of {_nbt} to compound tag "components" of full nbt of event-block
     set {_e} to enchantment from key "turtle:soulbound"
@@ -22,7 +21,9 @@ on mine of any shulker box:
             set {_item} to loop-value
             enchant {_item} with {_e}
             set {_drops::%loop-iteration%} to {_item}
-    drop {_drops::*} at location of event-block ~ vector(0.5,0.5,0.5)
+    if size of {_drops::*} > 0:
+        clear drops
+        drop {_drops::*} at location of event-block ~ vector(0.5,0.5,0.5)
 
 on BlockBreakBlockEvent:
     event.getBlock() is any shulker box
