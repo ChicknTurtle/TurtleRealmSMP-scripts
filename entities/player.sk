@@ -8,6 +8,15 @@ on load:
     set {features::protecteditems::warn} to "When disabled, already protected items will stay protected"
     set {features::protecteditems::icon} to chest
 
+on join:
+    set {-playerdata::%player%::velocity} to vector(0,0,0)
+    set {-playerdata::%player%::velocityloc} to player's location
+    while player is online:
+        set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
+        set {-playerdata::%player%::velocityloc} to player's location
+        set {-playerdata::%player%::velocity} to {_v}
+        wait 1 tick
+
 on death of player:
     # drop skull
     if {features::dropskull::enabled} is true:

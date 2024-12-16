@@ -1,0 +1,69 @@
+
+import:
+    net.minecraft.nbt.ListTag
+    net.minecraft.nbt.DoubleTag
+
+local function setExplosionImpactPos(p:player, x:number, y:number, z:number):
+    set {_explosionPos} to new ListTag()
+    {_explosionPos}.add(DoubleTag.valueOf({_x}))
+    {_explosionPos}.add(DoubleTag.valueOf({_y}))
+    {_explosionPos}.add(DoubleTag.valueOf({_z}))
+
+    set {_nbt} to (full nbt of {_p}).getCompound()
+    {_nbt}.put("current_explosion_impact_pos", {_explosionPos})
+    {_p}.getHandle().load({_nbt})
+
+function cloudJumpBoost(p:player):
+    # boost
+    if {_p} is gliding:
+        # tailwind
+        push {_p} forwards with force 0.4 + 2*0.15
+        push {_p} up with force 0.4 + 2*0.15
+    else:
+        # cloud jump
+        set {_v} to {-playerdata::%{_p}%::velocity}
+        set {_x} to (x of {_v})
+        set {_z} to (z of {_v})
+        set {_y} to 0.55
+        add 0.1 * (level of jump boost of {_p}) to {_y}
+        add 0.05 to exhaustion of {_p}
+        if {_p} is sprinting:
+            add 0-sin(yaw of {_p})*0.3 to {_x}
+            add cos(yaw of {_p})*0.3 to {_z}
+            add 0.1 to {_y}
+            add 0.2-0.05 to exhaustion of {_p}
+        set velocity of {_p} to vector({_x},{_y},{_z})
+    # fall damage
+    set boolean tag "ignore_fall_damage_from_current_explosion" of full nbt of {_p} to true
+    set {_xpos} to x-coord of {_p}
+    set {_ypos} to y-coord of {_p}
+    set {_zpos} to z-coord of {_p}
+    setExplosionImpactPos({_p},{_xpos},{_ypos},{_zpos})
+    # effects
+    play sound "minecraft:entity.wind_charge.wind_burst" with pitch 0.75 at {_p}
+    make 1 of gust emitter small at {_p}
+
+on join:
+    while player isn't on ground:
+        wait 1 tick
+        if player isn't online:
+            exit loop
+    set {-playerdata::%player%::canCloudJump} to true
+
+on jump input:
+    player isn't on ground
+    player isn't climbing
+    player isn't in water
+    player isn't in lava
+    player isn't in bubble column
+    player isn't flying
+    set {_e} to enchantment from key "turtle:cloud_jump"
+    player's leggings are enchanted with {_e}
+    {-playerdata::%player%::canCloudJump} isn't false
+    cloudJumpBoost(player)
+    set {-playerdata::%player%::canCloudJump} to false
+    while player isn't on ground:
+        wait 1 tick
+        if player isn't online:
+            exit loop
+    set {-playerdata::%player%::canCloudJump} to true

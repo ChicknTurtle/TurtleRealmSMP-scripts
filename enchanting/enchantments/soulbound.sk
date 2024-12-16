@@ -6,3 +6,34 @@ on death of player:
         loop-value is enchanted with {_e}
         remove loop-value from drops
         event.getItemsToKeep().add(loop-value)
+
+import:
+    io.papermc.paper.event.block.BlockBreakBlockEvent
+
+on mine of any shulker box:
+    player's gamemode isn't creative
+    set {_drops::*} to drops of target block using player's tool
+    clear drops
+    set {_nbt} to empty nbt compound
+    set compound tag "components" of {_nbt} to compound tag "components" of full nbt of event-block
+    set {_e} to enchantment from key "turtle:soulbound"
+    if dirt with nbt {_nbt} is enchanted with {_e}:
+        loop {_drops::*}:
+            set {_item} to loop-value
+            enchant {_item} with {_e}
+            set {_drops::%loop-iteration%} to {_item}
+    drop {_drops::*} at location of event-block ~ vector(0.5,0.5,0.5)
+
+on BlockBreakBlockEvent:
+    event.getBlock() is any shulker box
+    set {_nbt} to empty nbt compound
+    set compound tag "components" of {_nbt} to compound tag "components" of full nbt of event.getBlock()
+    set {_e} to enchantment from key "turtle:soulbound"
+    if dirt with nbt {_nbt} is enchanted with {_e}:
+        set {_drops::*} to ...event.getDrops()
+        event.getDrops().clear()
+        loop {_drops::*}:
+            set {_item} to loop-value
+            enchant {_item} with {_e}
+            set {_drops::%loop-iteration%} to {_item}
+        drop {_drops::*} at location of event.getBlock() ~ vector(0.5,0.5,0.5)

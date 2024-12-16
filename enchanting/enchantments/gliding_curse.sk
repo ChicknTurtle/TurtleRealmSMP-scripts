@@ -4,7 +4,6 @@ on armor change:
     player's chestplate is enchanted with {_e}
     player isn't gliding
     set player's gliding state to on
-    tailwindBoost(player)
 
 on toggling gliding:
     player is gliding
