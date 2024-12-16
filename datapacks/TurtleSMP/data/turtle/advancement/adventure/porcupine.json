@@ -1,0 +1,16 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:arrow"
+    },
+    "title": "Porcupine",
+    "description": "Have 15 arrows stuck in you at once",
+    "frame": "task"
+  },
+  "parent": "minecraft:adventure/shoot_arrow",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

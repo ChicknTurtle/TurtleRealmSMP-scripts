@@ -1,0 +1,23 @@
+{
+  "description": {
+    "text": "Soulbound"
+  },
+  "exclusive_set": "#turtle:exclusive_set/soulbound",
+  "supported_items": "#turtle:enchantable/soulbound",
+  "primary_items": null,
+  "weight": 2,
+  "max_level": 1,
+  "min_cost": {
+    "base": 25,
+    "per_level_above_first": 25
+  },
+  "max_cost": {
+    "base": 75,
+    "per_level_above_first": 25
+  },
+  "anvil_cost": 10,
+  "slots": [
+    "any"
+  ],
+  "effects": {}
+}
