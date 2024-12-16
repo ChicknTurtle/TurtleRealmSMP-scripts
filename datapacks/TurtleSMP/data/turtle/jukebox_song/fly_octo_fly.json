@@ -1,0 +1,10 @@
+{
+  "comparator_output": 8,
+  "description": {
+    "translate": "Noteblock - Fly Octo Fly"
+  },
+  "length_in_seconds": 244.0,
+  "sound_event": {
+    "sound_id": "turtle:music_disc.fly_octo_fly"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:bundle",
+      "components": {
+        "minecraft:bundle_contents": [
+          {
+            "id": "minecraft:emerald"
+          }
+        ]
+      }
+    },
+    "title": "Kidnapping",
+    "description": "Pick up a baby villager with a bundle",
+    "frame": "task"
+  },
+  "parent": "minecraft:adventure/trade",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

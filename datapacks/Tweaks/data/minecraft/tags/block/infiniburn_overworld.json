@@ -1,0 +1,8 @@
+{
+  "replace": true,
+  "values": [
+    "minecraft:netherrack",
+    "minecraft:magma_block",
+    "minecraft:coal_block"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "comparator_output": 11,
+  "description": {
+    "translate": "Bossfight - Milky Ways"
+  },
+  "length_in_seconds": 187.0,
+  "sound_event": {
+    "sound_id": "turtle:music_disc.milky_ways"
+  }
+}

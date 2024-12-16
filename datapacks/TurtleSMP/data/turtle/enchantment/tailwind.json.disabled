@@ -1,0 +1,23 @@
+{
+  "description": {
+    "text": "Tailwind"
+  },
+  "exclusive_set": null,
+  "supported_items": "minecraft:elytra",
+  "primary_items": null,
+  "weight": 3,
+  "max_level": 3,
+  "min_cost": {
+    "base": 50,
+    "per_level_above_first": 25
+  },
+  "max_cost": {
+    "base": 50,
+    "per_level_above_first": 25
+  },
+  "anvil_cost": 10,
+  "slots": [
+    "chest"
+  ],
+  "effects": {}
+}

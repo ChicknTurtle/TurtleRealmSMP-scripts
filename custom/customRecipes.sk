@@ -23,6 +23,7 @@ local function prepareCustomCraft2(recipe:string, inv:inventory, offset:number) 
 import:
     org.bukkit.event.inventory.PrepareItemCraftEvent
     org.bukkit.inventory.ShapedRecipe
+    org.bukkit.inventory.ShapelessRecipe
     org.bukkit.inventory.RecipeChoice
 on PrepareItemCraftEvent:
     set {_recipe} to event.getRecipe()
@@ -52,24 +53,23 @@ on PrepareItemCraftEvent:
             if {_succeeded} isn't true:
                 {_inv}.setResult(air)
                 exit trigger 
-    else:
-        pass
-        #set {_materialChoices::*} to ...{_recipe}.getChoiceList()
-        #set {_succeeded} to false
-        #loop {_materialChoices::*}:
-        #    loop ...loop-value.getChoices():
-        #        if loop-value-1 is instance of RecipeChoice.ExactChoice:
-        #            set {_item} to loop-value-2
-        #        else:
-        #            set {_item} to loop-value-2.asItemType().createItemStack()
-        #        #broadcast("%getId({_item})% : %{_ids::%loop-iteration-1%}%", "comparing")
-        #        if getId({_item}) is {_ids::%loop-iteration-1%}:
-        #            set {_succeeded} to true
-        #            exit loop
-        #    if {_succeeded} isn't true:
-        #        {_inv}.setResult(air)
-        #        #broadcast "failed"
-        #        exit trigger
+    else if {_recipe} is instance of ShapelessRecipe:
+        set {_materialChoices::*} to ...{_recipe}.getChoiceList()
+        set {_succeeded} to false
+        loop {_materialChoices::*}:
+            loop ...loop-value.getChoices():
+                if loop-value-1 is instance of RecipeChoice.ExactChoice:
+                    set {_item} to loop-value-2
+                else:
+                    set {_item} to loop-value-2.asItemType().createItemStack()
+                #broadcast("%getId({_item})% : %{_ids::%loop-iteration-1%}%", "comparing")
+                if getId({_item}) is {_ids::%loop-iteration-1%}:
+                    set {_succeeded} to true
+                    exit loop
+            if {_succeeded} isn't true:
+                {_inv}.setResult(air)
+                #broadcast "failed"
+                exit trigger
 
 # smelting
 # cancel custom smelts for now

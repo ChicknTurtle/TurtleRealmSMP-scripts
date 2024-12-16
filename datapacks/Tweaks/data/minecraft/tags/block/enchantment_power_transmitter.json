@@ -1,0 +1,8 @@
+{
+  "replace": true,
+  "values": [
+    "#minecraft:replaceable",
+    "#minecraft:wool_carpets",
+    "minecraft:moss_carpet"
+  ]
+}
