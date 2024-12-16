@@ -36,6 +36,18 @@ on message received:
     set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7%discord name of event-user%"
     broadcast component merge components {_c::*}
 
-on skript stop:
+on command "/stop" or "/minecraft:stop":
     {features::discordlink::enabled} is true
+    cancel event
+    broadcast "§cStopping server..."
     discordSend("**:octagonal_sign: Server Stopped**")
+    wait 2 seconds
+    stop server
+
+on command "/restart" or "/spigot:restart":
+    {features::discordlink::enabled} is true
+    cancel event
+    broadcast "§cStopping server..."
+    discordSend("**:octagonal_sign: Server Stopped**")
+    wait 2 seconds
+    restart server
