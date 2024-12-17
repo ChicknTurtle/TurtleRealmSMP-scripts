@@ -24,7 +24,7 @@ function shock(arrow:entity,shooter:entity,wet:boolean):
                 set {_nv} to {_v} * loop-number-2/{@particleAmount}
                 set {_loc} to location of {_arrow} ~ {_nv}
                 make 2 of {@particle} at {_loc} with extra 0
-    loop entities in radius {_r} of location 0.5 blocks under {_arrow}:
+    loop entities in radius {_r} of ({_arrow}'s location ~ vector(0,-0.5,0)):
         loop-entity is a living entity
         loop-entity is alive
         loop-entity's gamemode isn't creative
@@ -32,7 +32,8 @@ function shock(arrow:entity,shooter:entity,wet:boolean):
         set {_loc} to {_arrow} ~ vector(0,{_arrow}.getHeight()/2,0)
         set {_loc2} to loop-entity ~ vector(0,loop-entity.getHeight()/2,0)
         set {_v} to vector from {_loc} to {_loc2}
-        set {_ray} to raytrace from {_arrow} along {_v} with max distance (vector length of {_v}) with ray size 0.1 while ignoring all entity types
+        set {_ignore::*} to entities in radius (vector length of {_v}) of {_arrow}
+        set {_ray} to raytrace from {_arrow} along {_v} with max distance (vector length of {_v}) with ray size 0.1 while ignoring {_ignore::*}
         set {_hit} to ray trace hit block of {_ray}
         {_hit} isn't set
         damage loop-entity by {_damage} with {_source}
