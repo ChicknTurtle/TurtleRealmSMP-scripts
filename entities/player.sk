@@ -11,10 +11,14 @@ on load:
 on join:
     set {-playerdata::%player%::velocity} to vector(0,0,0)
     set {-playerdata::%player%::velocityloc} to player's location
+    set {-playerdata::%player%::lastonground} to 1
     while player is online:
         set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
         set {-playerdata::%player%::velocityloc} to player's location
         set {-playerdata::%player%::velocity} to {_v}
+        add 1 to {-playerdata::%player%::lastonground}
+        if player is on ground:
+            set {-playerdata::%player%::lastonground} to 0
         wait 1 tick
 
 on death of player:
