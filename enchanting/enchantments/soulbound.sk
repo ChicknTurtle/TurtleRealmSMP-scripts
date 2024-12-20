@@ -9,7 +9,7 @@ on death of player:
 
 import:
     io.papermc.paper.event.block.BlockBreakBlockEvent
-
+###
 on mine of any shulker box:
     player's gamemode isn't creative
     set {_drops::*} to drops of target block using player's tool
@@ -38,3 +38,4 @@ on BlockBreakBlockEvent:
             enchant {_item} with {_e}
             set {_drops::%loop-iteration%} to {_item}
         drop {_drops::*} at location of event.getBlock() ~ vector(0.5,0.5,0.5)
+###
