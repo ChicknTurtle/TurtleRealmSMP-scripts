@@ -9,10 +9,10 @@ on death of player:
 
 import:
     io.papermc.paper.event.block.BlockBreakBlockEvent
-###
+
 on mine of any shulker box:
     player's gamemode isn't creative
-    set {_drops::*} to drops of target block using player's tool
+    set {_drops::*} to drops of event-block using player's tool
     set {_nbt} to empty nbt compound
     set compound tag "components" of {_nbt} to compound tag "components" of full nbt of event-block
     set {_e} to enchantment from key "turtle:soulbound"
@@ -38,4 +38,13 @@ on BlockBreakBlockEvent:
             enchant {_item} with {_e}
             set {_drops::%loop-iteration%} to {_item}
         drop {_drops::*} at location of event.getBlock() ~ vector(0.5,0.5,0.5)
-###
+
+# shulkers can't explode
+on explode:
+    loop exploded blocks:
+        loop-block is any shulker box
+        remove loop-block from exploded blocks
+on block explode:
+    loop ...event.blockList():
+        loop-value is any shulker box
+        event.blockList().remove(loop-value)
