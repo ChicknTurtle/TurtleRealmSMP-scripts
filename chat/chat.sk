@@ -55,4 +55,4 @@ on async chat:
     # send message
     set async chat format to {_format}
     replace "[item]" with "**[%{_name}%]**" in {_msg}
-    discordSend("%player%: %uncolored {_msg}%")
+    discordChat({_msg}, player)

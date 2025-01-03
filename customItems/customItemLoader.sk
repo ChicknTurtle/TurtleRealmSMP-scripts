@@ -1,0 +1,421 @@
+
+# Made for 1.21.4
+
+import:
+    org.bukkit.Material
+    java.lang.Integer
+
+# format attribute type
+local function formatAttrType(value:string, item:item) :: object:
+    set {_value_attr} to str({_value}) parsed as attribute type
+    set {_value_attr2} to "minecraft:%{_value}%" parsed as attribute type
+    if {_value} is set:
+        if {_value_attr} is set:
+            return {_value_attr}
+        else if {_value_attr2} is set:
+            return {_value_attr2}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid attribute type for %{_fullid}%: %{_value}%"
+
+# format block tag/id
+local function formatBlockTagOrId(value:string, item:item) :: object:
+    set {_blockskey} to namespacedkey from {_value}
+    set {_blockstag} to minecraft block tag {_blockskey}
+    if {_blockstag} is set:
+        return "#%{_blockskey}%"
+    else if itemtype of {_blockskey} is set:
+        return "%{_blockskey}%"
+    else:
+        set {_fullid} to string tag "customId" of custom nbt of {_item}
+        log error "Invalid block tag/id for %{_fullid}%: %{_value}%"
+
+# get attribute operation
+local function getAttrOperation(path:string, yaml:string, index:string, item:item) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value} to "add_value" if {_value} isn't set
+    if {_value} is "add_value":
+        set {_value} to "add_number"
+    else if {_value} is "add_multiplied_base":
+        set {_value} to "add_scalar"
+    else if {_value} is "add_multiplied_total":
+        set {_value} to "multiply_scalar_1"
+    set {_value_oper} to {_value} parsed as attribute operation
+    if {_value} is set:
+        if {_value_oper} is set:
+            return {_value_oper}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# get equipment slot group
+local function getEquipSlotGroup(path:string, yaml:string, index:string, item:item) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value} to "any" if {_value} isn't set
+    set {_value_group} to "%{_value}%_slot_group" parsed as equipment slot group
+    if {_value} is set:
+        if {_value_group} is set:
+            return {_value_group}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# get namespaced
+local function getNamespaced(path:string, yaml:string, index:string, item:item) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_key} to namespacedkey from {_value}
+    if {_value} is set:
+        if {_value_key} is set:
+            return {_value_key}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# get integer
+local function getInteger(path:string, yaml:string, index:string, item:item, min:number={_}, max:number={_}) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_int} to str({_value}) parsed as integer
+    set {_min} to {_value_int} if {_min} isn't set
+    set {_max} to {_value_int} if {_max} isn't set
+    set {_min} to max({_min}, Integer.MIN_VALUE)
+    set {_max} to min({_max}, Integer.MAX_VALUE)
+    if {_value} is set:
+        if all:
+            {_value_int} is set
+            {_value_int} >= {_min}
+            {_value_int} <= {_max}
+        then:
+            return {_value_int}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# get number
+local function getNumber(path:string, yaml:string, index:string, item:item, min:number={_}, max:number={_}) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_num} to str({_value}) parsed as number
+    set {_min} to {_value_num} if {_min} isn't set
+    set {_max} to {_value_num} if {_max} isn't set
+    set {_min} to max({_min}, Integer.MIN_VALUE)
+    set {_max} to min({_max}, Integer.MAX_VALUE)
+    if {_value} is set:
+        if all:
+            {_value_num} is set
+            {_value_num} >= {_min}
+            {_value_num} <= {_max}
+        then:
+            return {_value_num}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# get boolean
+local function getBoolean(path:string, yaml:string, index:string, item:item) :: object:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_bool} to str({_value}) parsed as boolean
+    if {_value} is set:
+        if {_value_bool} is set:
+            return {_value_bool}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+
+# set namespaced
+local function setNamespaced(path:string, yaml:string, index:string, item:item, nbt:string) :: item:
+    set {_value_key} to getNamespaced({_path}, {_yaml}, {_index}, {_item})
+    if {_value_key} is set:
+        set string tag {_nbt} of vanilla nbt of {_item} to str({_value_key})
+    return {_item}
+
+# set choice
+local function setChoice(path:string, yaml:string, index:string, item:item, nbt:string, values:objects) :: item:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_str} to str({_value})
+    if {_value} is set:
+        if all:
+            {_value_str} is set
+            {_values::*} contains {_value_str}
+        then:
+            set string tag {_nbt} of vanilla nbt of {_item} to {_value_str}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+    return {_item}
+
+# set integer
+local function setInteger(path:string, yaml:string, index:string, item:item, nbt:string, min:number={_}, max:number={_}) :: item:
+    set {_value_int} to getInteger({_path}, {_yaml}, {_index}, {_item}, {_min}, {_max})
+    if {_value_int} is set:
+        set int tag {_nbt} of vanilla nbt of {_item} to {_value_int}
+    return {_item}
+
+# set boolean
+local function setBoolean(path:string, yaml:string, index:string, item:item, nbt:string) :: item:
+    set {_value_bool} to getBoolean({_path}, {_yaml}, {_index}, {_item})
+    if {_value_bool} is set:
+        set boolean tag {_nbt} of vanilla nbt of {_item} to {_value_bool}
+    return {_item}
+
+# set boolean compound
+local function setBooleanCompound(path:string, yaml:string, index:string, item:item, nbt:string) :: item:
+    set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
+    set {_value_bool} to str({_value}) parsed as boolean
+    if {_value} is set:
+        if {_value_bool} is set:
+            if {_value_bool} is true:
+                compound tag {_nbt} of vanilla nbt of {_item} isn't set
+                set compound tag {_nbt} of nbt of {_item} to empty nbt compound
+            else:
+                compound tag {_nbt} of vanilla nbt of {_item} is set
+                delete compound tag {_nbt} of nbt of {_item}
+        else:
+            set {_fullid} to string tag "customId" of custom nbt of {_item}
+            log error "Invalid %{_index}% for %{_fullid}%: %{_value}%"
+    return {_item}
+
+local function loadItem(namespace:string, id:string, yaml:string):
+    set {_path} to "%{_namespace}%.items.%{_id}%"
+    set {_fullid} to "%{_namespace}%:%{_id}%"
+    
+    # base
+    set {_base} to yaml value "%{_path}%.base" of {_yaml}
+    set {_item} to Material.matchMaterial({_base}).asItemType().createItemStack()
+    set string tag "customId" of custom nbt of {_item} to {_fullid}
+    if {_item} isn't set:
+        log error "Invalid base for %{_fullid}%"
+        stop
+        
+    # model
+    set {_item} to setNamespaced({_path}, {_yaml}, "model", {_item}, "minecraft:item_model")
+    
+    # custom model data
+
+    # name
+    set {_name} to yaml value "%{_path}%.name" of {_yaml}
+    if {_name} is set:
+        set component item name of {_item} to text component from {_name}
+    
+    # rarity
+    set {_rarities::*} to "common", "uncommon", "rare", and "epic"
+    set {_item} to setChoice({_path}, {_yaml}, "rarity", {_item}, "minecraft:rarity", {_rarities::*})
+    
+    # lore
+    set {_lore::*} to yaml list "%{_path}%.lore" of {_yaml}
+    if {_lore::*} is set:
+        loop {_lore::*}:
+            add "&7%loop-value%" to lore of {_item}
+    
+    # tooltip style
+    set {_item} to setNamespaced({_path}, {_yaml}, "tooltip_style", {_item}, "minecraft:tooltip_style")
+    
+    # hide additional tooltip
+    set {_item} to setBoolean({_path}, {_yaml}, "hide_additional_tooltip", {_item}, "minecraft:hide_additional_tooltip")
+    
+    # hide entire tooltip
+    set {_item} to setBooleanCompound({_path}, {_yaml}, "hide_tooltip", {_item}, "minecraft:hide_tooltip")
+    
+    # stack size
+    set {_item} to setInteger({_path}, {_yaml}, "max_stack_size", {_item}, "minecraft:max_stack_size", 1, 99)
+    
+    # damage resistant
+    set {_damage_resistant} to getNamespaced({_path}, {_yaml}, "damage_resistant", {_item})
+    if {_damage_resistant} is set:
+        set {_damage_resistant_str} to "#%{_damage_resistant}%"
+        set {_item} to setNbt({_item}, string tag, "minecraft:damage_resistant;types", {_damage_resistant_str})
+    
+    # durability, unbreakable
+    if getInteger({_path}, {_yaml}, "max_damage", {_item}) is -1:
+        set {_unbreakable_tooltip} to getBoolean({_path}, {_yaml}, "unbreakable_show_in_tooltip", {_item})
+        if {_unbreakable_tooltip} is false:
+            set compound tag "minecraft:unbreakable" of nbt of {_item} to nbt from "{show_in_tooltip:false}"
+        else:
+            set compound tag "minecraft:unbreakable" of nbt of {_item} to empty nbt compound
+    else:
+        set {_durability} to getInteger({_path}, {_yaml}, "max_damage", {_item}, 1)
+        if {_durability} is set:
+            set max durability of {_item} to {_durability}
+    
+    # enchantable
+    set {_enchantable} to getInteger({_path}, {_yaml}, "enchantable", {_item}, 1)
+    if {_enchantable} is set:
+        int tag "minecraft:enchantable;value" of vanilla nbt of {_item} isn't {_enchantable}
+        set {_item} to setNbt({_item}, int tag, "minecraft:enchantable;value", {_enchantable})
+    
+    # attributes
+    loop yaml node keys "%{_path}%.attributes" of {_yaml}:
+        # attr
+        set {_attr} to formatAttrType(loop-value, {_item})
+        if {_attr} isn't set:
+            continue this loop
+        
+        # attrid
+        set {_attr_id} to "%{_namespace}%:%loop-value%"
+        replace " " with "_" in {_attr_id}
+        
+        # amount
+        set {_attr_amount} to getInteger({_path}, {_yaml}, "attributes.%loop-value%.amount", {_item})
+        set {_attr_amount} to 1 if {_amount} isn't set
+        
+        # equipslot
+        set {_attr_equipslot} to getEquipSlotGroup({_path}, {_yaml}, "attributes.%loop-value%.slot", {_item})
+        if {_attr_equipslot} isn't set:
+            continue this loop
+        
+        # operation
+        set {_attr_operation} to getAttrOperation({_path}, {_yaml}, "attributes.%loop-value%.operation", {_item})
+        if {_attr_operation} isn't set:
+            continue this loop
+        
+        # apply attribute
+        apply attribute modifier to {_item}:
+            attribute: {_attr}
+            id: {_attr_id}
+            amount: {_attr_amount}
+            slot: {_attr_equipslot}
+            operation: {_attr_operation}
+        
+    # show attributes in tooltip
+    set {_item} to setBoolean({_path}, {_yaml}, "show_attributes_in_tooltip", {_item}, "minecraft:attribute_modifiers;show_in_tooltip")
+    
+    # tool
+    if yaml value "%{_path}%.tool" of {_yaml} is set:
+        set {_toolnbt} to nbt from "{rules:[]}"
+
+        # default mining speed
+        set {_default_mining_speed} to getNumber({_path}, {_yaml}, "tool.default_mining_speed", {_item})
+        if {_default_mining_speed} is set:
+            set float tag "default_mining_speed" of {_toolnbt} to {_default_mining_speed}
+        
+        # damage per block
+        set {_damage_per_block} to getInteger({_path}, {_yaml}, "tool.damage_per_block", {_item}, 1)
+        if {_damage_per_block} is set:
+            set int tag "damage_per_block" of {_toolnbt} to {_damage_per_block}
+        
+        # rules
+        loop yaml node keys "%{_path}%.tool.rules" of {_yaml}:
+            set {_rulenbt} to empty nbt compound
+
+            # blocks
+            set {_blocks} to formatBlockTagOrId(loop-value, {_item})
+            if {_blocks} is set:
+                set string tag "blocks" of {_rulenbt} to {_blocks}
+            else:
+                continue this loop
+            
+            # speed
+            set {_speed} to getNumber({_path}, {_yaml}, "tool.rules.%loop-value%.speed", {_item})
+            if {_speed} is set:
+                set float tag "speed" of {_rulenbt} to {_speed}
+            
+            # correct for drops
+            set {_correct_for_drops} to getBoolean({_path}, {_yaml}, "tool.rules.%loop-value%.correct_for_drops", {_item})
+            if {_correct_for_drops} is false:
+                set boolean tag "correct_for_drops" of {_rulenbt} to false
+            else if {_correct_for_drops} is true:
+                set boolean tag "correct_for_drops" of {_rulenbt} to true
+            
+            add {_rulenbt} to {_rulenbt::*}
+            
+        # set tool
+        if {_rulenbt::*} is set:
+            set compound list tag "rules" of {_toolnbt} to {_rulenbt::*}
+        set {_item} to setNbt({_item}, compound tag, "minecraft:tool", {_toolnbt})
+
+    # food
+    if yaml value "%{_path}%.food" of {_yaml} is set:
+        set {_foodnbt} to empty nbt compound
+
+        # nutrition
+        set {_nutrition} to getInteger({_path}, {_yaml}, "food.nutrition", {_item}, 1)
+        if {_nutrition} isn't set:
+            exit 1 section
+        
+        # saturation
+        set {_saturation} to getNumber({_path}, {_yaml}, "food.saturation", {_item})
+        if {_saturation} isn't set:
+            exit 1 section
+
+        # can always eat
+        set {_can_always_eat} to getBoolean({_path}, {_yaml}, "food.can_always_eat", {_item})
+        set {_can_always_eat} to false if {_can_always_eat} isn't set
+        
+        # set food
+        apply food component to {_item}:
+            nutrition: {_nutrition}
+            saturation: {_saturation}
+            can always eat: {_can_always_eat}
+        
+        # ensure item is edible
+        if yaml value "%{_path}%.consumable" of {_yaml} isn't set:
+            compound tag "minecraft:consumable" of vanilla nbt of {_item} isn't set
+            set compound tag "minecraft:consumable" of vanilla nbt of {_item} to empty nbt compound
+
+    # consumable
+    if yaml value "%{_path}%.consumable" of {_yaml} is set:
+        set {_consumablenbt} to empty nbt compound
+
+        # consume seconds
+        set {_consume_seconds} to str(yaml value "%{_path}%.consumable.consume_seconds" of {_yaml})
+        set {_consume_seconds_num} to {_consume_seconds} parsed as number
+        if {_consume_seconds} is set:
+            if {_consume_seconds_num} > 0:
+                set float tag "consume_seconds" of {_consumablenbt} to {_consume_seconds_num}
+            else:
+                log error "Invalid consumable consume seconds for %{_fullid}%"
+        
+        # animation
+        set {_animation} to str(yaml value "%{_path}%.consumable.animation" of {_yaml})
+        set {_animation} to "eat" if {_animation} isn't set
+        if {_animation} is "none", "eat", "drink", "block", "bow", "spear", "crossbow", "spyglass", "toot_horn", or "brush":
+            string tag "minecraft:consumable;animation" of vanilla nbt of {_item} isn't {_animation}
+            set string tag "animation" of {_consumablenbt} to {_animation}
+        else:
+            log error "Invalid consumable animation for %{_fullid}%"
+        
+        # sound event
+        set {_sound_event} to str(yaml value "%{_path}%.consumable.sound_event" of {_yaml})
+        set {_sound_event} to "minecraft:entity.generic.eat" if {_sound_event} isn't set
+        if (namespacedkey from {_sound_event}) is set:
+            string tag "minecraft:consumable;sound_event" of vanilla nbt of {_item} isn't {_sound_event}
+            set string tag "sound_event" of {_consumablenbt} to str(namespacedkey from {_sound_event})
+        else:
+            log error "Invalid consumable sound event for %{_fullid}%"
+        
+        # play sound
+        set {_play_sound} to str(yaml value "%{_path}%.consumable.play_sound" of {_yaml})
+        set {_play_sound} to "minecraft:entity.player.burp" if {_play_sound} isn't set
+        if (namespacedkey from {_play_sound}) is set:
+            string tag "minecraft:consumable;play_sound" of vanilla nbt of {_item} isn't {_play_sound}
+            set string tag "play_sound" of {_consumablenbt} to str(namespacedkey from {_play_sound})
+        else:
+            log error "Invalid consumable play sound for %{_fullid}%"
+        
+        # has consume particles
+        set {_has_consume_particles} to yaml value "%{_path}%.consumable.has_consume_particles" of {_yaml}
+        set {_has_consume_particles_bool} to str({_has_consume_particles}) parsed as boolean
+        if {_has_consume_particles} is set:
+            if {_has_consume_particles_bool} is set:
+                {_has_consume_particles_bool} isn't boolean tag "consumable;has_consume_particles" of vanilla nbt of {_item}
+                set boolean tag "has_consume_particles" of {_consumablenbt} to {_has_consume_particles_bool}
+            else:
+                log error "Invalid consumable has consume particles for %{_fullid}%"
+        
+        # set consumable
+        set compound tag "minecraft:consumable" of nbt of {_item} to {_consumablenbt}
+
+    # finalize custom item
+    set {-customItems::%{_fullid}%} to {_item}
+    log debug "Loaded custom item &a%{_fullid}%"
+
+
+local function loadYaml(yaml:string):
+    loop all yaml nodes of {_yaml}:
+        loop yaml node list "%loop-value%.items" of {_yaml}:
+            set {_item} to last element of (loop-value-2 split by ".")
+            loadItem(loop-value-1, {_item}, {_yaml})
+
+on load:
+    clear {-customItems::*}
+    load all yaml from directory "plugins/Skript/scripts/customItems/yamls" using filename as id
+    loop loaded yaml files:
+        loadYaml(loop-value)

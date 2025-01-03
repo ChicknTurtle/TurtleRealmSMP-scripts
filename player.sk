@@ -12,13 +12,51 @@ on join:
     set {-playerdata::%player%::velocity} to vector(0,0,0)
     set {-playerdata::%player%::velocityloc} to player's location
     set {-playerdata::%player%::lastonground} to 1
+    set {-playerdata::%player%::lastmoved} to now
     while player is online:
+
+        # velocity
         set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
         set {-playerdata::%player%::velocityloc} to player's location
         set {-playerdata::%player%::velocity} to {_v}
+
+        # last on ground
         add 1 to {-playerdata::%player%::lastonground}
         if player is on ground:
             set {-playerdata::%player%::lastonground} to 0
+        
+        # last moved
+        if any:
+            player is pressing jump
+            player is pressing sneak
+            player is pressing w
+            player is pressing a
+            player is pressing s
+            player is pressing d
+        then:
+            set {-playerdata::%player%::lastmoved} to now
+        
+        # afk, name pain
+        if any:
+            player's gamemode is creative
+            player's gamemode is spectator
+        then:
+            set {_health} to 1
+        else:
+            set {_health} to player's health/player's max health
+        set {_health} to round({_health}*255)
+        set {_gb} to {_health}
+        set {_r} to 255
+        if {-playerdata::%player%::lastmoved} < (now - 5 minutes):
+            set {_r} to round({_r}/2)
+            set {_gb} to round({_gb}/2)
+        set {_hex} to rgbToHex({_r}, {_gb}, {_gb})
+        set {_name} to colored "<%{_hex}%>%player's name%"
+        set player's tablist name to {_name}
+        
+        # tablist
+        updateTablist(player)
+        
         wait 1 tick
 
 on death of player:

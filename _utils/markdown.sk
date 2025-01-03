@@ -1,0 +1,52 @@
+
+function mcToMarkdown(text:string) :: string:
+    replace "&" with "§" in {_text}
+    set {_colors::*} to "§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f"
+    loop {_colors::*}:
+        replace loop-value with "" in {_text}
+    set {_text::*} to {_text} split at ""
+    loop {_text::*}:
+        if loop-value is "del":
+            continue loop
+        if loop-value is "§":
+            if lowercase {_text::%loop-iteration+1%} is "l":
+                set {_text::%loop-iteration+1%} to "del"
+                if {_formatting::*} doesn't contain "**":
+                    add "**" to {_formatting::*}
+                    add "**" to {_final::*}
+                continue loop
+            else if lowercase {_text::%loop-iteration+1%} is "o":
+                set {_text::%loop-iteration+1%} to "del"
+                {_formatting::*} doesn't contain "*":
+                    add "*" to {_formatting::*}
+                    add "*" to {_final::*}
+                continue loop
+            else if lowercase {_text::%loop-iteration+1%} is "n":
+                set {_text::%loop-iteration+1%} to "del"
+                {_formatting::*} doesn't contain "__":
+                    add "__" to {_formatting::*}
+                    add "__" to {_final::*}
+                continue loop
+            else if lowercase {_text::%loop-iteration+1%} is "m":
+                set {_text::%loop-iteration+1%} to "del"
+                {_formatting::*} doesn't contain "~~":
+                    add "~~" to {_formatting::*}
+                    add "~~" to {_final::*}
+                continue loop
+            else if lowercase {_text::%loop-iteration+1%} is "k":
+                set {_text::%loop-iteration+1%} to "del"
+                {_formatting::*} doesn't contain "||":
+                    add "||" to {_formatting::*}
+                    add "||" to {_final::*}
+                continue loop
+            else if lowercase {_text::%loop-iteration+1%} is "r":
+                set {_text::%loop-iteration+1%} to "del"
+                add (join (reversed {_formatting::*}) by "") to {_final::*}
+                clear {_formatting::*}
+                if {_text::%loop-iteration -1%} is " ":
+                    add " " to {_final::*}
+                continue loop
+        add loop-value to {_final::*}
+    add (join (reversed {_formatting::*}) by "") to {_final::*}
+    set {_final} to join {_final::*} with ""
+    return "%{_final}%"

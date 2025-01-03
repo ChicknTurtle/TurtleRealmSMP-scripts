@@ -1,0 +1,15 @@
+
+import:
+    java.lang.Integer
+
+brig command /givecustom <players:players>:
+    permission: op
+    arguments:
+        register namespacedkey arg "item" using indexes of {-customItems::*}
+        register optional int arg "count" with min 1 and max Integer.MAX_VALUE
+    trigger:
+        set {_count} to 1 if {_count} isn't set
+        if {-customItems::%{_item}%} isn't set:
+            send "§cUnknown custom item '%{_item}%'" to player
+            stop
+        give or drop {_count} of {-customItems::%{_item}%} to {_players::*}

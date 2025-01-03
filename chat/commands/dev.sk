@@ -1,0 +1,20 @@
+
+brig command /nbt:
+    permission: op
+    arguments:
+        register optional literal arg "mode" using ("nbt", "vanilla", "full", "custom")
+    trigger:
+        if player's tool is air:
+            send "§cYou aren't holding anything!" to player
+            stop
+        if any:
+            {_mode} isn't set
+            {_mode} is "nbt"
+        then:
+            send (pretty nbt of nbt of player's tool) to player
+        else if {_mode} is "vanilla":
+            send (pretty nbt of vanilla nbt of player's tool) to player
+        else if {_mode} is "full":
+            send (pretty nbt of full nbt of player's tool) to player    
+        else if {_mode} is "custom":
+            send (pretty nbt of custom nbt of player's tool) to player    

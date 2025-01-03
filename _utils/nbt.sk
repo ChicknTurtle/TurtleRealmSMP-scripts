@@ -1,0 +1,54 @@
+###
+import:
+    net.minecraft.nbt.DoubleTag
+    net.minecraft.nbt.IntTag
+    net.minecraft.nbt.StringTag
+    net.minecraft.nbt.ListTag
+
+function setNbt(item:item, path:text, value:object) :: item:
+    set {_compound} to (nbt of {_item}).getCompound()
+    set {_keys::*} to split {_path} at ";"
+
+    if {_item} isn't set:
+        log error "setNbt(): Item unset while setting ""%{_path}%"""
+        stop
+    if {_value} isn't set:
+        log error "setNbt(): Value unset while setting ""%{_path}%"""
+        stop
+
+    set {_current} to {_compound}
+    loop {_keys::*}:
+        if loop-iteration is size of {_keys::*}:
+            if skript type of {_value} is "number":
+                set {_tag} to DoubleTag.valueOf({_value})
+            else if skript type of {_value} is "integer":
+                set {_tag} to IntTag.valueOf({_value})
+            else if skript type of {_value} is "text":
+                set {_tag} to StringTag.valueOf({_value})
+            else:
+                log error "setNbt(): Unsupported value type: %{_value}% (%skript type of {_value}%)"
+                stop
+            {_current}.put(loop-value, {_tag})
+        else:
+            if {_current}.contains(loop-value) is false:
+                {_current}.put(loop-value, (empty nbt compound).getCompound())
+            set {_current} to {_current}.getCompound(loop-value)
+
+    return {_item} with nbt from str({_compound})
+###
+
+# used to bypass errors like: "Tried to load invalid item: 'No key rules in MapLike[{}] missed input: {"minecraft:tool":{}}"
+# done by setting entire nbt of the item at once, instead of adding to the nbt
+function setNbt(item:item, nbttype:nbttype, path:string, value:object) :: item:
+    # detatch nbt var from the item
+    set {_nbt} to nbt from "%nbt of {_item}%"
+    # don't check if already the same for compound tags, to avoid errors
+    if {_nbttype} is compound tag:
+        set {_nbttype} {_path} of {_nbt} to {_value}
+    else:
+        # no need to set nbt if it is already the same
+        {_nbttype} {_path} of vanilla nbt of {_item} isn't {_value}
+        set {_nbttype} {_path} of {_nbt} to {_value}
+    # build new item
+    set {_newitem} to (type of {_item}) with nbt {_nbt}
+    return {_newitem}
