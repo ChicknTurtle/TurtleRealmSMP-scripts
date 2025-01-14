@@ -12,4 +12,4 @@ expression:
         else if component item name of expr-1 isn't "":
             return component item name of expr-1 + "§r"
         else:
-            return translate component from translation key of expr-1
+            return translate component from (translation key of expr-1)

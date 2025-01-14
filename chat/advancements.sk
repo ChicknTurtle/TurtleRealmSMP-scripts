@@ -71,9 +71,9 @@ on projectile collide:
 
 # Big Trouble
 on warden move:
-    grantAdvancement("turtle:adventure/encounter_warden", players in radius 32 of event-entity)
+    grantAdvancement("turtle:adventure/encounter_warden", (players in radius 32 of event-entity))
 on spawn of warden:
-    grantAdvancement("turtle:adventure/encounter_warden", players in radius 32 of event-entity)
+    grantAdvancement("turtle:adventure/encounter_warden", (players in radius 32 of event-entity))
 
 # Beast Slayer
 on death of warden:
