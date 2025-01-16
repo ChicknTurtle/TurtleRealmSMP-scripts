@@ -2,7 +2,7 @@
 import:
     java.lang.Integer
 
-brig command /givecustom <players:players>:
+brig command /turtle:givecustom <players:players>:
     permission: op
     arguments:
         register namespacedkey arg "item" using indexes of {-customItems::*}

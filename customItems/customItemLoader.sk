@@ -2,42 +2,21 @@
 # Made for 1.21.4
 
 import:
-    org.bukkit.Material
     java.lang.Integer
     java.lang.Float
 
-# format attribute type
-local function formatAttrType(value:string, item:item) :: object:
-    set {_attr} to str({_value}) parsed as attribute type
-    set {_attr2} to "minecraft:%{_value}%" parsed as attribute type
-    if {_value} is set:
-        if {_attr} is set:
-            return {_attr}
-        else if {_attr2} is set:
-            return {_attr2}
-        else:
-            set {_fullid} to string tag "customId" of custom nbt of {_item}
-            log error "Invalid attribute type for %{_fullid}%: %{_value}%"
-
-# format effect type
-local function formatEffectType(value:string, item:item) :: object: 
+# format namespaced type
+local function formatNamespacedType(value:string, type:type, item:item) :: object:
     set {_valuekey} to namespaced key from {_value}
-    set {_effecttype} to potion effect type from key {_valuekey}
-    if {_effecttype} is set:
+    parse effect "set {-valuetype} to %{_type}% from key ""%{_valuekey}%"""
+    set {_valuetype} to {-valuetype}
+    delete {-valuetype}
+    if {_valuetype} is set:
         return str({_valuekey})
     else:
+        set {_valuekey} to {_value} if {_valuekey} isn't set
         set {_fullid} to string tag "customId" of custom nbt of {_item}
-        log error "Invalid effect type for %{_fullid}%: %{_valuekey}%"
-
-# format enchant type
-local function formatEnchantType(value:string, item:item) :: object: 
-    set {_valuekey} to namespaced key from {_value}
-    set {_enchanttype} to enchantment from key {_valuekey}
-    if {_enchanttype} is set:
-        return str({_valuekey})
-    else:
-        set {_fullid} to string tag "customId" of custom nbt of {_item}
-        log error "Invalid enchant type for %{_fullid}%: %{_valuekey}%"
+        log error "Invalid %{_type}% for %{_fullid}%: %{_valuekey}%"
 
 # format item
 local function formatItemId(value:string, item:item) :: object: 
@@ -45,20 +24,38 @@ local function formatItemId(value:string, item:item) :: object:
     if {_itemId} is set:
         return {_itemId}
     else:
+        set {_valuekey} to {_value} if {_valuekey} isn't set
         set {_fullid} to string tag "customId" of custom nbt of {_item}
         log error "Invalid item id for %{_fullid}%: %{_value}%"
 
 # format block tag/id
 local function formatBlockTagOrId(value:string, item:item) :: object:
-    set {_blockskey} to namespacedkey from {_value}
-    set {_blockstag} to minecraft block tag {_blockskey}
-    if {_blockstag} is set:
-        return "#%{_blockskey}%"
-    else if itemtype of {_blockskey} is set:
-        return "%{_blockskey}%"
+    set {_valuekey} to namespaced key from {_value}
+    set {_blockid} to material from key {_valuekey}
+    set {_blockid} to {_} if item within {_blockid} isn't a block
+    set {_blocktag} to minecraft block tag {_valuekey}
+    if {_blocktag} is set:
+        return "#%{_valuekey}%"
+    else if {_blockid} is set:
+        return "%{_valuekey}%"
     else:
+        set {_valuekey} to {_value} if {_valuekey} isn't set
         set {_fullid} to string tag "customId" of custom nbt of {_item}
-        log error "Invalid block tag/id for %{_fullid}%: %{_value}%"
+        log error "Invalid block tag/id for %{_fullid}%: %{_valuekey}%"
+
+# format entity tag/id
+local function formatEntityTagOrId(value:string, item:item) :: object:
+    set {_valuekey} to namespaced key from {_value}
+    set {_entityid} to entity type from key {_valuekey}
+    set {_entitytag} to minecraft entity tag {_valuekey}
+    if {_entitytag} is set:
+        return "#%{_valuekey}%"
+    else if {_entityid} is set:
+        return "%{_valuekey}%"
+    else:
+        set {_valuekey} to {_value} if {_valuekey} isn't set
+        set {_fullid} to string tag "customId" of custom nbt of {_item}
+        log error "Invalid entity tag/id for %{_fullid}%: %{_valuekey}%"
 
 # get nbt
 local function getNbt(path:string, yaml:string, index:string, item:item) :: object:
@@ -182,19 +179,21 @@ local function loadItem(namespace:string, id:string, yaml:string):
     
     # base
     set {_base} to yaml value "%{_path}%.base" of {_yaml}
-    set {_item} to Material.matchMaterial({_base}).asItemType().createItemStack()
+    set {_basekey} to namespaced key from {_base}
+    set {_item} to material from key {_basekey}
     set string tag "customId" of custom nbt of {_item} to {_fullid}
     if {_item} isn't set:
-        log error "Invalid base for %{_fullid}%"
+        set {_basekey} to {_base} if {_basekey} isn't set
+        log error "Invalid base for %{_fullid}%: %{_basekey}%"
         stop
-      
+    
     # model
     set {_model} to getNamespaced({_path}, {_yaml}, "model", {_item})
     if {_model} is set:
         set string tag "minecraft:item_model" of nbt of {_item} to {_model}
     
     # custom model data
-
+    
     # name
     set {_name} to yaml value "%{_path}%.name" of {_yaml}
     if {_name} is set:
@@ -229,7 +228,9 @@ local function loadItem(namespace:string, id:string, yaml:string):
             compound tag "minecraft:hide_tooltip" of vanilla nbt of {_item} isn't set
             set compound tag "minecraft:hide_tooltip" of nbt of {_item} to empty nbt compound
         else:
+            compound tag "minecraft:hide_tooltip" of vanilla nbt of {_item} is set
             delete compound tag "minecraft:hide_tooltip" of nbt of {_item}
+            set compound tag "!minecraft:hide_tooltip" of nbt of {_item} to empty nbt compound
     
     # max stack size
     set {_max_stack_size} to getInteger({_path}, {_yaml}, "max_stack_size", {_item}, 1, 99)
@@ -256,7 +257,18 @@ local function loadItem(namespace:string, id:string, yaml:string):
     
     # enchantments
     loop yaml node keys "%{_path}%.enchantments" of {_yaml}:
-        set {_enchantment} to formatEnchantType(loop-value, {_item})
+        set {_enchantment} to formatNamespacedType(loop-value, enchantment, {_item})
+        set {_level} to getInteger({_path}, {_yaml}, "enchantments.%loop-value%", {_item}, 1, 255)
+        if {_enchantment} is set:
+            {_level} is set
+            set {_enchanttype} to "%{_enchantment}% %{_level}%" parsed as enchantment type
+            {_enchanttype} is set
+            enchant {_item} with {_enchanttype}
+    
+    # enchantment glint override
+    set {_enchantment_glint_override} to getBoolean({_path}, {_yaml}, "enchantment_glint_override", {_item})
+    if {_enchantment_glint_override} is set:
+        set boolean tag "minecraft:enchantment_glint_override" of vanilla nbt of {_item} to {_enchantment_glint_override}
     
     # enchantable
     set {_enchantable} to getInteger({_path}, {_yaml}, "enchantable", {_item}, 1)
@@ -267,7 +279,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
     # attributes
     loop yaml node keys "%{_path}%.attributes" of {_yaml}:
         # attr
-        set {_attr} to formatAttrType(loop-value, {_item})
+        set {_attr} to formatNamespacedType(loop-value, attribute type, {_item})
         if {_attr} isn't set:
             continue this loop
         
@@ -304,51 +316,50 @@ local function loadItem(namespace:string, id:string, yaml:string):
     
     # tool
     if yaml value "%{_path}%.tool" of {_yaml} is set:
-        set {_toolnbt} to nbt from "{rules:[]}"
+        set {_tool_nbt} to nbt from "{rules:[]}"
 
         # default mining speed
         set {_default_mining_speed} to getNumber({_path}, {_yaml}, "tool.default_mining_speed", {_item})
         if {_default_mining_speed} is set:
-            set float tag "default_mining_speed" of {_toolnbt} to {_default_mining_speed}
+            set float tag "default_mining_speed" of {_tool_nbt} to {_default_mining_speed}
         
         # damage per block
         set {_damage_per_block} to getInteger({_path}, {_yaml}, "tool.damage_per_block", {_item}, 1)
         if {_damage_per_block} is set:
-            set int tag "damage_per_block" of {_toolnbt} to {_damage_per_block}
+            set int tag "damage_per_block" of {_tool_nbt} to {_damage_per_block}
         
         # rules
         loop yaml node keys "%{_path}%.tool.rules" of {_yaml}:
-            set {_rulenbt} to empty nbt compound
+            set {_rule_nbt} to empty nbt compound
 
             # blocks
             set {_blocks} to formatBlockTagOrId(loop-value, {_item})
             if {_blocks} is set:
-                set string tag "blocks" of {_rulenbt} to {_blocks}
+                set string tag "blocks" of {_rule_nbt} to {_blocks}
             else:
                 continue this loop
             
             # speed
             set {_speed} to getNumber({_path}, {_yaml}, "tool.rules.%loop-value%.speed", {_item})
             if {_speed} is set:
-                set float tag "speed" of {_rulenbt} to {_speed}
+                set float tag "speed" of {_rule_nbt} to {_speed}
             
             # correct for drops
             set {_correct_for_drops} to getBoolean({_path}, {_yaml}, "tool.rules.%loop-value%.correct_for_drops", {_item})
             if {_correct_for_drops} is false:
-                set boolean tag "correct_for_drops" of {_rulenbt} to false
+                set boolean tag "correct_for_drops" of {_rule_nbt} to false
             else if {_correct_for_drops} is true:
-                set boolean tag "correct_for_drops" of {_rulenbt} to true
+                set boolean tag "correct_for_drops" of {_rule_nbt} to true
             
-            add {_rulenbt} to {_rulenbt::*}
+            add {_rule_nbt} to {_rule_nbt::*}
             
         # set tool
-        if {_rulenbt::*} is set:
-            set compound list tag "rules" of {_toolnbt} to {_rulenbt::*}
+        if {_rule_nbt::*} is set:
+            set compound list tag "rules" of {_toolnbt} to {_rule_nbt::*}
         set {_item} to setNbt({_item}, compound tag, "minecraft:tool", {_toolnbt})
 
     # food
     if yaml value "%{_path}%.food" of {_yaml} is set:
-        set {_foodnbt} to empty nbt compound
 
         # nutrition
         set {_nutrition} to getInteger({_path}, {_yaml}, "food.nutrition", {_item}, 1)
@@ -377,23 +388,23 @@ local function loadItem(namespace:string, id:string, yaml:string):
 
     # consumable
     if yaml value "%{_path}%.consumable" of {_yaml} is set:
-        set {_consumablenbt} to empty nbt compound
+        set {_consumable_nbt} to empty nbt compound
 
         # consume seconds
         set {_consume_seconds} to getNumber({_path}, {_yaml}, "consumable.consume_seconds", {_item}, 0)
         if {_consume_seconds} is set:
-            set float tag "consume_seconds" of {_consumablenbt} to {_consume_seconds}
+            set float tag "consume_seconds" of {_consumable_nbt} to {_consume_seconds}
         
         # animation
         set {_animations::*} to "none", "eat", "drink", "block", "bow", "spear", "crossbow", "spyglass", "toot_horn", and "brush"
         set {_animation} to getChoice({_path}, {_yaml}, "consumable.animation", {_item}, {_animations::*})
         if {_animation} is set:
-            set string tag "animation" of {_consumablenbt} to {_animation}
+            set string tag "animation" of {_consumable_nbt} to {_animation}
         
         # sound event
         set {_sound_event} to getNamespaced({_path}, {_yaml}, "consumable.sound_event", {_item})
         if {_sound_event} is set:
-            set string tag "sound" of {_consumablenbt} to {_sound_event}
+            set string tag "sound" of {_consumable_nbt} to {_sound_event}
         
         # play sound
         set {_play_sound} to getNamespaced({_path}, {_yaml}, "consumable.play_sound", {_item})
@@ -403,7 +414,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
         # has consume particles
         set {_has_consume_particles} to getBoolean({_path}, {_yaml}, "consumable.has_consume_particles", {_item})
         if {_has_consume_particles} is set:
-            set boolean tag "has_consume_particles" of {_consumablenbt} to {_has_consume_particles}
+            set boolean tag "has_consume_particles" of {_consumable_nbt} to {_has_consume_particles}
         
         # clear all effects
         set {_clear_all_effects} to getBoolean({_path}, {_yaml}, "consumable.clear_all_effects", {_item})
@@ -412,7 +423,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
         
         # remove effects
         loop yaml list "%{_path}%.consumable.remove_effects" of {_yaml}:
-            set {_effect} to formatEffectType(loop-value, {_item})
+            set {_effect} to formatNamespacedType(loop-value, potion effect type, {_item})
             {_effect} is set
             add {_effect} to {_remove_effects::*}
         if {_remove_effects::*} is set:
@@ -422,12 +433,12 @@ local function loadItem(namespace:string, id:string, yaml:string):
         
         # apply effects
         loop yaml node keys "%{_path}%.consumable.apply_effects" of {_yaml}:
-            set {_effectnbt} to empty nbt compound
+            set {_effect_nbt} to empty nbt compound
             
             # id
-            set {_id} to formatEffectType(loop-value, {_item})
+            set {_id} to formatNamespacedType(loop-value, potion effect type, {_item})
             if {_id} is set:
-                set string tag "id" of {_effectnbt} to {_id}
+                set string tag "id" of {_effect_nbt} to {_id}
             else:
                 continue this loop
             
@@ -436,31 +447,31 @@ local function loadItem(namespace:string, id:string, yaml:string):
             set {_amplifier} to 0 if {_amplifier} isn't set
             if {_amplifier} is set:
                 set {_amplifier} to {_amplifier} - 1
-                set int tag "amplifier" of {_effectnbt} to {_amplifier}
+                set int tag "amplifier" of {_effect_nbt} to {_amplifier}
             
             # duration
             set {_duration} to getNumber({_path}, {_yaml}, "consumable.apply_effects.%loop-value%.duration", {_item}, -1)
             set {_duration} to 15 if {_duration} isn't set
             if {_duration} is set:
                 set {_duration} to ceil({_duration}*20)
-                set int tag "duration" of {_effectnbt} to {_duration}
+                set int tag "duration" of {_effect_nbt} to {_duration}
             
             # show particles
             set {_show_particles} to getBoolean({_path}, {_yaml}, "consumable.apply_effects.%loop-value%.show_particles", {_item})
             if {_show_particles} is set:
-                set boolean tag "show_particles" of {_effectnbt} to {_show_particles}
+                set boolean tag "show_particles" of {_effect_nbt} to {_show_particles}
             
             # show icon
             set {_show_icon} to getBoolean({_path}, {_yaml}, "consumable.apply_effects.%loop-value%.show_icon", {_item})
             if {_show_icon} is set:
-                set boolean tag "show_icon" of {_effectnbt} to {_show_icon}
+                set boolean tag "show_icon" of {_effect_nbt} to {_show_icon}
             
             # ambient
             set {_ambient} to getBoolean({_path}, {_yaml}, "consumable.apply_effects.%loop-value%.ambient", {_item})
             if {_ambient} is set:
-                set boolean tag "ambient" of {_effectnbt} to {_ambient}
+                set boolean tag "ambient" of {_effect_nbt} to {_ambient}
             
-            add {_effectnbt} to {_apply_effects::*}
+            add {_effect_nbt} to {_apply_effects::*}
         
         if size of {_apply_effects::*} > 0:
             set {_apply_effects_nbt} to nbt from "{type:""minecraft:apply_effects""}"
@@ -482,27 +493,27 @@ local function loadItem(namespace:string, id:string, yaml:string):
         
         # set consumable
         if {_on_consume_effects::*} is set:
-            set compound list tag "on_consume_effects" of {_consumablenbt} to {_on_consume_effects::*}
-        set compound tag "minecraft:consumable" of vanilla nbt of {_item} to {_consumablenbt}
+            set compound list tag "on_consume_effects" of {_consumable_nbt} to {_on_consume_effects::*}
+        set compound tag "minecraft:consumable" of vanilla nbt of {_item} to {_consumable_nbt}
     
     # use cooldown
     if yaml value "%{_path}%.use_cooldown" of {_yaml} is set:
-        set {_cooldownnbt} to empty nbt compound
+        set {_cooldown_nbt} to empty nbt compound
 
         # seconds
         set {_seconds} to getNumber({_path}, {_yaml}, "use_cooldown.seconds", {_item}, Float.MIN_VALUE)
         set {_seconds} to 5 if {_seconds} isn't set
         if {_seconds} is set:
-            set float tag "seconds" of {_cooldownnbt} to {_seconds}
+            set float tag "seconds" of {_cooldown_nbt} to {_seconds}
         
         # cooldown group
         set {_cooldown_group} to getNamespaced({_path}, {_yaml}, "use_cooldown.cooldown_group", {_item})
         set {_cooldown_group} to {_fullid} if {_cooldown_group} isn't set
         if {_cooldown_group} is set:
-            set string tag "cooldown_group" of {_cooldownnbt} to {_cooldown_group}
+            set string tag "cooldown_group" of {_cooldown_nbt} to {_cooldown_group}
         
         # set use cooldown
-        set {_item} to setNbt({_item}, compound tag, "minecraft:use_cooldown", {_cooldownnbt})
+        set {_item} to setNbt({_item}, compound tag, "minecraft:use_cooldown", {_cooldown_nbt})
 
     # use remainder
     set {_use_remainder} to getNamespaced({_path}, {_yaml}, "use_remainder", {_item})
@@ -524,27 +535,241 @@ local function loadItem(namespace:string, id:string, yaml:string):
     
     # equippable
     if yaml value "%{_path}%.equippable" of {_yaml} is set:
-        set {_equippablenbt} to empty nbt compound
+        set {_equippable_nbt} to empty nbt compound
 
         # slot
         set {_slots::*} to "feet", "legs", "chest", "head", "body", "mainhand", "offhand"
         set {_slot} to getChoice({_path}, {_yaml}, "equippable.slot", {_item}, {_slots::*})
         if {_slot} is set:
-            set string tag "slot" of {_equippablenbt} to {_slot}
+            set string tag "slot" of {_equippable_nbt} to {_slot}
         
         # equip sound
         set {_equip_sound} to getNamespaced({_path}, {_yaml}, "equippable.equip_sound", {_item})
         set {_equip_sound} to "item.armor.equip_generic" if {_equip_sound} isn't set
         if {_equip_sound} is set:
-            set string tag "equip_sound" of {_equippablenbt} to {_equip_sound}
+            set string tag "equip_sound" of {_equippable_nbt} to {_equip_sound}
         
         # asset id
         set {_asset_id} to getNamespaced({_path}, {_yaml}, "equippable.asset_id", {_item})
         if {_asset_id} is set:
-            set string tag "asset_id" of {_equippablenbt} to {_asset_id}
+            set string tag "asset_id" of {_equippable_nbt} to {_asset_id}
+        
+        # allowed entities
+        set {_allowed_entities} to yaml value "%{_path}%.equippable.allowed_entities" of {_yaml}
+        if {_allowed_entities} is set:
+            set {_allowed_entities} to formatEntityTagOrId({_allowed_entities}, {_item})
+            {_allowed_entities} is set
+            set string tag "allowed_entities" of {_equippable_nbt} to {_allowed_entities}
+        
+        # dispensable
+        set {_dispensable} to getBoolean({_path}, {_yaml}, "equippable.dispensable", {_item})
+        if {_dispensable} is set:
+            set boolean tag "dispensable" of {_equippable_nbt} to {_dispensable}
+        
+        # swappable
+        set {_swappable} to getBoolean({_path}, {_yaml}, "equippable.swappable", {_item})
+        if {_swappable} is set:
+            set boolean tag "swappable" of {_equippable_nbt} to {_swappable}
+        
+        # damage on hurt
+        set {_damage_on_hurt} to getBoolean({_path}, {_yaml}, "equippable.damage_on_hurt", {_item})
+        if {_damage_on_hurt} is set:
+            set boolean tag "damage_on_hurt" of {_equippable_nbt} to {_damage_on_hurt}
+        
+        # camera overlay
+        set {_camera_overlay} to getNamespaced({_path}, {_yaml}, "equippable.camera_overlay", {_item})
+        if {_camera_overlay} is set:
+            set string tag "camera_overlay" of {_equippable_nbt} to {_camera_overlay}
         
         # set equippable
-        set {_item} to setNbt({_item}, compound tag, "minecraft:equippable", {_equippablenbt})
+        set {_item} to setNbt({_item}, compound tag, "minecraft:equippable", {_equippable_nbt})
+
+        # glider
+        set {_glider} to getBoolean({_path}, {_yaml}, "equippable.glider", {_item})
+        if {_glider} is set:
+            if {_glider} is true:
+                compound tag "minecraft:glider" of vanilla nbt of {_item} isn't set
+                set compound tag "minecraft:glider" of nbt of {_item} to empty nbt compound
+            else:
+                compound tag "minecraft:glider" of vanilla nbt of {_item} is set
+                delete compound tag "minecraft:glider" of nbt of {_item}
+                set compound tag "!minecraft:glider" of nbt of {_item} to empty nbt compound
+        
+    # potion contents
+    if yaml value "%{_path}%.potion_contents" of {_yaml} is set:
+        set {_potion_contents_nbt} to empty nbt compound
+
+        # potion
+        set {_potion} to getNamespaced({_path}, {_yaml}, "potion_contents.potion", {_item})
+        if {_potion} is set:
+            set string tag "potion" of {_potion_contents_nbt} to {_potion}
+        
+        # custom color
+        set {_custom_color} to yaml value "%{_path}%.potion_contents.custom_color" of {_yaml}
+        set {_custom_color} to hex_to_decimal({_custom_color})
+        if {_custom_color} is set:
+            set int tag "custom_color" of {_potion_contents_nbt} to {_custom_color}
+        
+        # custom name
+        set {_custom_name} to yaml value "%{_path}%.potion_contents.custom_name" of {_yaml}
+        if {_custom_name} is set:
+            set string tag "custom_name" of {_potion_contents_nbt} to {_custom_name}
+        
+        # custom effects
+        loop yaml node keys "%{_path}%.potion_contents.custom_effects" of {_yaml}:
+            set {_effect_nbt} to empty nbt compound
+            
+            # id
+            set {_id} to formatNamespacedType(loop-value, potion effect type, {_item})
+            if {_id} is set:
+                set string tag "id" of {_effect_nbt} to {_id}
+            else:
+                continue this loop
+            
+            # amplifier
+            set {_amplifier} to getInteger({_path}, {_yaml}, "potion_contents.custom_effects.%loop-value%.amplifier", {_item}, 1, 256)
+            set {_amplifier} to 0 if {_amplifier} isn't set
+            if {_amplifier} is set:
+                set {_amplifier} to {_amplifier} - 1
+                set int tag "amplifier" of {_effect_nbt} to {_amplifier}
+            
+            # duration
+            set {_duration} to getNumber({_path}, {_yaml}, "potion_contents.custom_effects.%loop-value%.duration", {_item}, -1)
+            set {_duration} to 15 if {_duration} isn't set
+            if {_duration} is set:
+                set {_duration} to ceil({_duration}*20)
+                set int tag "duration" of {_effect_nbt} to {_duration}
+            
+            # show particles
+            set {_show_particles} to getBoolean({_path}, {_yaml}, "potion_contents.custom_effects.%loop-value%.show_particles", {_item})
+            if {_show_particles} is set:
+                set boolean tag "show_particles" of {_effect_nbt} to {_show_particles}
+            
+            # show icon
+            set {_show_icon} to getBoolean({_path}, {_yaml}, "potion_contents.custom_effects.%loop-value%.show_icon", {_item})
+            if {_show_icon} is set:
+                set boolean tag "show_icon" of {_effect_nbt} to {_show_icon}
+            
+            # ambient
+            set {_ambient} to getBoolean({_path}, {_yaml}, "potion_contents.custom_effects.%loop-value%.ambient", {_item})
+            if {_ambient} is set:
+                set boolean tag "ambient" of {_effect_nbt} to {_ambient}
+            
+            add {_effect_nbt} to {_custom_effects::*}
+        
+        if size of {_custom_effects::*} > 0:
+            set compound list tag "custom_effects" of {_potion_contents_nbt} to {_custom_effects::*}
+        
+        # set potion contents
+        set {_item} to setNbt({_item}, compound tag, "minecraft:potion_contents", {_potion_contents_nbt})
+    
+    # death protection
+    if yaml value "%{_path}%.death_protection" of {_yaml} is set:
+        set {_death_protection_nbt} to empty nbt compound
+        
+        # play sound
+        set {_play_sound} to getNamespaced({_path}, {_yaml}, "death_protection.play_sound", {_item})
+        if {_play_sound} is set:
+            add nbt from "{type:""minecraft:play_sound"",sound:""%{_play_sound}%""}" to {_death_effects::*}
+                
+        # clear all effects
+        set {_clear_all_effects} to getBoolean({_path}, {_yaml}, "death_protection.clear_all_effects", {_item})
+        if {_clear_all_effects} is true:
+            add (nbt from "{type:""minecraft:clear_all_effects""}") to {_death_effects::*}
+        
+        # remove effects
+        loop yaml list "%{_path}%.death_protection.remove_effects" of {_yaml}:
+            set {_effect} to formatNamespacedType(loop-value, potion effect type, {_item})
+            {_effect} is set
+            add {_effect} to {_remove_effects::*}
+        if {_remove_effects::*} is set:
+            set {_remove_effects_nbt} to nbt from "{type:""minecraft:remove_effects""}"
+            set string list tag "effects" of {_remove_effects_nbt} to {_remove_effects::*}
+            add {_remove_effects_nbt} to {_death_effects::*}
+        
+        # apply effects
+        loop yaml node keys "%{_path}%.death_protection.apply_effects" of {_yaml}:
+            set {_effect_nbt} to empty nbt compound
+            
+            # id
+            set {_id} to formatNamespacedType(loop-value, potion effect type, {_item})
+            if {_id} is set:
+                set string tag "id" of {_effect_nbt} to {_id}
+            else:
+                continue this loop
+            
+            # amplifier
+            set {_amplifier} to getInteger({_path}, {_yaml}, "death_protection.apply_effects.%loop-value%.amplifier", {_item}, 1, 256)
+            set {_amplifier} to 0 if {_amplifier} isn't set
+            if {_amplifier} is set:
+                set {_amplifier} to {_amplifier} - 1
+                set int tag "amplifier" of {_effect_nbt} to {_amplifier}
+            
+            # duration
+            set {_duration} to getNumber({_path}, {_yaml}, "death_protection.apply_effects.%loop-value%.duration", {_item}, -1)
+            set {_duration} to 15 if {_duration} isn't set
+            if {_duration} is set:
+                set {_duration} to ceil({_duration}*20)
+                set int tag "duration" of {_effect_nbt} to {_duration}
+            
+            # show particles
+            set {_show_particles} to getBoolean({_path}, {_yaml}, "death_protection.apply_effects.%loop-value%.show_particles", {_item})
+            if {_show_particles} is set:
+                set boolean tag "show_particles" of {_effect_nbt} to {_show_particles}
+            
+            # show icon
+            set {_show_icon} to getBoolean({_path}, {_yaml}, "death_protection.apply_effects.%loop-value%.show_icon", {_item})
+            if {_show_icon} is set:
+                set boolean tag "show_icon" of {_effect_nbt} to {_show_icon}
+            
+            # ambient
+            set {_ambient} to getBoolean({_path}, {_yaml}, "death_protection.apply_effects.%loop-value%.ambient", {_item})
+            if {_ambient} is set:
+                set boolean tag "ambient" of {_effect_nbt} to {_ambient}
+            
+            add {_effect_nbt} to {_apply_effects::*}
+        
+        if size of {_apply_effects::*} > 0:
+            set {_apply_effects_nbt} to nbt from "{type:""minecraft:apply_effects""}"
+            set compound list tag "effects" of {_apply_effects_nbt} to {_apply_effects::*}
+            # probability
+            set {_probability} to getNumber({_path}, {_yaml}, "death_protection.probability", {_item}, 0, 100)
+            if {_probability} is set:
+                set {_probability} to {_probability} / 100
+                set float tag "probability" of {_apply_effects_nbt} to {_probability}
+            add {_apply_effects_nbt} to {_death_effects::*}
+        
+        # teleport randomly
+        set {_teleport_randomly} to getNumber({_path}, {_yaml}, "death_protection.teleport_randomly", {_item}, Float.MIN_VALUE)
+        if {_teleport_randomly} is set:
+            {_teleport_randomly} isn't 0
+            set {_teleport_randomly_nbt} to nbt from "{type:""minecraft:teleport_randomly""}"
+            set float tag "diameter" of {_teleport_randomly_nbt} to {_teleport_randomly}
+            add {_teleport_randomly_nbt} to {_death_effects::*}
+        
+        # set death protection
+        if {_death_effects::*} is set:
+            set compound list tag "death_effects" of {_death_protection_nbt} to {_death_effects::*}
+        set compound tag "minecraft:death_protection" of vanilla nbt of {_item} to {_death_protection_nbt}
+    
+    # jukebox playable
+    if yaml value "%{_path}%.jukebox_playable" of {_yaml} is set:
+        set {_jukebox_playable_nbt} to empty nbt compound
+        
+        # song
+        set {_song} to getNamespaced({_path}, {_yaml}, "jukebox_playable.song", {_item})
+        if {_song} is set:
+            set string tag "song" of {_jukebox_playable_nbt} to {_song}
+        else:
+            exit 2 sections
+                
+        # show in tooltip
+        set {_show_in_tooltip} to getBoolean({_path}, {_yaml}, "jukebox_playable.show_in_tooltip", {_item})
+        if {_show_in_tooltip} is set:
+            set boolean tag "show_in_tooltip" of {_jukebox_playable_nbt} to {_show_in_tooltip}
+                
+        # set jukebox playable
+        set {_item} to setNbt({_item}, compound tag, "minecraft:jukebox_playable", {_jukebox_playable_nbt})
     
     # finalize custom item
     set {-customItems::%{_fullid}%} to {_item}
@@ -559,6 +784,7 @@ local function loadYaml(yaml:string):
 
 on load:
     clear {-customItems::*}
-    load all yaml from directory "plugins/Skript/scripts/customItems/yamls" using filename as id
-    loop loaded yaml files:
+    log info "‍🔥 Loading custom items..."
+    load all yaml from directory "plugins/Skript/scripts/customItems/yamls"
+    loop loaded yaml files where [input starts with "plugins/Skript/scripts/customItems/yamls/"]:
         loadYaml(loop-value)
