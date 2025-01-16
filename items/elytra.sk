@@ -1,7 +1,7 @@
-###
+
+# Elytra bouncing!
 on toggle gliding:
     player is gliding
     player is on ground
-    # check if space key held using predicate
+    player has space key held
     cancel event
-###
