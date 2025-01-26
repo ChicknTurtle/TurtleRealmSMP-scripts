@@ -1,6 +1,6 @@
 
 Options:
-    BotToken: "<REDACTED>"
+    BotToken: "MTEyMjk0ODE2MDYwMDQyNDQ2OQ.Gv6O6Q.XqDWpE3RL_PG0zKOOjrRg92UX_ILGDXnIO8JS4"
     DiscordChannelID: "1251617201757360149"
 
 on load:

@@ -1,7 +1,0 @@
-
-# Elytra bouncing!
-on toggle gliding:
-    player is gliding
-    player is on ground
-    player has space key held
-    cancel event

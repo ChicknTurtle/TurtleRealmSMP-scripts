@@ -1,0 +1,308 @@
+# namespace
+example:
+  items:
+    # item id
+    super_sword:
+      # base item (required)
+      base: minecraft:diamond_sword
+      # specify item model, defined in a resource pack (optional)
+      # https://minecraft.wiki/w/Items_model_definition
+      model: example:super_sword
+      # custom model data (optional)
+      custom_model_data:
+        # floats (???)
+        floats: null
+        # flags (???)
+        flags: null
+        # strings (???)
+        strings: null
+        # colors (???)
+        colors: null
+      # name (optional)
+      name: "Super Sword"
+      # rarity (optional)
+      # values: common, uncommon, rare, epic
+      rarity: epic
+      # lore (optional)
+      lore:
+        - "A super duper sword!"
+      # specify tooltip style, defined in a resource pack (optional)
+      tooltip_style: example:super
+      # hide additional tooltip (default=false)
+      hide_additional_tooltip: null
+      # hide entire tooltip (default=false)
+      hide_tooltip: null
+      # stack size (optional)
+      max_stack_size: 1
+      # damage resistant (optional)
+      # damage sources that the item won't take damage from
+      damage_resistant: "minecraft:is_fire"
+      # durability, -1 for unbreakable (optional)
+      max_damage: 500
+      # whether unbreakable should be shown in tooltip (default=false)
+      unbreakable_show_in_tooltip: null
+      # anvil repair items or tags (optional)
+      repairable:
+        - minecraft:blaze_rod
+      enchantments:
+      # force enchantment glint to be on or off (optional)
+      enchantment_glint_override: null
+      # enchantment value used for enchanting in enchanting table (optional)
+      # https://minecraft.wiki/w/Data_component_format#enchantable
+      enchantable: null
+      # item attributes (optional)
+      # https://minecraft.wiki/w/Attribute
+      attributes:
+        entity_interaction_range:
+          # amount (default=1)
+          amount: 1
+          # slot (default=any)
+          # values: any, hand, mainhand, offhand, armor, head, chest, legs, feet
+          slot: mainhand
+          # operation (default=add_value)
+          # values: add_value, add_multiplied_base, add_multiplied_total
+          operation: add_value
+      # whether attributes should be shown in tooltip (default=true)
+      show_attributes_in_tooltip: true
+      # tool options (optional)
+      tool:
+        # mining speed when no rules match (default=1.0)
+        default_mining_speed: 1.0
+        # durability removed for each block (default=1)
+        damage_per_block: 1
+        # tool rules (optional)
+        # rules can be a minecraft block tag or a single block id
+        rules:
+          minecraft:sword_efficient:
+            # override default mining speed (optional)
+            speed: null
+            # correct for drops (default=true)
+            correct_for_drops: null
+          shulker_boxes:
+            speed: 100
+          cobweb:
+            speed: 100
+      # consumable options (optional)
+      consumable:
+        # consume time in seconds (default=1.6)
+        consume_seconds: 2.4
+        # consume animation (default=eat)
+        # values: none, eat, drink, block, bow, spear, crossbow, spyglass, toot_horn, brush
+        animation: bow
+        # sound played while consuming (default="entity.generic.eat")
+        sound_event: "minecraft:block.beacon.activate"
+        # sound played after consuming (optional)
+        play_sound: "minecraft:block.beacon.power_select"
+        # whether particles are emitted (default=true)
+        has_consume_particles: false
+        # whether consuming should clear all effects (default=false)
+        clear_all_effects: false
+        # types of effects to remove
+        remove_effects:
+          - minecraft:slowness
+          - minecraft:poison
+          - minecraft:weakness
+          - minecraft:wither
+        # effects to apply
+        apply_effects:
+          minecraft:speed:
+            # amplifier of effect (default=1)
+            amplifier: 2
+            # duration of effect in seconds, -1 for infinite (default=15)
+            duration: 15
+            # whether particles should be shown (default=true)
+            show_particles: true
+            # whether icon should be shown (default=true)
+            show_icon: true
+            # whether there should be less particles like a beacon effect (default=false)
+            ambient: false
+          minecraft:glowing:
+            duration: 30
+          minecraft:strength: null
+        # percent chance of applying effects (default=100, rotten flesh=80)
+        probability: 100
+        # diameter the user teleports when consumed (default=0, chorus fruit=16)
+        teleport_randomly: 0
+      # use cooldown (optional)
+      use_cooldown:
+        # duration of cooldown in seconds (default=5)
+        seconds: 30
+        # cooldown group (default=<namespace>:<item>)
+        cooldown_group: null
+      # use remainder, can be a custom item (optional)
+      use_remainder: null
+      # nbt of remainder item (optional)
+      use_remainder_nbt: null
+      # additional nbt to add (optional)
+      nbt: "{}"
+    super_potion:
+      base: minecraft:splash_potion
+      name: "Super Potion"
+      rarity: epic
+      # custom potion options (optional)
+      potion_contents:
+        # vanilla minecraft potion to use as a base (optional)
+        # example: "minecraft:strong_swiftness"
+        potion: "minecraft:strong_swiftness"
+        # custom potion color in hex (optional)
+        custom_color: "#FFFF00"
+        # custom potion name (optional)
+        # uses translation key at "item.minecraft.<item type>.effect.<value>"
+        custom_name: "super"
+        # custom potion effects (optional)
+        custom_effects:
+          minecraft:strength:
+            # amplifier of effect (default=1)
+            amplifier: 2
+            # duration of effect in seconds, -1 for infinite (default=180)
+            duration: null
+            # whether particles should be shown (default=true)
+            show_particles: true
+            # whether icon should be shown (default=true)
+            show_icon: true
+            # whether there should be less particles like a beacon effect (default=false)
+            ambient: false
+          minecraft:resistance:
+            # amplifier of effect (default=1)
+            amplifier: 2
+            # duration of effect in seconds, -1 for infinite (default=180)
+            duration: 30
+          minecraft:glowing: null
+          minecraft:instant_health: null
+    super_snack:
+      base: minecraft:golden_apple
+      name: "Super Snack"
+      rarity: epic
+      # food options (optional)
+      food:
+        # nutrition (required)
+        nutrition: 8
+        # saturation (required)
+        saturation: 14.4
+        # can always eat (default=false)
+        can_always_eat: true
+      consumable:
+        consume_seconds: 1.6
+        animation: eat
+        sound_event: "minecraft:entity.generic.eat"
+        play_sound: "minecraft:entity.player.burp"
+        has_consume_particles: true
+        clear_all_effects: false
+        remove_effects:
+          - minecraft:weakness
+          - minecraft:infested
+          - minecraft:mining_fatigue
+        apply_effects:
+          minecraft:resistance:
+            amplifier: 2
+            duration: 20
+          minecraft:glowing:
+            duration: 5
+          minecraft:strength: null
+      use_cooldown:
+        seconds: 3
+      use_remainder: minecraft:apple
+      use_remainder_nbt: >
+        {item_name:'"Apple O\' Yummy"'}
+    super_chestplate:
+      base: minecraft:golden_chestplate
+      name: "Super Chestplate"
+      rarity: epic
+      max_damage: 12345
+      enchantments:
+        minecraft:protection: 50
+        thorns: 20
+        turtle:soulbound: 1
+      enchantment_glint_override: true
+      # equippable options (optional)
+      # https://minecraft.wiki/w/Data_component_format/equippable
+      equippable:
+        # slot (required)
+        # values: feet, legs, chest, head, body, mainhand, offhand
+        slot: chest
+        # sound played when equipped (default=item.armor.equip_generic)
+        equip_sound: "minecraft:entity.zombie_villager.cure"
+        # asset id (optional)
+        # specify equipped texture, defined in a resource pack
+        asset_id: "minecraft:gold"
+        # allowed entities (optional)
+        # a minecraft entity tag or a single entity id to limit which entities can equip the item
+        allowed_entities: null
+        # whether item can be equipped with a dispenser (default=true)
+        dispensable: false
+        # whether item can be equipped by right-clicking (default=true)
+        swappable: false
+        # whether item loses durability when wearer takes damage (default=true)
+        damage_on_hurt: true
+        # texture to use as camera overlay (optional)
+        camera_overlay: "minecraft:block/yellow_stained_glass"
+        # whether item can be used as an elytra (optional)
+        glider: false
+    super_totem:
+      base: totem_of_undying
+      name: "Super Totem"
+      rarity: epic
+      # options for item to be used like a totem (optional)
+      # can be set to 'true' for simple death protection
+      death_protection:
+        # sound to play when revived (optional)
+        play_sound: "minecraft:item.trident.thunder"
+        # whether reviving should clear all effects (default=false)
+        clear_all_effects: true
+        # types of effects to remove
+        remove_effects:
+          - minecraft:slowness
+        # effects to apply
+        apply_effects:
+          minecraft:resistance:
+            # amplifier of effect (default=1)
+            amplifier: 2
+            # duration of effect in seconds, -1 for infinite (default=15)
+            duration: 30
+            # whether particles should be shown (default=true)
+            show_particles: true
+            # whether icon should be shown (default=true)
+            show_icon: true
+            # whether there should be less particles like a beacon effect (default=false)
+            ambient: false
+          minecraft:regeneration:
+            amplifier: 2
+            duration: 5
+          minecraft:saturation:
+            amplifier: 1
+            duration: 1
+          minecraft:speed:
+            amplifier: 2
+            duration: 30
+          glowing:
+            duration: 15
+        # percent chance of applying effects (default=100, rotten flesh=80)
+        probability: 100
+        # diameter the user teleports like chorus fruit when revived (default=0)
+        teleport_randomly: 16
+    repeater_disc:
+      base: minecraft:repeater
+      # custom music disc options (optional)
+      jukebox_playable:
+        # id of song to play (required)
+        song: "wait"
+        # whether song is shown in tooltip (default=true)
+        show_in_tooltip: false
+minecraft:
+  items:
+    resin_clump:
+      # base item is not required for vanilla items
+      base: null
+      food:
+        nutrition: 1
+        saturation: 1
+        can_always_eat: true
+      consumable:
+        consume_seconds: 1
+    resin_brick:
+      food:
+        nutrition: 3
+        saturation: 3
+        can_always_eat: true
+      consumable:
+        consume_seconds: 1

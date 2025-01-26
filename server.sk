@@ -8,7 +8,7 @@ on load:
 # unlock recipes
 # send resource pack
 on join:
-    send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
+    #send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
     unlock recipes all recipes for player
 
 function updateTablist(p:player):

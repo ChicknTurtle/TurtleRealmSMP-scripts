@@ -1,0 +1,24 @@
+
+function updateItem(item:item) :: item:
+    set {_id} to getId({_item})
+    set {_rawitem} to getItem({_id})
+    if nbt of {_item} is nbt of {_rawitem}:
+        return {_item}
+    set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
+    add nbt of {_item} to nbt of {_newitem}
+    add nbt of {_rawitem} to nbt of {_newitem}
+    return {_newitem}
+
+on slot load:
+    set {_item} to updateItem(event-item)
+    #if event-string is "hopper/dropper":
+    #    event-inventory has room for 1 of {_item}
+    #    delete (slot event-integer of event-inventory)
+    #    add {_item} to event-inventory
+    #    exit trigger
+    set (slot event-integer of event-inventory) to {_item}
+    
+on entity add to world:
+    event-entity is a dropped item
+    set {_item} to updateItem(item of event-entity)
+    set item of event-entity to {_item}

@@ -181,6 +181,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
     set {_base} to yaml value "%{_path}%.base" of {_yaml}
     set {_basekey} to namespaced key from {_base}
     set {_item} to material from key {_basekey}
+    set {_item} to (material from key (namespaced key from {_fullid})) ? {_item}
     set string tag "customId" of custom nbt of {_item} to {_fullid}
     if {_item} isn't set:
         set {_basekey} to {_base} if {_basekey} isn't set
@@ -785,6 +786,6 @@ local function loadYaml(yaml:string):
 on load:
     clear {-customItems::*}
     log info "‍🔥 Loading custom items..."
-    load all yaml from directory "plugins/Skript/scripts/customItems/yamls"
-    loop loaded yaml files where [input starts with "plugins/Skript/scripts/customItems/yamls/"]:
-        loadYaml(loop-value)
+    loop all recursive files in "plugins/Skript/scripts/customItems/yamls":
+        load yaml loop-file as loop-file
+        loadYaml(loop-file)

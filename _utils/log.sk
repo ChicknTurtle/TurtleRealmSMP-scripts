@@ -5,6 +5,7 @@ effect:
         [custom] log %object% [to (console|terminal)] (with|at) (severity|level) info
     trigger:
         set {_msg} to "&8[Skript] &7%expr-1%"
+        replace "§r" with "§r§7" in {_msg}
         send {_msg} to console
 
 effect:
@@ -13,6 +14,7 @@ effect:
         [custom] log %object% [to (console|terminal)] (with|at) (severity|level) warn[ing]
     trigger:
         set {_msg} to "&6[Skript] &e%expr-1%"
+        replace "§r" with "§r§e" in {_msg}
         send {_msg} to console
 
 effect:
@@ -21,6 +23,7 @@ effect:
         [custom] log %object% [to (console|terminal)] (with|at) (severity|level) (error|severe)
     trigger:
         set {_msg} to "&4[Skript] &c%expr-1%"
+        replace "§r" with "§r§c" in {_msg}
         send {_msg} to console
 
 effect:
@@ -29,5 +32,6 @@ effect:
         [custom] log %object% [to (console|terminal)] (with|at) (severity|level) debug
     trigger:
         set {_msg} to "&3[Skript] &b%expr-1%"
+        replace "§r" with "§r§b" in {_msg}
         send {_msg} to console
         #send "&3debug: &b%expr-1%" to all ops

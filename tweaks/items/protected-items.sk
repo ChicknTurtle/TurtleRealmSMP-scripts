@@ -1,0 +1,56 @@
+
+on load:
+    set {features::protecteditems::name} to "Protected items"
+    set {features::protecteditems::desc} to "Certain items are invulnerable, glow, and will never despawn\nSee 'Protect death loot' to disable only for players"
+    set {features::protecteditems::warn} to "When disabled, previously protected items will stay protected"
+    set {features::protecteditems::icon} to glowstone dust
+
+function protectItem(e:entity):
+    {features::protectdeathitems::enabled} is true
+    {_e} is a dropped item
+    set boolean tag "custom;protectedItem" of full nbt of {_e} to true
+
+function isProtectedItem(e:entity) :: boolean:
+    if all:
+        {_e} is a dropped item
+        boolean tag "custom;protectedItem" of full nbt of {_e} is true
+    then:
+        return true
+    else:
+        return false
+
+local function protectedItemGlowLoop(e:entity):
+    while chunk at {_e} is loaded:
+        make {_e} glow for all players
+        wait 1 tick
+
+# handle protected items
+
+on damage of dropped item:
+    isProtectedItem(victim) is true
+    cancel event
+
+on item despawn:
+    isProtectedItem(event-entity) is true
+    cancel event
+
+on item merge:
+    if any:
+        isProtectedItem(event-entity) is true
+        isProtectedItem(future event-entity) is true
+    then:
+        cancel event
+
+on entity pickup:
+    event-player isn't a player
+    isProtectedItem(event-dropped item) is true
+    cancel event
+
+on entity added to world:
+    event-entity is a dropped item
+    if isProtectedItem(event-entity) is true:
+        protectedItemGlowLoop(event-entity)
+    # for newly spawned items
+    wait 1 tick
+    if isProtectedItem(event-entity) is true:
+        protectedItemGlowLoop(event-entity)
