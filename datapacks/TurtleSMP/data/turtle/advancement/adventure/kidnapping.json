@@ -1,17 +1,18 @@
 {
   "display": {
     "icon": {
-      "id": "minecraft:bundle",
+      "id": "minecraft:black_bundle",
       "components": {
         "minecraft:bundle_contents": [
           {
             "id": "minecraft:emerald"
           }
-        ]
+        ],
+        "minecraft:item_model": "turtle:mob_bundle"
       }
     },
     "title": "Kidnapping",
-    "description": "Pick up a baby villager with a bundle",
+    "description": "Pick up a baby villager with a mob bundle",
     "frame": "task"
   },
   "parent": "minecraft:adventure/trade",

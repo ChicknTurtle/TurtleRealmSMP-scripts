@@ -5,6 +5,12 @@ options:
 import:
     org.bukkit.inventory.InventoryHolder
 
+# Called when custom recipes are ready to be load
+event "recipesReady":
+    patterns:
+        [on|when] recipe[s] [are] ready [to load]
+        [on|when] ready [to] load recipe[s]
+
 # Called when an inventory slot loads
 event "slotLoad":
     patterns:

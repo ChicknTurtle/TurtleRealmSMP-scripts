@@ -108,6 +108,7 @@ on entity add to world:
 
 # update recipes
 function customItemsUpdateAllRecipes():
+    ###
     log info "‍🔥 Updating all recipes..."
     Bukkit.resetRecipes()
     loop all recipes:
@@ -117,3 +118,6 @@ function customItemsUpdateAllRecipes():
     delete {-ingredients::*}
     update server recipes
     log info "Finished updating all §b%size of all recipes% §rrecipes!"
+    ###
+    call custom event "recipesReady"
+    unlock recipes all recipes for all players

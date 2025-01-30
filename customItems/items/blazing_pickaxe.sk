@@ -1,4 +1,15 @@
 
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:blazing_pickaxe"
+        result: getItem("turtle:blazing_pickaxe")
+        shape: "bgb", " s ", " s "
+        category: "equipment"
+        ingredients:
+            set ingredient of "b" to blaze rod
+            set ingredient of "g" to golden pickaxe
+            set ingredient of "s" to netherite scrap
+
 on break:
     # ignore if sneaking
     player isn't sneaking

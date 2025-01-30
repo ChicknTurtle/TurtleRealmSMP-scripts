@@ -38,7 +38,7 @@ example:
       # damage sources that the item won't take damage from
       damage_resistant: "minecraft:is_fire"
       # durability, -1 for unbreakable (optional)
-      max_damage: 500
+      max_damage: 1500
       # whether unbreakable should be shown in tooltip (default=false)
       unbreakable_show_in_tooltip: null
       # anvil repair items or tags (optional)
@@ -62,6 +62,13 @@ example:
           # operation (default=add_value)
           # values: add_value, add_multiplied_base, add_multiplied_total
           operation: add_value
+        attack_damage:
+          # id (optional)
+          # needed to modify vanilla attributes of the item
+          id: minecraft:base_attack_damage
+          amount: 2
+          slot: mainhand
+          operation: add_multiplied_base
       # whether attributes should be shown in tooltip (default=true)
       show_attributes_in_tooltip: true
       # tool options (optional)
@@ -81,7 +88,7 @@ example:
           shulker_boxes:
             speed: 100
           cobweb:
-            speed: 100
+            speed: 1000
       # consumable options (optional)
       consumable:
         # consume time in seconds (default=1.6)
@@ -290,19 +297,26 @@ example:
         show_in_tooltip: false
 minecraft:
   items:
-    resin_clump:
+    dirt:
       # base item is not required for vanilla items
       base: null
-      food:
-        nutrition: 1
-        saturation: 1
-        can_always_eat: true
-      consumable:
-        consume_seconds: 1
-    resin_brick:
       food:
         nutrition: 3
         saturation: 3
         can_always_eat: true
       consumable:
-        consume_seconds: 1
+        consume_seconds: 3
+    chiseled_resin_bricks:
+      food:
+        nutrition: 30
+        saturation: 30
+        can_always_eat: true
+      consumable:
+        consume_seconds: 10
+    netherite_axe:
+      attributes:
+        attack_speed:
+          id: minecraft:base_attack_speed
+          amount: 100
+          slot: mainhand
+          operation: add_value
