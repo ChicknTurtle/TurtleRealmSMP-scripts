@@ -7,6 +7,6 @@ expression:
         [the] [nbt|offline] (head|skull) of %string%
     get:
         if expr-1 is set:
-            return player skull with nbt from "{profile:{name:""%expr-1%""}}"
+            return player head with nbt from "{profile:{name:""%expr-1%""}}"
         else:
-            return player skull
+            return player head

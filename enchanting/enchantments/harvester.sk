@@ -9,17 +9,17 @@ on break:
         cancel event
         stop trigger
     # crops
-    if event-block is wheat plant:
+    if event-block is wheat:
         set {_seeds} to wheat seeds
-    else if event-block is carrot plant:
+    else if event-block is carrots:
         set {_seeds} to carrot
-    else if event-block is potato plant:
+    else if event-block is potatoes:
         set {_seeds} to potato
-    else if event-block is beetroot plant:
+    else if event-block is beetroots:
         set {_seeds} to beetroot seeds
-    else if event-block is nether wart plant:
+    else if event-block is nether wart:
         set {_seeds} to nether wart
-    else if event-block is torchflower crop:
+    else if event-block is torchflower:
         set {_seeds} to torchflower seeds
     else if event-block is pitcher crop:
         set {_seeds} to pitcher pod

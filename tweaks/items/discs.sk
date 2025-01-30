@@ -15,7 +15,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to lime wool
     register shaped recipe:
         id: "turtle:music_disc_blocks"
@@ -23,7 +23,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to orange wool
     register shaped recipe:
         id: "turtle:music_disc_chirp"
@@ -31,15 +31,15 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
-            set ingredient of "#" to redstone dust
+            set ingredient of "f" to disc fragment 5
+            set ingredient of "#" to redstone
     register shaped recipe:
         id: "turtle:music_disc_far"
         result: music disc far
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to emerald
     register shaped recipe:
         id: "turtle:music_disc_mall"
@@ -47,7 +47,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to purple wool
     register shaped recipe:
         id: "turtle:music_disc_mellohi"
@@ -55,7 +55,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to amethyst shard
     register shaped recipe:
         id: "turtle:music_disc_stal"
@@ -63,7 +63,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to black wool
     register shaped recipe:
         id: "turtle:music_disc_strad"
@@ -71,7 +71,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to white wool
     register shaped recipe:
         id: "turtle:music_disc_ward"
@@ -79,7 +79,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to green wool
     register shaped recipe:
         id: "turtle:music_disc_wait"
@@ -87,7 +87,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to light blue wool
     register shaped recipe:
         id: "turtle:music_disc_13"
@@ -95,7 +95,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to gold ingot
     register shaped recipe:
         id: "turtle:music_disc_11"
@@ -103,7 +103,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to flint
     register shaped recipe:
         id: "turtle:music_disc_otherside"
@@ -111,7 +111,7 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to cyan wool
     register shaped recipe:
         id: "turtle:music_disc_5"
@@ -119,5 +119,5 @@ on load:
         shape: "fff", "f#f", "fff"
         category: "misc"
         ingredients:
-            set ingredient of "f" to disc fragment
+            set ingredient of "f" to disc fragment 5
             set ingredient of "#" to echo shard

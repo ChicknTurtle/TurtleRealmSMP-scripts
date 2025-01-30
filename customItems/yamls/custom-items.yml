@@ -1,0 +1,22 @@
+turtle:
+  items:
+    ravager_hide:
+      base: leather
+      name: "Ravager Hide"
+      rarity: uncommon
+      model: "turtle:ravager_hide"
+      damage_resistant: "minecraft:is_fire"
+    mob_bundle:
+      base: black_bundle
+      name: "Mob Bundle"
+      rarity: uncommon
+      model: "turtle:mob_bundle"
+      damage_resistant: "minecraft:is_fire"
+    blazing_pickaxe:
+      base: minecraft:diamond_pickaxe
+      name: "Blazing Pickaxe"
+      lore:
+        - "Automatically smelts block drops"
+      rarity: uncommon
+      model: "turtle:blazing_pickaxe"
+      damage_resistant: "minecraft:is_fire"

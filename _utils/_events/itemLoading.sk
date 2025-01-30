@@ -22,6 +22,10 @@ event "slotLoad":
 
 local function callEvent(item:item, inv:inventory, slot:integer, source:string=""):
     if {_item} isn't set:
+        if {_source} is "player join":
+            {_slot} >= 36
+            {_slot} <= 39
+            exit 2 sections
         log error "Item unset when calling for slot %{_slot}% of %{_inv}%"
         exit trigger
     {_item} isn't air
@@ -67,10 +71,11 @@ on join:
 
 # creative inv, /give etc
 on inventory slot change:
-    gamemode of player isn't creative
+    gamemode of player isn't creative # messes with cursor slot in creative
     set {_slot} to index of event-slot
-    callEvent(event-item, player's inventory, {_slot})
+    callEvent(event-item, player's inventory, {_slot}, "slot change")
 
+###
 # crafting
 on preparing craft:
     callEvent(event-item, event-inventory, 0, "crafting")
@@ -99,6 +104,7 @@ on inventory item move:
         set {_slot} to (loop-value) - 1
         set {_item} to (slot {_slot} of {_inv})
         callEvent({_item}, {_inv}, {_slot}, "hopper/dropper")
+###
 
 on book edit:
     set {_slot} to 40 if event.getSlot() is -1 else event.getSlot()

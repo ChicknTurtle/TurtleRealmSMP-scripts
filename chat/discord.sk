@@ -35,7 +35,8 @@ define new bot named "ChatLink":
     intents: default intents
 
     on ready:
-        discordSend("**:white_check_mark: Server Started**")
+        #discordSend("**:white_check_mark: Server Started**")
+        pass
 
 on message received:
     {features::discordlink::enabled} is true
@@ -47,6 +48,7 @@ on message received:
     set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7%discord name of event-user%"
     broadcast component merge components {_c::*}
 
+###
 on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
     {features::discordlink::enabled} is true
     cancel event
@@ -57,6 +59,7 @@ on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
     shutdown bot (bot named "ChatLink")
     wait 1 second
     stop server
+###
 
-on skript stop:
-    force shutdown bot (bot named "ChatLink")
+#on skript stop:
+#    force shutdown bot (bot named "ChatLink")

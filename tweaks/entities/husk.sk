@@ -2,7 +2,7 @@
 # zombie suffocate to husk
 on death of zombie:
     damage cause is suffocation
-    block at victim's head is sand or red sand or concrete powder
+    (tag values of block tag "concrete_powder"), sand, red sand contains block at victim's head
     cancel event
     set {_nbt} to full nbt of victim
     set {_loc} to victim's location
@@ -13,5 +13,5 @@ on death of zombie:
 
 on damage of husk:
     damage cause is suffocation
-    block at victim's head is sand or red sand or concrete powder
+    (tag values of block tag "concrete_powder"), sand, red sand contains block at victim's head
     cancel event

@@ -8,7 +8,7 @@ on load:
     set {features::croptrample::icon} to farmland
     set {features::bonemealing::name} to "Bonemealing"
     set {features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't\nWorks for: sugar cane, cactus, nether wart, pumpkins, melons, chorus flower"
-    set {features::bonemealing::icon} to bonemeal
+    set {features::bonemealing::icon} to bone meal
     set {features::planting::name} to "Planting"
     set {features::planting::desc} to "Allows planting certain items onto blocks\nCurrently just seeds on dirt to make grass"
     set {features::planting::icon} to wheat seeds
@@ -45,9 +45,9 @@ local function bonemealCropBlock(block:block) :: boolean:
     else:
         return false
 
-local function bonemealStemBlock(block:block) :: boolean:
+local function bonemealStemBlock(block:block, amount:integer=1) :: boolean:
     if (age of {_block}) is (max age of {_block}):
-        loop 100 times:
+        loop {_amount} times:
             {_block}.randomTick()
         play sound "minecraft:item.bone_meal.use" at {_block}
         make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
@@ -64,59 +64,59 @@ local function bonemealSingleTickBlock(block:block) :: boolean:
 
 on right click:
     {features::bonemealing::enabled} is true
-    player's tool is bonemeal
+    player's tool is bone meal
     # vertical growth block
     if (sugar cane, cactus) contains (type of event-block):
         bonemealVerticalGrowthBlock(event-block) is true
         make player swing their hand
         player's gamemode isn't creative
-        remove 1 of bonemeal from player's tool
+        remove 1 of bone meal from player's tool
     # crop block
     else if (nether wart) contains (type of event-block):
         bonemealCropBlock(event-block) is true
         make player swing their hand
         player's gamemode isn't creative
-        remove 1 of bonemeal from player's tool
+        remove 1 of bone meal from player's tool
     # stem block
     else if (pumpkin stem, melon stem) contains (type of event-block):
-        bonemealStemBlock(event-block) is true
+        bonemealStemBlock(event-block, 5) is true
         make player swing their hand
         player's gamemode isn't creative
-        remove 1 of bonemeal from player's tool
+        remove 1 of bone meal from player's tool
     # single tick block
     else if (chorus flower) contains (type of event-block):
         bonemealSingleTickBlock(event-block) is true
         make player swing their hand
         player's gamemode isn't creative
-        remove 1 of bonemeal from player's tool
+        remove 1 of bone meal from player's tool
 
 on BlockPreDispenseEvent:
     {features::bonemealing::enabled} is true
-    event.getItemStack() is bonemeal
+    event.getItemStack() is bone meal
     set {_block} to (block in front of event.getBlock())
     # vertical growth block
     if (sugar cane, cactus) contains (type of {_block}):
         bonemealVerticalGrowthBlock({_block}) is true
         cancel event
-        remove 1 bonemeal from slot event.getSlot() of inventory of event.getBlock()
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
         play sound "minecraft:block.dispenser.dispense" at event.getBlock()
     # crop block
     else if (nether wart) contains (type of {_block}):
         bonemealCropBlock({_block}) is true
         cancel event
-        remove 1 bonemeal from slot event.getSlot() of inventory of event.getBlock()
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
         play sound "minecraft:block.dispenser.dispense" at event.getBlock()
     # stem block
     else if (pumpkin stem, melon stem) contains (type of {_block}):
         bonemealStemBlock({_block}) is true
         cancel event
-        remove 1 bonemeal from slot event.getSlot() of inventory of event.getBlock()
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
         play sound "minecraft:block.dispenser.dispense" at event.getBlock()
     # single tick block
     else if (chorus flower) contains (type of {_block}):
         bonemealSingleTickBlock({_block}) is true
         cancel event
-        remove 1 bonemeal from slot event.getSlot() of inventory of event.getBlock()
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
         play sound "minecraft:block.dispenser.dispense" at event.getBlock()
 
 # apply seeds

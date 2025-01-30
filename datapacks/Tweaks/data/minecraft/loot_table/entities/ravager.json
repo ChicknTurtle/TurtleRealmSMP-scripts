@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:leather",
+          "functions": [
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{customId:\"turtle:ravager_hide\"}"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1,
+              "add": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": 1,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:saddle"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "minecraft:entities/ravager"
+}

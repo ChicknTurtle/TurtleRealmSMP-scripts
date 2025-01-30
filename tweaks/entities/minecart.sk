@@ -320,7 +320,7 @@ on load:
         category: "redstone"
         ingredients:
             add rail to ingredients
-            add redstone dust to ingredients
+            add redstone to ingredients
     register shapeless recipe:
         id: "minecraft:powered_rail"
         result: 1 powered rail
@@ -328,7 +328,7 @@ on load:
         ingredients:
             add rail to ingredients
             add copper ingot to ingredients
-            add redstone dust to ingredients
+            add redstone to ingredients
     register shapeless recipe:
         id: "minecraft:powered_rail_activator"
         result: 1 powered rail
@@ -345,22 +345,22 @@ on load:
         category: "redstone"
         ingredients:
             add rail to ingredients
-            add material choice of all pressure plates to ingredients
-            add redstone dust to ingredients
+            add material choice of (tag values of block tag "pressure_plates") to ingredients
+            add redstone to ingredients
     register shapeless recipe:
         id: "minecraft:detector_rail_activator"
         result: 1 detector rail
         category: "redstone"
         ingredients:
             add activator rail to ingredients
-            add material choice of all pressure plates to ingredients
+            add material choice of (tag values of block tag "pressure_plates") to ingredients
 
 # Right click apply
 on right click:
     {features::railrecipes::enabled} is true
     {@railApply} is true
     if event-block is rail:
-        player's held item is redstone dust
+        player's held item is redstone
         if player's gamemode isn't creative:
             remove 1 of player's tool from player's tool
         make player swing their hand
@@ -379,7 +379,7 @@ on right click:
             set {_s} to blockdata tag "shape" of event-block
             set event-block to powered rail
             set blockdata tag "shape" of event-block to {_s}
-        if player's held item is a pressure plate:
+        if (tag values of block tag "pressure_plates") contains player's held item:
             if player's gamemode isn't creative:
                 remove 1 of player's tool from player's tool
             make player swing their hand

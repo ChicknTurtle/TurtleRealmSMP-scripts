@@ -25,10 +25,14 @@ brig command /turtle:nbt:
         else:
             set {_ogpath} to {_path}
             replace "." with ";" in {_path}
-            set {_tag} to ((tag type of tag {_path} of nbt of tool) {_path} of {_nbt})
+            set {_tagtype} to (tag type of tag {_path} of nbt of tool)
+            if {_tagtype} is set:
+                set {_tag} to ({_tagtype} {_path} of {_nbt})
             if {_tag} isn't set:
                 set {_path} to "minecraft:%{_path}%"
-                set {_tag} to ((tag type of tag {_path} of nbt of tool) {_path} of {_nbt})
+                set {_tagtype} to (tag type of tag {_path} of nbt of tool)
+                {_tagtype} is set
+                set {_tag} to ({_tagtype} {_path} of {_nbt})
             if {_tag} is set:
                 if {_tag} is an nbt compound:
                     send pretty nbt of {_tag} to player

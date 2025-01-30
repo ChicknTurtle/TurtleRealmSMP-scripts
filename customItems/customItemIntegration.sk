@@ -6,6 +6,7 @@ function getId(item:item) :: string:
 
 # id > item
 function getItem(id:string) :: item:
+    {_id} is set
     set {_id} to namespaced key from {_id}
     if {-customItems::%{_id}%} is set:
         return {-customItems::%{_id}%}

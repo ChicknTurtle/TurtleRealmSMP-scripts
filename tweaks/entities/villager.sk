@@ -9,18 +9,9 @@ on entity start pathfinding:
     then:
         delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity
 
-# drop emeralds
-import:
-    org.bukkit.entity.Villager
-
-on death:
-    victim is instance of Villager
-    age of victim >= 0
-    drop (random number from 0 to 3) of emerald at victim ~ vector(0.5,0.5,0.5)
-
 # infinite trading
 import:
-    java.lang.Integer
+    java.lang.Integer as javaInteger
 
 on load:
     set {features::infinitetrading::name} to "Infinite trading"
@@ -32,6 +23,6 @@ on right click on villager:
     {features::infinitetrading::enabled} is true
     set {_trades::*} to merchant recipes of event-entity
     loop {_trades::*}:
-        loop-value.setMaxUses(Integer.MAX_VALUE)
+        loop-value.setMaxUses(javaInteger.MAX_VALUE)
         loop-value.setUses(0)
         loop-value.setDemand(0)

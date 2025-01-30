@@ -1,4 +1,6 @@
 
+using item_component
+
 on load:
     set {features::anvil::name} to "Anvil cost/renaming"
     set {features::anvil::desc} to "Item repair costs do not build up,\nand item renaming is free and can be colored"
@@ -10,16 +12,16 @@ on load:
 on anvil prepare:
     {features::anvil::enabled} is true
     # no cost stacking
-    reset repair cost of event-item
+    reset repair cost component of event-item
     # colored rename
-    set event-slot's name to colored event-item's name
+    set event-slot's name to (colored event-item's name)
     # remove rename cost
-    if name of slot 2 of event-inventory isn't set:
-        name of slot 0 of event-inventory isn't set
+    if name of (slot 2 of event-inventory) isn't set:
+        name of (slot 0 of event-inventory) isn't set
         add 1 to repair cost of event-inventory
-    if name of slot 2 of event-inventory isn't name of slot 0 of event-inventory:
+    if (name of slot 2 of event-inventory) isn't (name of slot 0 of event-inventory):
         subtract 1 from repair cost of event-inventory
-    if slot 1 of event-inventory is air:
+    if (slot 1 of event-inventory) is air:
         set repair cost of event-inventory to 0
 
 on right click on chipped anvil:
