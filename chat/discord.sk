@@ -1,7 +1,4 @@
 
-options:
-    DiscordLinkChannel: "1251617201757360149"
-
 on load:
     set {features::discordlink::name} to "Discord link"
     set {features::discordlink::desc} to "Links in-game chat with a discord channel"
@@ -10,7 +7,7 @@ on load:
 
 function discordSend(msg:string):
     {features::discordlink::enabled} is true
-    post {_msg} to text channel with id {@DiscordLinkChannel}
+    post {_msg} to text channel with id {-env::DiscordLinkChannel}
 
 function discordChat(msg:string, p:player):
     # waypoint
@@ -30,7 +27,7 @@ function discordChat(msg:string, p:player):
 on message received:
     {features::discordlink::enabled} is true
     event-user isn't a discord bot
-    discord id of event-channel is {@DiscordLinkChannel}
+    discord id of event-channel is {-env::DiscordLinkChannel}
     set {_c::1} to text component from "%effective name of event-member%:"
     set {_c::2} to text component from " &f%event-message%"
     set color format of {_c::1} to rgb(88, 101, 242)
