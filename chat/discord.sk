@@ -1,7 +1,6 @@
 
-Options:
-    BotToken: "MTEyMjk0ODE2MDYwMDQyNDQ2OQ.Gv6O6Q.XqDWpE3RL_PG0zKOOjrRg92UX_ILGDXnIO8JS4"
-    DiscordChannelID: "1251617201757360149"
+options:
+    DiscordLinkChannel: "1251617201757360149"
 
 on load:
     set {features::discordlink::name} to "Discord link"
@@ -11,7 +10,7 @@ on load:
 
 function discordSend(msg:string):
     {features::discordlink::enabled} is true
-    post {_msg} to text channel with id {@DiscordChannelID}
+    post {_msg} to text channel with id {@DiscordLinkChannel}
 
 function discordChat(msg:string, p:player):
     # waypoint
@@ -28,20 +27,10 @@ function discordChat(msg:string, p:player):
     set {_msg} to mcToMarkdown({_msg})
     discordSend("%{_p}'s name%: %{_msg}%")
 
-define new bot named "ChatLink": 
-
-    token: {@BotToken}
-
-    intents: default intents
-
-    on ready:
-        #discordSend("**:white_check_mark: Server Started**")
-        pass
-
 on message received:
     {features::discordlink::enabled} is true
     event-user isn't a discord bot
-    discord id of event-channel is {@DiscordChannelID}
+    discord id of event-channel is {@DiscordLinkChannel}
     set {_c::1} to text component from "%effective name of event-member%:"
     set {_c::2} to text component from " &f%event-message%"
     set color format of {_c::1} to rgb(88, 101, 242)
