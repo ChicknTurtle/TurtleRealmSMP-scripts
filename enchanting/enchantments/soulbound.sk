@@ -7,10 +7,19 @@ on death of player:
         remove loop-value from drops
         event.getItemsToKeep().add(loop-value)
 
+on drop:
+    player isn't sneaking
+    set {_e} to enchantment from key "turtle:soulbound"
+    event-item is enchanted with {_e}
+    cancel event
+    send actionbar "§cSneak to drop a soulbound item"
+    play sound "minecraft:block.note_block.hat" with volume 0.25 to player
+
 import:
     io.papermc.paper.event.block.BlockBreakBlockEvent
 
-on mine of any shulker box:
+on mine:
+    (tag values of block tag "shulker_boxes") contains event-block
     player's gamemode isn't creative
     set {_drops::*} to drops of event-block using player's tool
     set {_nbt} to empty nbt compound
@@ -26,7 +35,7 @@ on mine of any shulker box:
         drop {_drops::*} at location of event-block ~ vector(0.5,0.5,0.5)
 
 on BlockBreakBlockEvent:
-    event.getBlock() is any shulker box
+    (tag values of block tag "shulker_boxes") contains event.getBlock()
     set {_nbt} to empty nbt compound
     set compound tag "components" of {_nbt} to compound tag "components" of full nbt of event.getBlock()
     set {_e} to enchantment from key "turtle:soulbound"
@@ -42,9 +51,9 @@ on BlockBreakBlockEvent:
 # shulkers can't explode
 on explode:
     loop exploded blocks:
-        loop-block is any shulker box
+        (tag values of block tag "shulker_boxes") contains loop-block
         remove loop-block from exploded blocks
 on block explode:
     loop ...event.blockList():
-        loop-value is any shulker box
+        (tag values of block tag "shulker_boxes") contains loop-value
         event.blockList().remove(loop-value)

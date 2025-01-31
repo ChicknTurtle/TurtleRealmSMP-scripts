@@ -1,0 +1,36 @@
+minecraft:
+  items:
+    sugar:
+      food:
+        nutrition: 1
+        saturation: 1
+        can_always_eat: true
+      consumable:
+        consume_seconds: 0.8
+        apply_effects:
+          minecraft:speed:
+            amplifier: 1
+            duration: 10
+        probability: 33
+    resin_clump:
+      food:
+        nutrition: 1
+        saturation: 1
+        can_always_eat: true
+      consumable:
+        consume_seconds: 0.8
+    nether_wart:
+      food:
+        nutrition: 3
+        saturation: 1
+        can_always_eat: true
+      consumable:
+        consume_seconds: 0.8
+        apply_effects:
+          minecraft:nausea:
+            amplifier: 1
+            duration: 15
+        probability: 20
+    cookie:
+      consumable:
+        consume_seconds: 1.2

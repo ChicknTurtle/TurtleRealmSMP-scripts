@@ -1,0 +1,28 @@
+
+import:
+    java.io.File
+
+local function getFiles(dir:string) :: strings:
+    set {_dir} to new File({_dir})
+    loop ...{_dir}.listFiles() where [input.isFile()]:
+        add loop-value.getPath() to {_return::*}
+    return {_return::*}
+
+local function getFilesRecursive(dir:string) :: strings:
+    set {_dir} to new File({_dir})
+    loop ...{_dir}.listFiles():
+        if loop-value.isDirectory():
+            add getFilesRecursive(loop-value.getPath()) to {_return::*}
+        else:
+            add loop-value.getPath() to {_return::*}
+    return {_return::*}    
+
+plural expression:
+    patterns:
+        [all] [:recursive] files in [folder|directory] %string%
+    loop of: file
+    get:
+        if parse tags contains "recursive":
+            return getFilesRecursive(expr-1)
+        else:
+            return getFiles(expr-1)

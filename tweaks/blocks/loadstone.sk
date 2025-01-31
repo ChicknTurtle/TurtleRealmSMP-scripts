@@ -1,0 +1,61 @@
+
+on load:
+    set {features::loadstone::name} to "Loadstones"
+    set {features::loadstone::desc} to "Lodestones can be used as chunk-loaders\nTo activate one, use an echo shard on it"
+    set {features::loadstone::warn} to "Disabling only disables creating new loadstones"
+    set {features::loadstone::icon} to lodestone
+
+function tickChunk(chunk:chunk):
+    set {_world} to world of {_chunk}
+    set {_tickSpeed} to "%gamerule randomTickSpeed of {_world}%" parsed as integer
+    set {_sections} to ((max height of {_world}) + (min height of {_world}))/16
+    loop {_sections} times:
+        set {_y} to min height of {_world} + ((loop-number-1) - 1)*16
+        set {_x} to chunk x of {_chunk} * 16
+        set {_z} to chunk z of {_chunk} * 16
+        set {_pos1} to location({_x},{_y},{_z},{_world})
+        set {_blocks::*} to blocks within {_pos1} and {_pos1} ~ vector(15,16,15)
+        loop {_tickSpeed} times:
+            random tick random element out of {_blocks::*}
+
+function tickChunkTimes(chunk:chunk, times:integer):
+    loop {_times} times:
+        tickChunk({_chunk})
+        wait 1 tick
+
+function deactivateLoadstone(block:block):
+    {loadstones::*} contains {_block}
+    remove {_block} from {loadstones::*}
+    unload chunk at {_block}
+    play sound "minecraft:block.beacon.deactivate" at {_block}
+
+on load:
+    set {_s} to "" if (size of {loadstones::*} is 1) else "s"
+    log info "There are §b%size of {loadstones::*}% §rloadstone%{_s}% active."
+
+every tick:
+    loop {loadstones::*}:
+        if loop-value isn't lodestone:
+            deactivateLoadstone(loop-value)
+            continue
+        make 1 of sculk_charge using 0 at loop-value with offset vector(0.35,0.35,0.35) with extra 0.025
+        load chunk at loop-value with ticket
+
+on right click on lodestone:
+    {features::loadstone::enabled} is true
+    player's tool is echo shard
+    {loadstones::*} doesn't contain event-block
+    if player's gamemode isn't creative:
+        remove 1 of player's tool from player's tool
+    add event-block to {loadstones::*}
+    play sound "minecraft:block.beacon.activate" at event-block
+    cancel event
+    make player swing their hand
+    make 20 of sculk_charge using 0 at event-block with extra 0.1
+
+on break of lodestone:
+    deactivateLoadstone(event-block)
+
+on explode:
+    loop exploded blocks:
+        deactivateLoadstone(loop-block)

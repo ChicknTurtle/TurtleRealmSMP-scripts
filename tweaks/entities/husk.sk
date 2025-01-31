@@ -1,0 +1,17 @@
+
+# zombie suffocate to husk
+on death of zombie:
+    damage cause is suffocation
+    (tag values of block tag "concrete_powder"), sand, red sand contains block at victim's head
+    cancel event
+    set {_nbt} to full nbt of victim
+    set {_loc} to victim's location
+    delete victim
+    set float tag "Health" of {_nbt} to 20
+    spawn husk at {_loc} with nbt {_nbt}
+    play sound "minecraft:entity.husk.converted_to_zombie" in hostile category at {_loc}
+
+on damage of husk:
+    damage cause is suffocation
+    (tag values of block tag "concrete_powder"), sand, red sand contains block at victim's head
+    cancel event

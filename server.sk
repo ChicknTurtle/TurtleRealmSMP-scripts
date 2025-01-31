@@ -8,5 +8,12 @@ on load:
 # unlock recipes
 # send resource pack
 on join:
-    send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
+    #send resource pack "https://download.mc-packs.net/pack/d26f66a5b04c13f10f2ee90c53e8c3bfa818723e.zip" to player
     unlock recipes all recipes for player
+
+function updateTablist(p:player):
+    set {_players} to real online player count
+    set {_tps} to placeholder "spark_tps_5s"
+    set {_cpu} to placeholder "spark_cpu_system_10s"
+    set tablist header of {_p} to "                                             %nl%§x§F§F§5§F§1§5&lDev Server%nl%%nl%&7Players: %{_players}%%nl%"
+    set tablist footer of {_p} to "%nl%&7TPS: %{_tps}% &8- &7CPU: %{_cpu}%%nl%"

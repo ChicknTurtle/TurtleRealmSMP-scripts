@@ -1,0 +1,10 @@
+
+on load:
+    set {features::dismount::name} to "Dismount"
+    set {features::dismount::desc} to "Shift-click an entity to make it dismount its vehicle"
+    set {features::dismount::icon} to oak boat
+
+on player interact on entity:
+    {features::dismount::enabled} is true
+    player is sneaking
+    make event-entity dismount vehicle

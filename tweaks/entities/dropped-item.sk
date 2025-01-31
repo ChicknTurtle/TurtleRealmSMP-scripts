@@ -1,0 +1,11 @@
+
+# cactus and explosions don't destroy items
+# explosions launch items
+on damage of dropped item:
+    damage cause is contact, block explosion, or entity explosion
+    cancel event
+    damage cause is block explosion or entity explosion
+    set {_loc} to event.getDamageSource().getSourceLocation()
+    set {_v} to vector from {_loc} to victim
+    set vector length of {_v} to max(0, 4-vector length of {_v})
+    push victim {_v}

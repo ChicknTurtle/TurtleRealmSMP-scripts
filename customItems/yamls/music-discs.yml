@@ -1,0 +1,19 @@
+turtle:
+  items:
+    music_disc_megalovania:
+      base: music_disc_cat
+      model: "turtle:music_disc_megalovania"
+      jukebox_playable:
+        song: "turtle:megalovania"
+    music_disc_fly_octo_fly:
+      base: music_disc_cat
+      model: "turtle:music_disc_fly_octo_fly"
+      rarity: rare
+      jukebox_playable:
+        song: "turtle:fly_octo_fly"
+    music_disc_milky_ways:
+      base: music_disc_cat
+      model: "turtle:music_disc_milky_ways"
+      rarity: epic
+      jukebox_playable:
+        song: "turtle:milky_ways"

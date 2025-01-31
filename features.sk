@@ -76,6 +76,9 @@ command /features:
 # make sure all features are initialized
 on load:
     update_gui(1)
+    set {_s} to "" if (size of indexes of {features::*} is 1) else "s"
+    log info "Loaded §b%size of indexes of {features::*}% §rfeature%{_s}%."
+    
 
 on inventory click:
     string tag "gui" of custom nbt of slot 27 of top inventory is "featuretoggler"

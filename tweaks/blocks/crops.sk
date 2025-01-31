@@ -1,0 +1,133 @@
+
+import:
+    io.papermc.paper.event.block.BlockPreDispenseEvent
+
+on load:
+    set {features::croptrample::name} to "Crop trampling"
+    set {features::croptrample::desc} to "Crops cannot be trampled while wearing feather falling"
+    set {features::croptrample::icon} to farmland
+    set {features::bonemealing::name} to "Bonemealing"
+    set {features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't\nWorks for: sugar cane, cactus, nether wart, pumpkins, melons, chorus flower"
+    set {features::bonemealing::icon} to bone meal
+    set {features::planting::name} to "Planting"
+    set {features::planting::desc} to "Allows planting certain items onto blocks\nCurrently just seeds on dirt to make grass"
+    set {features::planting::icon} to wheat seeds
+
+# no trample with feather falling
+on block trample:
+    {features::croptrample::enabled} is true
+    if type of event-block is farmland:
+        boots of event-entity are enchanted with feather falling
+        cancel event
+
+# custom bonemeal blocks
+
+local function bonemealVerticalGrowthBlock(block:block) :: boolean:
+    set {_type} to type of {_block}
+    loop blocks between {_block} and location 1000 blocks above {_block}:
+        if loop-block is {_type}:
+            continue loop
+        if loop-block is air:
+            set loop-block to {_type}
+            loop-block.tick()
+            play sound "minecraft:item.bone_meal.use" at {_block}
+            make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
+            return true
+        return false
+
+local function bonemealCropBlock(block:block) :: boolean:
+    if (age of {_block}) isn't (max age of {_block}):
+        add 1 to age of {_block}
+        {_block}.tick()
+        play sound "minecraft:item.bone_meal.use" at {_block}
+        make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
+        return true
+    else:
+        return false
+
+local function bonemealStemBlock(block:block, amount:integer=1) :: boolean:
+    if (age of {_block}) is (max age of {_block}):
+        loop {_amount} times:
+            {_block}.randomTick()
+        play sound "minecraft:item.bone_meal.use" at {_block}
+        make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
+        return true
+    return false
+
+local function bonemealSingleTickBlock(block:block) :: boolean:
+    if (age of {_block}) isn't (max age of {_block}):
+        {_block}.randomTick()
+        play sound "minecraft:item.bone_meal.use" at {_block}
+        make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
+        return true
+    return false
+
+on right click:
+    {features::bonemealing::enabled} is true
+    player's tool is bone meal
+    # vertical growth block
+    if (sugar cane, cactus) contains (type of event-block):
+        bonemealVerticalGrowthBlock(event-block) is true
+        make player swing their hand
+        player's gamemode isn't creative
+        remove 1 of bone meal from player's tool
+    # crop block
+    else if (nether wart) contains (type of event-block):
+        bonemealCropBlock(event-block) is true
+        make player swing their hand
+        player's gamemode isn't creative
+        remove 1 of bone meal from player's tool
+    # stem block
+    else if (pumpkin stem, melon stem) contains (type of event-block):
+        bonemealStemBlock(event-block, 5) is true
+        make player swing their hand
+        player's gamemode isn't creative
+        remove 1 of bone meal from player's tool
+    # single tick block
+    else if (chorus flower) contains (type of event-block):
+        bonemealSingleTickBlock(event-block) is true
+        make player swing their hand
+        player's gamemode isn't creative
+        remove 1 of bone meal from player's tool
+
+on BlockPreDispenseEvent:
+    {features::bonemealing::enabled} is true
+    event.getItemStack() is bone meal
+    set {_block} to (block in front of event.getBlock())
+    # vertical growth block
+    if (sugar cane, cactus) contains (type of {_block}):
+        bonemealVerticalGrowthBlock({_block}) is true
+        cancel event
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
+        play sound "minecraft:block.dispenser.dispense" at event.getBlock()
+    # crop block
+    else if (nether wart) contains (type of {_block}):
+        bonemealCropBlock({_block}) is true
+        cancel event
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
+        play sound "minecraft:block.dispenser.dispense" at event.getBlock()
+    # stem block
+    else if (pumpkin stem, melon stem) contains (type of {_block}):
+        bonemealStemBlock({_block}) is true
+        cancel event
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
+        play sound "minecraft:block.dispenser.dispense" at event.getBlock()
+    # single tick block
+    else if (chorus flower) contains (type of {_block}):
+        bonemealSingleTickBlock({_block}) is true
+        cancel event
+        remove 1 bone meal from slot event.getSlot() of inventory of event.getBlock()
+        play sound "minecraft:block.dispenser.dispense" at event.getBlock()
+
+# apply seeds
+on right click on dirt:
+    {features::planting::enabled} is true
+    player isn't sneaking
+    player's tool is wheat seeds
+    event-blockface is up_face
+    cancel event
+    set event-block to grass block
+    play sound "minecraft:item.crop.plant" at event-block
+    make player swing their hand
+    player's gamemode isn't creative
+    remove 1 of player's tool from player's tool

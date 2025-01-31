@@ -1,0 +1,28 @@
+
+# forget far away job-sites
+on entity start pathfinding:
+    event-entity is a villager
+    set {_job} to event-entity's work station
+    if any:
+        world of event-entity isn't world of {_job}
+        distance between event-entity and {_job} > 256
+    then:
+        delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity
+
+# infinite trading
+import:
+    java.lang.Integer as javaInteger
+
+on load:
+    set {features::infinitetrading::name} to "Infinite trading"
+    set {features::infinitetrading::desc} to "Villager trades have infinite stock and no raising demand"
+    set {features::infinitetrading::warn} to "When disabled, previously interacted with villagers will still have infinite trades"
+    set {features::infinitetrading::icon} to emerald
+
+on right click on villager:
+    {features::infinitetrading::enabled} is true
+    set {_trades::*} to merchant recipes of event-entity
+    loop {_trades::*}:
+        loop-value.setMaxUses(javaInteger.MAX_VALUE)
+        loop-value.setUses(0)
+        loop-value.setDemand(0)

@@ -1,0 +1,388 @@
+
+# Better Minecarts
+# by ChicknTurtle
+
+# Made for use with the Minecart Improvements experiment
+
+# Features:
+# - Rail intersections
+# - Better rail recipes
+# - Directly apply items to make rails
+# - Display speed in action bar
+# - Immersive sounds
+# - All configurable! (See options section below)
+
+# Instructions:
+#  Speed
+#   Minecarts will slowly build up to max speed instead of instantly being max speed.
+#  Intersections
+#   Create a cross of rails with a detector rail in the center to create a rail intersection.
+#   The rail will automatically rotate when a minecart travels across it.
+#  Crafting
+#   Normal rails are crafted as usual. (6 iron ingots, 1 stick = 16 rails)
+#   Add redstone dust to a normal rail to create an activator rail
+#   Add a gold/copper ingot (depending on config) to an activator rail to create a powered rail.
+#   Add any pressure plate to an activator rail to create a detector rail.
+#   
+
+Options:
+
+    # Maximum speed of minecarts.
+    # Overwrites the minecartMaxSpeed gamerule.
+    # Set to 0 to not overwrite gamerule.
+    # vanilla = 8
+    # default = 40
+    maximumSpeed: 40
+
+    # Minumum speed of minecarts.
+    # default = 4
+    minimumSpeed: 4
+
+    # How fasts minecarts speed up.
+    # default = 5
+    speedup: 5
+
+    # Should detector rails be able to be used as intersections?
+    # default = true
+    intersection: true
+
+    # Should detector rails be able to be used as track switchers?
+    # The rail will turn in the direction you look.
+    # default = true
+    trackSwitcher: false
+
+    # Should detector rails be able to turn rails?
+    # Recommended to be enabled along with trackSwitcher.
+    # default = true
+    detectorNoTurn: false
+
+    # Should copper be used instead of gold to make powered rails?
+    # Note: they will still look gold unless you use a resource pack.
+    # default = true
+    useCopper: true
+
+    # Allow right click applying items to make rails?
+    # Example: right click with redstone on a normal rail
+    # default = true
+    railApply: true
+
+    # Display speed in action bar?
+    # Displayed in meters (blocks) per second.
+    # default = false
+    showSpeed: true
+
+    # Play skid sound when slowing down on unlit powered rails?
+    # default = true
+    skidSound: true
+
+    # Play small sounds?
+    # Currently just makes detector rails make small pops when triggered.
+    # default = true
+    smallSounds: true
+
+    # Should minecarts stop when going over soul sand?
+    # Won't stop minecarts that are on an active powered rail.
+    # default = true
+    soulsandStop: true
+
+import:
+    org.bukkit.entity.Minecart
+    org.bukkit.event.vehicle.VehicleMoveEvent
+    org.bukkit.event.vehicle.VehicleUpdateEvent
+    org.bukkit.event.block.BlockPhysicsEvent
+
+on load:
+    set {features::minecart::name} to "Minecart"
+    set {features::minecart::desc} to "Many minecart improvements, configurable in file"
+    set {features::minecart::warn} to "Placed carts need to be replaced when disabling"
+    set {features::minecart::icon} to minecart
+    set {features::railrecipes::name} to "Rail recipes"
+    set {features::railrecipes::desc} to "Add items to rails to craft other rail types"
+    set {features::railrecipes::warn} to "Requires server reload when disabling"
+    set {features::railrecipes::icon} to powered rail
+
+on VehicleUpdateEvent:
+    {features::minecart::enabled} is true
+    set {_cart} to event.getVehicle()
+    {_cart} is instance of Minecart
+
+    # Speed
+    set {_speed} to vector length of velocity of {_cart}
+    if {@showSpeed} is true:
+        set {_mps} to round({_speed}*20)
+        send actionbar "§3%{_mps}% §7ᴍ/s" to first element of {_cart}'s passengers
+
+    # Reset max speed if not moving
+    if {_speed} is 0:
+        set max minecart speed of {_cart} to {@minimumSpeed}/20
+
+on VehicleMoveEvent:
+    {features::minecart::enabled} is true
+    set {_cart} to event.getVehicle()
+    {_cart} is instance of Minecart
+
+    # Get max speed
+    if gamerule minecartMaxSpeed of world of {_cart} isn't {@maximumSpeed}:
+        set gamerule minecartMaxSpeed of world of {_cart} to {@maximumSpeed}
+    set {_maxSpeed} to "%gamerule minecartMaxSpeed of world of {_cart}%" parsed as number
+    set {_maxSpeed} to {_maxSpeed}/20
+
+    # Increase minecart speed
+    set {_speedIncrease} to 0.001*{@speedup}
+    set max minecart speed of {_cart} to min({_maxSpeed}, max minecart speed of {_cart} + {_speedIncrease})
+    if max minecart speed of {_cart} is {_maxSpeed}:
+        grantAdvancement("turtle:adventure/bullet_train", first element of {_cart}'s passengers)
+
+    # Soul sand stop
+    if {@soulsandStop} is true:
+        block under {_cart} is soul sand
+        block at {_cart} isn't powered rail[powered=true]
+        set velocity of {_cart} to vector(0,0,0)
+
+    # Unpowered rail brake sound
+    if block at {_cart} is powered rail:
+        blockdata tag "powered" of block at {_cart} is false
+        set {_vol} to vector length of {_cart}'s velocity
+        play sound "minecraft:block.grindstone.use" with volume {_vol}*0.5+0.1 and pitch 2 at {_cart}
+
+    # Intersection / Track Switcher
+    if any:
+        {@intersection} is true
+        {@trackSwitcher} is true
+    then:
+        set {_v} to velocity of {_cart}
+        loop blocks between {_cart} and {_cart} offset by {_v}:
+            # stop if end of rail
+            if loop-block isn't rail, activator rail, powered rail, or detector rail:
+                stop loop
+            # check if flat detector rail
+            loop-block is detector rail
+            blockdata tag "shape" of loop-block doesn't start with "ascending_"
+            # rotate detector rail (intersection)
+            if {@intersection} is true:
+                if blockdata tag "shape" of block at {_cart} is "east_west", "ascending_east" or "ascending_west":
+                    blockdata tag "shape" of loop-block isn't "east_west"
+                    set blockdata tag "shape" of loop-block to "east_west"
+                    stop loop
+                if blockdata tag "shape" of block at {_cart} is "north_south", "ascending_north" or "ascending_south":
+                    blockdata tag "shape" of loop-block isn't "north_south"
+                    set blockdata tag "shape" of loop-block to "north_south"
+                    stop loop
+            # rotate rail in front (track switcher)
+            if {@trackSwitcher} is true:
+                first element of {_cart}'s passengers is set
+                set vector length of {_v} to 1
+                set {_switch} to block at loop-block ~ {_v}
+                set {_dir1} to facing of vector ({_v} * -1)
+                set {_dir2} to facing of first element of {_cart}'s passengers
+                {_dir2} is north, south, east, or west
+                block at ({_switch}'s location ~ vector of direction {_dir2}) is rail, activator rail, powered rail, or detector rail
+                # super long rail logic D:
+                if all:
+                    {_dir1} is north
+                    {_dir2} is south
+                then:
+                    set {_north_south1} to true
+                if all:
+                    {_dir1} is south
+                    {_dir2} is north
+                then:
+                    set {_north_south2} to true
+                if all:
+                    {_dir1} is north
+                    {_dir2} is north
+                then:
+                    set {_north_south3} to true
+                if all:
+                    {_dir1} is south
+                    {_dir2} is south
+                then:
+                    set {_north_south4} to true
+                if all:
+                    {_dir1} is east
+                    {_dir2} is west
+                then:
+                    set {_east_west1} to true
+                if all:
+                    {_dir1} is west
+                    {_dir2} is east
+                then:
+                    set {_east_west2} to true
+                if all:
+                    {_dir1} is east
+                    {_dir2} is east
+                then:
+                    set {_east_west3} to true
+                if all:
+                    {_dir1} is west
+                    {_dir2} is west
+                then:
+                    set {_east_west4} to true
+                if all:
+                    {_dir1} is south
+                    {_dir2} is east
+                then:
+                    set {_south_east1} to true
+                if all:
+                    {_dir1} is east
+                    {_dir2} is south
+                then:
+                    set {_south_east2} to true
+                if all:
+                    {_dir1} is south
+                    {_dir2} is west
+                then:
+                    set {_south_west1} to true
+                if all:
+                    {_dir1} is west
+                    {_dir2} is south
+                then:
+                    set {_south_west2} to true
+                if all:
+                    {_dir1} is north
+                    {_dir2} is east
+                then:
+                    set {_north_east1} to true
+                if all:
+                    {_dir1} is east
+                    {_dir2} is north
+                then:
+                    set {_north_east2} to true
+                if all:
+                    {_dir1} is north
+                    {_dir2} is west
+                then:
+                    set {_north_west1} to true
+                if all:
+                    {_dir1} is west
+                    {_dir2} is north
+                then:
+                    set {_north_west2} to true
+                if any:
+                    {_north_south1} is true
+                    {_north_south2} is true
+                    {_north_south3} is true
+                    {_north_south4} is true
+                then:
+                    set {_shape} to "north_south"
+                if any:
+                    {_east_west1} is true
+                    {_east_west2} is true
+                    {_east_west3} is true
+                    {_east_west4} is true
+                then:
+                    set {_shape} to "east_west"
+                if any:
+                    {_south_east1} is true
+                    {_south_east2} is true
+                then:
+                    set {_shape} to "south_east"
+                if any:
+                    {_south_west1} is true
+                    {_south_west2} is true
+                then:
+                    set {_shape} to "south_west"
+                if any:
+                    {_north_east1} is true
+                    {_north_east2} is true
+                then:
+                    set {_shape} to "north_east"
+                if any:
+                    {_north_west1} is true
+                    {_north_west2} is true
+                then:
+                    set {_shape} to "north_west"
+                set blockdata tag "shape" of {_switch} to {_shape}
+
+# Detector rails don't turn rails
+on BlockPhysicsEvent:
+    {@detectorNoTurn} is true
+    event.getBlock() is rail
+    event.getSourceBlock() is detector rail
+    cancel event
+
+# Sounds
+on redstone change:
+    {features::minecart::enabled} is true
+    event-block is detector rail
+    {@smallSounds} is true
+    if redstone power of event-block is 0:
+        play sound "minecraft:block.copper_bulb.turn_on" at event-block
+    else:
+        play sound "minecraft:block.copper_bulb.turn_off" at event-block
+
+# Recipes
+on load:
+    {features::railrecipes::enabled} is true
+    register shapeless recipe:
+        id: "minecraft:activator_rail"
+        result: 1 activator rail
+        category: "redstone"
+        ingredients:
+            add rail to ingredients
+            add redstone to ingredients
+    register shapeless recipe:
+        id: "minecraft:powered_rail"
+        result: 1 powered rail
+        category: "redstone"
+        ingredients:
+            add rail to ingredients
+            add copper ingot to ingredients
+            add redstone to ingredients
+    register shapeless recipe:
+        id: "minecraft:powered_rail_activator"
+        result: 1 powered rail
+        category: "redstone"
+        ingredients:
+            add activator rail to ingredients
+            if {@useCopper} is true:
+                add copper ingot to ingredients
+            else:
+                add gold ingot to ingredients
+    register shapeless recipe:
+        id: "minecraft:detector_rail"
+        result: 1 detector rail
+        category: "redstone"
+        ingredients:
+            add rail to ingredients
+            add material choice of (tag values of block tag "pressure_plates") to ingredients
+            add redstone to ingredients
+    register shapeless recipe:
+        id: "minecraft:detector_rail_activator"
+        result: 1 detector rail
+        category: "redstone"
+        ingredients:
+            add activator rail to ingredients
+            add material choice of (tag values of block tag "pressure_plates") to ingredients
+
+# Right click apply
+on right click:
+    {features::railrecipes::enabled} is true
+    {@railApply} is true
+    if event-block is rail:
+        player's held item is redstone
+        if player's gamemode isn't creative:
+            remove 1 of player's tool from player's tool
+        make player swing their hand
+        set {_s} to blockdata tag "shape" of event-block
+        set event-block to activator rail
+        set blockdata tag "shape" of event-block to {_s}
+    if event-block is activator rail:
+        if {@useCopper} is true:
+            set {_i} to copper ingot
+        else:
+            set {_i} to gold ingot
+        if player's held item is {_i}:
+            if player's gamemode isn't creative:
+                remove 1 of player's tool from player's tool
+            make player swing their hand
+            set {_s} to blockdata tag "shape" of event-block
+            set event-block to powered rail
+            set blockdata tag "shape" of event-block to {_s}
+        if (tag values of block tag "pressure_plates") contains player's held item:
+            if player's gamemode isn't creative:
+                remove 1 of player's tool from player's tool
+            make player swing their hand
+            set {_s} to blockdata tag "shape" of event-block
+            set event-block to detector rail
+            set blockdata tag "shape" of event-block to {_s}

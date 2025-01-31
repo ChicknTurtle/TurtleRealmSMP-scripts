@@ -9,7 +9,7 @@ on load:
     set {features::deathmsgs::icon} to skeleton skull
     set {features::customchat::name} to "Custom chat"
     set {features::customchat::desc} to "Better looking and colorable chat messages\n[item] is replaced with your held item"
-    set {features::customchat::icon} to oak floor sign
+    set {features::customchat::icon} to oak sign
 
 on join:
     {features::joinleavemsgs::enabled} is true
@@ -55,4 +55,4 @@ on async chat:
     # send message
     set async chat format to {_format}
     replace "[item]" with "**[%{_name}%]**" in {_msg}
-    discordSend("%player%: %uncolored {_msg}%")
+    discordChat({_msg}, player)

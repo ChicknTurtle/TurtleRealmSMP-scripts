@@ -1,10 +1,6 @@
 
-import:
-    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-
-Options:
-    BotToken: "<REDACTED>"
-    DiscordChannelID: "1251617201757360149"
+options:
+    DiscordLinkChannel: "1251617201757360149"
 
 on load:
     set {features::discordlink::name} to "Discord link"
@@ -14,40 +10,45 @@ on load:
 
 function discordSend(msg:string):
     {features::discordlink::enabled} is true
-    post {_msg} to text channel with id {@DiscordChannelID}
+    post {_msg} to text channel with id {@DiscordLinkChannel}
 
-define new bot named "ChatLink": 
-
-    token: {@BotToken}
-
-    intents: default intents
-
-    on ready:
-        {features::discordlink::enabled} is true
-        discordSend("**:white_check_mark: Server Started**")
+function discordChat(msg:string, p:player):
+    # waypoint
+    if {_msg} contains "xaero-waypoint:":
+        set {_parts::*} to {_msg} split at ":"
+        loop {_parts::*}:
+            loop-value is "xaero-waypoint"
+            set {_name} to {_parts::%loop-iteration+1%}
+            stop loop
+        set {_name} to "Shared Waypoint" if {_name} is ""
+        discordSend(":round_pushpin: %{_p}'s name% shared a waypoint called **%{_name}%**")
+        stop
+    # chat
+    set {_msg} to mcToMarkdown({_msg})
+    discordSend("%{_p}'s name%: %{_msg}%")
 
 on message received:
     {features::discordlink::enabled} is true
     event-user isn't a discord bot
-    discord id of event-channel is {@DiscordChannelID}
+    discord id of event-channel is {@DiscordLinkChannel}
     set {_c::1} to text component from "%effective name of event-member%:"
     set {_c::2} to text component from " &f%event-message%"
     set color format of {_c::1} to rgb(88, 101, 242)
     set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7%discord name of event-user%"
     broadcast component merge components {_c::*}
 
-on command "/stop" or "/minecraft:stop":
+###
+on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
     {features::discordlink::enabled} is true
     cancel event
-    broadcast "§cStopping server..."
+    send "§cStopping server..." to all players
+    log info "Sending stop msg and stopping server..." to console
     discordSend("**:octagonal_sign: Server Stopped**")
-    wait 2 seconds
+    wait 1 second
+    shutdown bot (bot named "ChatLink")
+    wait 1 second
     stop server
+###
 
-on command "/restart" or "/spigot:restart":
-    {features::discordlink::enabled} is true
-    cancel event
-    broadcast "§cStopping server..."
-    discordSend("**:octagonal_sign: Server Stopped**")
-    wait 2 seconds
-    restart server
+#on skript stop:
+#    force shutdown bot (bot named "ChatLink")

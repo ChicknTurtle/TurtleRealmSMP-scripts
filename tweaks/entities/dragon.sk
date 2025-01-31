@@ -1,0 +1,15 @@
+
+on target:
+    target is an ender dragon
+    event-entity is an enderman
+    cancel event
+
+on death of ender dragon:
+    set {dragonDefeated} to true
+    set {_disc} to getItem("turtle:music_disc_milky_ways")
+    drop 1 of {_disc} at victim
+    protectItem(last dropped item)
+
+on load:
+    if {dragonDefeated} isn't set:
+        set {dragonDefeated} to false

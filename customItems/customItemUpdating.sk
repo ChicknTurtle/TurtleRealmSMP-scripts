@@ -1,0 +1,123 @@
+
+import:
+    org.bukkit.Bukkit
+    org.bukkit.inventory.SmithingTrimRecipe
+    org.bukkit.inventory.ShapedRecipe
+    org.bukkit.inventory.RecipeChoice
+
+function updateItem(item:item) :: item:
+    set {_id} to getId({_item})
+    set {_rawitem} to getItem({_id})
+    if nbt of {_item} is nbt of {_rawitem}:
+        return {_item}
+    set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
+    add nbt of {_item} to nbt of {_newitem}
+    add nbt of {_rawitem} to nbt of {_newitem}
+    return {_newitem}
+
+local function updateRecipe(id:string) :: object:
+    set {_key} to namespaced key from {_id}
+    set {_recipe} to Bukkit.getRecipe({_key})
+    set {_result} to updateItem(result of recipe {_id})
+    set {_type} to str(recipe type of recipe {_id})
+    if {_type} is "furnace_recipe":
+        register furnace recipe:
+            id: {_id}
+            result: {_result}
+            input: {_recipe}.getInputChoice()
+            group: {_recipe}.getGroup()
+            cooktime: cooktime of recipe {_id}
+            experience: experience of recipe {_id}
+            category: str({_recipe}.getCategory())
+    else if {_type} is "smoking_recipe":
+        register smoking recipe:
+            id: {_id}
+            result: {_result}
+            input: {_recipe}.getInputChoice()
+            group: {_recipe}.getGroup()
+            cooktime: cooktime of recipe {_id}
+            experience: experience of recipe {_id}
+            category: str({_recipe}.getCategory())
+    else if {_type} is "blasting_recipe":
+        register blasting recipe:
+            id: {_id}
+            result: {_result}
+            input: {_recipe}.getInputChoice()
+            group: {_recipe}.getGroup()
+            cooktime: cooktime of recipe {_id}
+            experience: experience of recipe {_id}
+            category: str({_recipe}.getCategory())
+    else if {_type} is "campfire_recipe":
+        register campfire recipe:
+            id: {_id}
+            result: {_result}
+            input: {_recipe}.getInputChoice()
+            cooktime: cooktime of recipe {_id}
+            experience: experience of recipe {_id}
+    else if {_type} is "shaped_recipe":
+        set {_newrecipe} to new ShapedRecipe({_id}, {_result})
+        {_newrecipe}.shape(...{_recipe}.getShape())
+        {_newrecipe}.setGroup({_recipe}.getGroup())
+        {_newrecipe}.setCategory({_recipe}.getCategory())
+        set {_map} to {_recipe}.getChoiceMap()
+        set {_chars::*} to ...{_map}.keySet()
+        loop {_chars::*}:
+            set {_char} to loop-value
+            loop ...{_map}.get({_char}).getChoices():
+                set {_material} to loop-value-2
+                set {_item} to {_material}.asItemType().createItemStack()
+                add updateItem({_item}) to {_choices::*}
+            set {_choice} to new RecipeChoice.ExactChoice([{_choices::*}])
+            {_newrecipe}.setIngredient({_char}, {_choice})
+    else if {_type} is "shapeless_recipe":
+        set {_ingredients::*} to ...{_recipe}.getChoiceList()
+        register shapeless recipe:
+            id: {_id}
+            result: {_result}
+            group: {_recipe}.getGroup()
+            category: str({_recipe}.getCategory())
+            ingredients:
+                loop {_ingredients::*}:
+                    add loop-value to ingredients
+    else if {_recipe} is instance of SmithingTrimRecipe:
+        pass
+    else if {_type} is "smithing_recipe":
+        register smithing recipe:
+            id: {_id}
+            result: {_result}
+            template: {_recipe}.getTemplate()
+            base: {_recipe}.getBase()
+            addition: {_recipe}.getAddition()
+            copynbt: {_recipe}.willCopyNbt()
+    else if {_type} is "stonecutting_recipe":
+        register stonecutting recipe for {_result} with ingredient {_recipe}.getInputChoice() with id {_id} in group {_recipe}.getGroup()
+    else if {_type} is "complex_recipe":
+        pass # too complex B)
+    else:
+        log error "Unknown recipe type %{_type}% for recipe %{_id}%"
+    return {_newrecipe}
+
+on slot load:
+    set {_item} to updateItem(event-item)
+    set (slot event-integer of event-inventory) to {_item}
+    
+on entity add to world:
+    event-entity is a dropped item
+    set {_item} to updateItem(item of event-entity)
+    set item of event-entity to {_item}
+
+# update recipes
+function customItemsUpdateAllRecipes():
+    ###
+    log info "‍🔥 Updating all recipes..."
+    Bukkit.resetRecipes()
+    loop all recipes:
+        updateRecipe(loop-value)
+        if mod(loop-iteration,100) is 0:
+            wait 1 tick
+    delete {-ingredients::*}
+    update server recipes
+    log info "Finished updating all §b%size of all recipes% §rrecipes!"
+    ###
+    call custom event "recipesReady"
+    unlock recipes all recipes for all players

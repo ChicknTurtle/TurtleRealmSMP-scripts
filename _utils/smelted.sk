@@ -1,0 +1,18 @@
+
+import:
+    org.bukkit.Bukkit
+
+# Smelted
+# Gets the smelted version of an item.
+expression:
+    patterns:
+        (smelt|cook)[ed] %itemtype%
+        %itemtype% (smelt|cook)ed
+    get:
+        loop all recipes where [(recipe type of recipe input) is furnace_recipe]:
+            set {_recipe} to Bukkit.getRecipe(namespaced key from loop-value)
+            {_recipe}.getInputChoice().test(expr-1) is true
+            set {_result} to {_recipe}.getResult()
+            set item amount of {_result} to item amount of expr-1
+            return {_result}
+        return expr-1

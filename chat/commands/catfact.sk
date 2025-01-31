@@ -1,4 +1,4 @@
-
+###
 import:
     java.lang.StringBuffer
     java.io.InputStreamReader
@@ -34,3 +34,4 @@ command /catfact:
             else:
                 broadcast {_con}.getErrorStream()
             {_con}.disconnect()
+###
