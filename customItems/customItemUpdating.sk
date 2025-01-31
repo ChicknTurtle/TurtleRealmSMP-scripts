@@ -7,7 +7,7 @@ import:
 
 function updateItem(item:item) :: item:
     set {_id} to getId({_item})
-    set {_rawitem} to getItem({_id})
+    set {_rawitem} to getItem({_id}) ? {_item}
     if nbt of {_item} is nbt of {_rawitem}:
         return {_item}
     set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
