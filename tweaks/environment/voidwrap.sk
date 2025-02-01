@@ -1,10 +1,10 @@
 
 local function warp(e:entity, world:text, coord:number):
     set {_loc} to {_e}'s location
-    set {_x} to x-coord of {_loc}
-    set {_z} to z-coord of {_loc}
-    set {_yaw} to yaw of {_loc}
-    set {_pitch} to pitch of {_loc}
+    set {_x} to (x-coord of {_loc})
+    set {_z} to (z-coord of {_loc})
+    set {_yaw} to (yaw of {_loc})
+    set {_pitch} to (pitch of {_loc})
     set {_dest} to location({_x}, {_coord}, {_z}, {_world}, {_yaw}, {_pitch})
     set {_v} to {_e}'s velocity
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
@@ -17,30 +17,30 @@ local function warp(e:entity, world:text, coord:number):
 on damage:
     damage cause is void
     cancel event
-    world of victim is "world_the_end"
+    (world of victim) is "world_the_end"
     warp(victim, "world", 500)
 
 on spawn of dropped item:
-    while event-entity is alive:
-        if y-coord of event-entity is less than (min height of world of event-entity - 64):
-            world of event-entity is "world_the_end"
+    while (event-entity is alive):
+        if ((y-coord of event-entity) < ((min height of (world of event-entity)) - 64)):
+            (world of event-entity) is "world_the_end"
             warp(event-entity, "world", 500)
         wait 1 tick
 
 on entity added to world:
     event-entity is a dropped item
-    while chunk at event-entity is loaded:
-        if y-coord of event-entity is less than (min height of world of event-entity - 64):
-            world of event-entity is "world_the_end"
+    while (chunk at event-entity is loaded):
+        if ((y-coord of event-entity) < ((min height of (world of event-entity)) - 64)):
+            (world of event-entity) is "world_the_end"
             warp(event-entity, "world", 500)
-        if event-entity isn't alive:
+        if (event-entity isn't alive):
             stop
         wait 1 tick
 
 on join:
-    while player is online:
-        if y-coord of player is more than 505:
+    while (player is online):
+        if ((y-coord of player) > 505):
             {dragonDefeated} is true
-            world of player is "world"
+            (world of player) is "world"
             warp(player, "world_the_end", -59)
         wait 1 tick
