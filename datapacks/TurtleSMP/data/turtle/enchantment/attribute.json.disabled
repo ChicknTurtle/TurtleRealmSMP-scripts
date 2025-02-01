@@ -12,7 +12,7 @@
           "per_level_above_first": -0.05
         },
         "attribute": "minecraft:generic.gravity",
-        "id": "turtlesmp:enchantment.gravitation",
+        "id": "turtle:enchantment.gravitation",
         "operation": "add_value"
       }
     ]
