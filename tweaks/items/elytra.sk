@@ -9,5 +9,5 @@ on toggle gliding:
     {features::elytrabounce::enabled} is true
     player is gliding
     player is on ground
-    player has space key held
+    player is pressing jump key
     cancel event

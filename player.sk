@@ -26,12 +26,12 @@ on join:
         
         # last moved
         if any:
-            player is pressing jump
-            player is pressing sneak
-            player is pressing w
-            player is pressing a
-            player is pressing s
-            player is pressing d
+            player is pressing jump key
+            player is pressing sneak key
+            player is pressing forward key
+            player is pressing backward key
+            player is pressing left key
+            player is pressing right key
         then:
             set {-playerdata::%player%::lastmoved} to now
         

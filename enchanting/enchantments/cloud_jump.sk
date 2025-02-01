@@ -52,7 +52,7 @@ on join:
             exit loop
     set {-playerdata::%player%::canCloudJump} to true
 
-on jump input:
+on player press of jump key:
     player isn't climbing
     player isn't in water
     player isn't in lava
