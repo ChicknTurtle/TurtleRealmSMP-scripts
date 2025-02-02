@@ -7,7 +7,7 @@ on load:
 
 function discordSend(msg:string):
     {enabledFeatures::discordlink} is true
-    post {_msg} to text channel with id {-env::DiscordLinkChannel}
+    post {_msg} to text channel with id {-env::discordLinkChannel}
 
 function discordChat(msg:string, p:player):
     # waypoint
@@ -27,7 +27,7 @@ function discordChat(msg:string, p:player):
 on message received:
     {enabledFeatures::discordlink} is true
     event-user isn't a discord bot
-    discord id of event-channel is {-env::DiscordLinkChannel}
+    discord id of event-channel is {-env::discordLinkChannel}
     set {_c::1} to text component from "%effective name of event-member%:"
     set {_c::2} to text component from " &f%event-message%"
     set color format of {_c::1} to rgb(88, 101, 242)
