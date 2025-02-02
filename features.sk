@@ -1,48 +1,41 @@
 
 local function build_item(feature:string) :: item:
     # icon
-    if {features::%{_feature}%::icon} is set:
-        set {_icon} to {features::%{_feature}%::icon}
+    if {-features::%{_feature}%::icon} is set:
+        set {_icon} to {-features::%{_feature}%::icon}
     if {_icon} isn't set:
         set {_icon} to cobblestone
         hide additional tooltip of {_icon}
     # name
-    if {features::%{_feature}%::name} is set:
-        set {_name} to "%{features::%{_feature}%::name}%"
+    if {-features::%{_feature}%::name} is set:
+        set {_name} to "%{-features::%{_feature}%::name}%"
     else:
         set {_name} to "Feature"
     # desc
-    if {features::%{_feature}%::desc} is set:
-        set {_desc::*} to "%{features::%{_feature}%::desc}%" split by "\n"
+    if {-features::%{_feature}%::desc} is set:
+        set {_desc::*} to "%{-features::%{_feature}%::desc}%" split by "\n"
         loop {_desc::*}:
             set {_desc::%loop-index%} to "§8%{_desc::%loop-index%}%"
     else:
         set {_desc::*} to {_}
     # warn
-    if {features::%{_feature}%::warn} is set:
-        set {_warn::*} to "%{features::%{_feature}%::warn}%" split by "\n"
+    if {-features::%{_feature}%::warn} is set:
+        set {_warn::*} to "%{-features::%{_feature}%::warn}%" split by "\n"
         loop {_warn::*}:
             set {_warn::%loop-index%} to "§e%{_warn::%loop-index%}%"
     else:
         set {_warn::*} to {_}
     # enabled
-    if {features::%{_feature}%::enabled} is set:
-        set {_enabled} to {features::%{_feature}%::enabled}
-    else:
-        set {_enabled} to true
-        set {features::%{_feature}%::enabled} to {_enabled}
-    if {_enabled} is true:
-        set {_enabledtext} to "§aEnabled"
-    else:
-        set {_enabledtext} to "§cDisabled"
+    set {_enabledtext} to ("§aEnabled" if ({enabledFeatures::%{_feature}%} is true) else "§cDisabled")
     set {_item} to {_icon} with custom nbt from "{feature:%{_feature}%}"
     set component item name of {_item} to text component from "§7%{_name}%"
     set lore of {_item} to {_desc::*} and {_warn::*} and {_enabledtext}
     return {_item}
 
 local function update_gui(page:integer) :: inventory:
-    set {_totalpages} to ceil((size of indexes of {features::*})/27)
-    loop indexes of {features::*}:
+    set {_totalpages} to ceil((size of indexes of {-features::*})/27)
+    loop indexes of {-features::*}:
+        set {enabledFeatures::%loop-value%} to {enabledFeatures::%loop-value%} ? true
         add build_item(loop-value) to {_feature-items::*}
     loop ({_page}-1)*27 times:
         delete {_feature-items::%loop-value%}
@@ -76,9 +69,8 @@ command /features:
 # make sure all features are initialized
 on load:
     update_gui(1)
-    set {_s} to "" if (size of indexes of {features::*} is 1) else "s"
-    log info "Loaded §b%size of indexes of {features::*}% §rfeature%{_s}%."
-    
+    set {_s} to "" if (size of indexes of {-features::*} is 1) else "s"
+    log info "Loaded §b%size of indexes of {-features::*}% §rfeature%{_s}%."
 
 on inventory click:
     string tag "gui" of custom nbt of slot 27 of top inventory is "featuretoggler"
@@ -87,16 +79,15 @@ on inventory click:
     # toggle feature
     set {_feature} to string tag "feature" of custom nbt of clicked slot
     if {_feature} is set:
-        set {_enabled} to {features::%{_feature}%::enabled}
-        if {_enabled} is true:
-            set {features::%{_feature}%::enabled} to false
+        if ({enabledFeatures::%{_feature}%} is true):
+            set {enabledFeatures::%{_feature}%} to false
         else:
-            set {features::%{_feature}%::enabled} to true
+            set {enabledFeatures::%{_feature}%} to true
         set clicked slot to build_item({_feature})
         play sound "minecraft:block.note_block.hat" with volume 0.25 with pitch 0.5 to player
     # pages
     set {_page} to int tag "page" of custom nbt of slot 27 of top inventory
-    set {_totalpages} to ceil((size of indexes of {features::*})/27)
+    set {_totalpages} to ceil((size of indexes of {-features::*})/27)
     # prev page
     if string tag "button" of custom nbt of custom nbt of clicked slot is "prev":
         {_page} > 1

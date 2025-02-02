@@ -11,5 +11,4 @@ on death of ender dragon:
     protectItem(last dropped item)
 
 on load:
-    if {dragonDefeated} isn't set:
-        set {dragonDefeated} to false
+    set {dragonDefeated} to {dragonDefeated} ? false

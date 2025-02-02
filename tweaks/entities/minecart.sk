@@ -92,17 +92,17 @@ import:
     org.bukkit.event.block.BlockPhysicsEvent
 
 on load:
-    set {features::minecart::name} to "Minecart"
-    set {features::minecart::desc} to "Many minecart improvements, configurable in file"
-    set {features::minecart::warn} to "Placed carts need to be replaced when disabling"
-    set {features::minecart::icon} to minecart
-    set {features::railrecipes::name} to "Rail recipes"
-    set {features::railrecipes::desc} to "Add items to rails to craft other rail types"
-    set {features::railrecipes::warn} to "Requires server reload when disabling"
-    set {features::railrecipes::icon} to powered rail
+    set {-features::minecart::name} to "Minecart"
+    set {-features::minecart::desc} to "Many minecart improvements, configurable in file"
+    set {-features::minecart::warn} to "Placed carts need to be replaced when disabling"
+    set {-features::minecart::icon} to minecart
+    set {-features::railrecipes::name} to "Rail recipes"
+    set {-features::railrecipes::desc} to "Add items to rails to craft other rail types"
+    set {-features::railrecipes::warn} to "Requires server reload when disabling"
+    set {-features::railrecipes::icon} to powered rail
 
 on VehicleUpdateEvent:
-    {features::minecart::enabled} is true
+    {enabledFeatures::minecart} is true
     set {_cart} to event.getVehicle()
     {_cart} is instance of Minecart
 
@@ -117,7 +117,7 @@ on VehicleUpdateEvent:
         set max minecart speed of {_cart} to {@minimumSpeed}/20
 
 on VehicleMoveEvent:
-    {features::minecart::enabled} is true
+    {enabledFeatures::minecart} is true
     set {_cart} to event.getVehicle()
     {_cart} is instance of Minecart
 
@@ -303,7 +303,7 @@ on BlockPhysicsEvent:
 
 # Sounds
 on redstone change:
-    {features::minecart::enabled} is true
+    {enabledFeatures::minecart} is true
     event-block is detector rail
     {@smallSounds} is true
     if redstone power of event-block is 0:
@@ -313,7 +313,7 @@ on redstone change:
 
 # Recipes
 on load:
-    {features::railrecipes::enabled} is true
+    {enabledFeatures::railrecipes} is true
     register shapeless recipe:
         id: "minecraft:activator_rail"
         result: 1 activator rail
@@ -357,7 +357,7 @@ on load:
 
 # Right click apply
 on right click:
-    {features::railrecipes::enabled} is true
+    {enabledFeatures::railrecipes} is true
     {@railApply} is true
     if event-block is rail:
         player's held item is redstone

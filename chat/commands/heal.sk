@@ -3,7 +3,7 @@ command /heal [<string>]:
     permission: op
     permission message: §cYou don't have permission!
     trigger:
-        {features::commands::enabled} is true
+        {enabledFeatures::commands} is true
         if arg-1 is set:
             set {_p} to arg-1 parsed as player
         else:

@@ -3,13 +3,13 @@ import:
     net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 
 on load:
-    set {features::advancementmsgs::name} to "Advancement messages"
-    set {features::advancementmsgs::desc} to "Better advancement messages"
-    set {features::advancementmsgs::icon} to gold block
+    set {-features::advancementmsgs::name} to "Advancement messages"
+    set {-features::advancementmsgs::desc} to "Better advancement messages"
+    set {-features::advancementmsgs::icon} to gold block
 
 # Display in chat
 on advancement done:
-    {features::advancementmsgs::enabled} is true
+    {enabledFeatures::advancementmsgs} is true
     (gamerule announceAdvancements of (world of player)) is true
     (event-advancement.getDisplay().doesAnnounceToChat()) is true
     event.message(null)

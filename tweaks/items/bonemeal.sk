@@ -3,9 +3,9 @@ import:
     io.papermc.paper.event.block.BlockPreDispenseEvent
 
 on load:
-    set {features::bonemealing::name} to "Bonemealing"
-    set {features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't\nWorks for: sugar cane, cactus, nether wart, pumpkins, melons,\nchorus flower, and small flowers (excluding wither rose and torchflower)"
-    set {features::bonemealing::icon} to bone meal
+    set {-features::bonemealing::name} to "Bonemealing"
+    set {-features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't\nWorks for: sugar cane, cactus, nether wart, pumpkins, melons,\nchorus flower, and small flowers (excluding wither rose and torchflower)"
+    set {-features::bonemealing::icon} to bone meal
 
 # bonemeal effects
 
@@ -78,7 +78,7 @@ local function bonemealFlowerBlock(block:block) :: boolean:
 # bonemeal events
 
 on right click:
-    {features::bonemealing::enabled} is true
+    {enabledFeatures::bonemealing} is true
     player's tool is bone meal
     # vertical growth block
     if (sugar cane, cactus) contains (type of event-block):
@@ -102,7 +102,7 @@ on right click:
         playerBonemeal(player)
 
 on BlockPreDispenseEvent:
-    {features::bonemealing::enabled} is true
+    {enabledFeatures::bonemealing} is true
     event.getItemStack() is bone meal
     set {_block} to (block in front of event.getBlock())
     # vertical growth block

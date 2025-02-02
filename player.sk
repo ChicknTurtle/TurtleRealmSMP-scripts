@@ -1,11 +1,11 @@
 
 on load:
-    set {features::dropskull::name} to "Drop skull"
-    set {features::dropskull::desc} to "When slain by another player, your head will be dropped"
-    set {features::dropskull::icon} to player head
-    set {features::protectdeathloot::name} to "Protect death loot"
-    set {features::protectdeathloot::desc} to "Whether player death drops should be protected\nSee 'Protected items' to fully disable protected items"
-    set {features::protectdeathloot::icon} to chest
+    set {-features::dropskull::name} to "Drop skull"
+    set {-features::dropskull::desc} to "When slain by another player, your head will be dropped"
+    set {-features::dropskull::icon} to player head
+    set {-features::protectdeathloot::name} to "Protect death loot"
+    set {-features::protectdeathloot::desc} to "Whether player death drops should be protected\nSee 'Protected items' to fully disable protected items"
+    set {-features::protectdeathloot::icon} to chest
 
 on join:
     set {-playerdata::%player%::velocity} to vector(0,0,0)
@@ -60,12 +60,12 @@ on join:
 
 on death of player:
     # drop skull
-    if {features::dropskull::enabled} is true:
+    if {enabledFeatures::dropskull} is true:
         attacker is player
         set {_head} to nbt skull of "%victim%"
         drop {_head} at victim's location
     # protected items
-    if {features::protectdeathloot::enabled} is true:
+    if {enabledFeatures::protectdeathloot} is true:
         set {_loc} to head location of victim
         wait 1 tick
         loop all dropped items in radius 2 of {_loc}:

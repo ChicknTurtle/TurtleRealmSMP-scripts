@@ -1,12 +1,12 @@
 
 on load:
-    set {features::elytrabounce::name} to "Elytra bouncing"
-    set {features::elytrabounce::desc} to "Hold space to not stop gliding"
-    set {features::elytrabounce::icon} to elytra
+    set {-features::elytrabounce::name} to "Elytra bouncing"
+    set {-features::elytrabounce::desc} to "Hold space to not stop gliding"
+    set {-features::elytrabounce::icon} to elytra
 
 # Elytra bouncing!
 on toggle gliding:
-    {features::elytrabounce::enabled} is true
+    {enabledFeatures::elytrabounce} is true
     player is gliding
     player is on ground
     player is pressing jump key

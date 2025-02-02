@@ -1,11 +1,11 @@
 
 on load:
-    set {features::bossmusic::name} to "Boss music"
-    set {features::bossmusic::desc} to "Plays music during bosses\nAdjusted using jukebox/noteblock sound slider"
-    set {features::bossmusic::icon} to music disc cat with nbt from "{item_model:""turtle:music_disc_milky_ways"",jukebox_playable:{song:""minecraft:cat"",show_in_tooltip:false}}"
+    set {-features::bossmusic::name} to "Boss music"
+    set {-features::bossmusic::desc} to "Plays music during bosses\nAdjusted using jukebox/noteblock sound slider"
+    set {-features::bossmusic::icon} to music disc cat with nbt from "{item_model:""turtle:music_disc_milky_ways"",jukebox_playable:{song:""minecraft:cat"",show_in_tooltip:false}}"
 
 every second:
-    {features::bossmusic::enabled} is true
+    {enabledFeatures::bossmusic} is true
     loop all players:
         # dragon
         set {_dragon} to nearest ender dragon to loop-player

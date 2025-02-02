@@ -8,10 +8,5 @@ effect:
     trigger:
         exit
 
-import:
-    java.lang.String as javaString
-function rgbToHex(r:integer, g:integer, b:integer) :: string:
-    return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
-
 function str(val:object) :: string:
     return "%{_val}%"

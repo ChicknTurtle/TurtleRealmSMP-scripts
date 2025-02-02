@@ -1,13 +1,13 @@
 
 on load:
-    set {features::commands::name} to "Commands"
-    set {features::commands::desc} to "Simple but useful commands\n/ping /heal /repair"
-    set {features::commands::warn} to "If disabled, commands will still be visible but not do anything"
-    set {features::commands::icon} to command block
+    set {-features::commands::name} to "Commands"
+    set {-features::commands::desc} to "Simple but useful commands\n/ping /heal /repair"
+    set {-features::commands::warn} to "If disabled, commands will still be visible but not do anything"
+    set {-features::commands::icon} to command block
 
 command /ping [<string>]:
     trigger:
-        {features::commands::enabled} is true
+        {enabledFeatures::commands} is true
         if arg-1 is set:
             set {_p} to arg-1 parsed as player
         else:
