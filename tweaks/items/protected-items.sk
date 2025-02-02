@@ -1,12 +1,12 @@
 
 on load:
-    set {features::protecteditems::name} to "Protected items"
-    set {features::protecteditems::desc} to "Certain items are invulnerable, glow, and will never despawn\nSee 'Protect death loot' to disable only for players"
-    set {features::protecteditems::warn} to "When disabled, previously protected items will stay protected"
-    set {features::protecteditems::icon} to glowstone dust
+    set {-features::protecteditems::name} to "Protected items"
+    set {-features::protecteditems::desc} to "Certain items are invulnerable, glow, and will never despawn\nSee 'Protect death loot' to disable only for players"
+    set {-features::protecteditems::warn} to "When disabled, previously protected items will stay protected"
+    set {-features::protecteditems::icon} to glowstone dust
 
 function protectItem(e:entity):
-    {features::protectdeathitems::enabled} is true
+    {enabledFeatures::protectdeathitems} is true
     {_e} is a dropped item
     set boolean tag "custom;protectedItem" of full nbt of {_e} to true
 

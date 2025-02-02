@@ -1,13 +1,13 @@
 
 on load:
-    set {features::musicdiscrecipes::name} to "Music disc recipes"
-    set {features::musicdiscrecipes::desc} to "Craftable music discs using disc fragments"
-    set {features::musicdiscrecipes::warn} to "Requires server reload when disabling"
-    set {features::musicdiscrecipes::icon} to music disc cat with nbt from "{jukebox_playable:{song:""minecraft:cat"",show_in_tooltip:false}}"
+    set {-features::musicdiscrecipes::name} to "Music disc recipes"
+    set {-features::musicdiscrecipes::desc} to "Craftable music discs using disc fragments"
+    set {-features::musicdiscrecipes::warn} to "Requires server reload when disabling"
+    set {-features::musicdiscrecipes::icon} to music disc cat with nbt from "{jukebox_playable:{song:""minecraft:cat"",show_in_tooltip:false}}"
 
 # disc recipes
 when ready to load recipes:
-    {features::musicdiscrecipes::enabled} is true
+    {enabledFeatures::musicdiscrecipes} is true
     remove recipe "minecraft:music_disc_5"
     register shaped recipe:
         id: "turtle:music_disc_cat"

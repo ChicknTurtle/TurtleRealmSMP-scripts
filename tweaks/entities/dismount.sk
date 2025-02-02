@@ -1,10 +1,18 @@
 
+import:
+    org.bukkit.entity.Minecart
+    org.bukkit.entity.Boat
+
 on load:
-    set {features::dismount::name} to "Dismount"
-    set {features::dismount::desc} to "Shift-click an entity to make it dismount its vehicle"
-    set {features::dismount::icon} to oak boat
+    set {-features::dismount::name} to "Dismount"
+    set {-features::dismount::desc} to "Shift-click an entity to make it dismount its vehicle"
+    set {-features::dismount::icon} to oak boat
 
 on player interact on entity:
-    {features::dismount::enabled} is true
+    {enabledFeatures::dismount} is true
     player is sneaking
-    make event-entity dismount vehicle
+    if any:
+        (vehicle of event-entity) is instance of Minecart
+        (vehicle of event-entity) is instance of Boat
+    then:
+        make event-entity dismount vehicle

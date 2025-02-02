@@ -1,12 +1,12 @@
 
 on load:
-    set {features::discordlink::name} to "Discord link"
-    set {features::discordlink::desc} to "Links in-game chat with a discord channel"
-    set {features::discordlink::warn} to "If formatting of chat, join/leave, or death messages is disabled,\nthose messages won't show up on discord"
-    set {features::discordlink::icon} to purple dye
+    set {-features::discordlink::name} to "Discord link"
+    set {-features::discordlink::desc} to "Links in-game chat with a discord channel"
+    set {-features::discordlink::warn} to "If formatting of chat, join/leave, or death messages is disabled,\nthose messages won't show up on discord"
+    set {-features::discordlink::icon} to purple dye
 
 function discordSend(msg:string):
-    {features::discordlink::enabled} is true
+    {enabledFeatures::discordlink} is true
     post {_msg} to text channel with id {-env::DiscordLinkChannel}
 
 function discordChat(msg:string, p:player):
@@ -25,7 +25,7 @@ function discordChat(msg:string, p:player):
     discordSend("%{_p}'s name%: %{_msg}%")
 
 on message received:
-    {features::discordlink::enabled} is true
+    {enabledFeatures::discordlink} is true
     event-user isn't a discord bot
     discord id of event-channel is {-env::DiscordLinkChannel}
     set {_c::1} to text component from "%effective name of event-member%:"
@@ -36,7 +36,7 @@ on message received:
 
 ###
 on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
-    {features::discordlink::enabled} is true
+    {enabledFeatures::discordlink} is true
     cancel event
     send "§cStopping server..." to all players
     log info "Sending stop msg and stopping server..." to console

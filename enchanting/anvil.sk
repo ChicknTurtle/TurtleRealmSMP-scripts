@@ -2,15 +2,15 @@
 using item_component
 
 on load:
-    set {features::anvil::name} to "Anvil cost/renaming"
-    set {features::anvil::desc} to "Item repair costs do not build up,\nand item renaming is free and can be colored"
-    set {features::anvil::icon} to anvil
-    set {features::anvilrepair::name} to "Anvil repairing"
-    set {features::anvilrepair::desc} to "Use iron blocks to repair anvils"
-    set {features::anvilrepair::icon} to damaged anvil
+    set {-features::anvil::name} to "Anvil cost/renaming"
+    set {-features::anvil::desc} to "Item repair costs do not build up,\nand item renaming is free and can be colored"
+    set {-features::anvil::icon} to anvil
+    set {-features::anvilrepair::name} to "Anvil repairing"
+    set {-features::anvilrepair::desc} to "Use iron blocks to repair anvils"
+    set {-features::anvilrepair::icon} to damaged anvil
 
 on anvil prepare:
-    {features::anvil::enabled} is true
+    {enabledFeatures::anvil} is true
     # no cost stacking
     reset repair cost component of event-item
     # colored rename
@@ -25,7 +25,7 @@ on anvil prepare:
         set repair cost of event-inventory to 0
 
 on right click on chipped anvil:
-    {features::anvilrepair::enabled} is true
+    {enabledFeatures::anvilrepair} is true
     player isn't sneaking
     player's tool is iron block
     cancel event
@@ -36,7 +36,7 @@ on right click on chipped anvil:
     play sound "minecraft:entity.iron_golem.repair" at event-block
 
 on right click on damaged anvil:
-    {features::anvilrepair::enabled} is true
+    {enabledFeatures::anvilrepair} is true
     player isn't sneaking
     player's tool is iron block
     cancel event

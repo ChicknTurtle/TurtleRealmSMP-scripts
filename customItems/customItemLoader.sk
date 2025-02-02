@@ -623,7 +623,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
         
         # custom color
         set {_custom_color} to yaml value "%{_path}%.potion_contents.custom_color" of {_yaml}
-        set {_custom_color} to hex_to_decimal({_custom_color})
+        set {_custom_color} to hexToDecimal({_custom_color})
         if {_custom_color} is set:
             set int tag "custom_color" of {_potion_contents_nbt} to {_custom_color}
         

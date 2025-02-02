@@ -5,7 +5,7 @@
 expression:
     patterns:
         [the] (effective|real) name of %itemstack%
-        %itemstack%'s (effective|name) name
+        %itemstack%'s (effective|real) name
     get:
         if name of expr-1 is set:
             return (name of expr-1) + "§r"
@@ -13,3 +13,15 @@ expression:
             return component item name of expr-1 + "§r"
         else:
             return translate component from (translation key of expr-1)
+
+# Spawn item
+# Get the item used to spawn an entity
+expression:
+    patterns:
+        [the] [effective|real] spawn[ ](item|egg) of %entity%
+        %entity%'s [effective|real] spawn[ ](item|egg)
+    get:
+        if spawn egg of expr-1 is set:
+            return spawn egg of expr-1
+        return ((str(type of expr-1) parsed as item type) ? {_})
+
