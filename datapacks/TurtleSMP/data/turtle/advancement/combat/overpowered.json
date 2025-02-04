@@ -1,0 +1,31 @@
+{
+  "parent": "turtle:combat/root",
+  "criteria": {
+    "overpowered": {
+      "conditions": {
+        "item": {
+          "items": "minecraft:enchanted_golden_apple"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "Eat an enchanted golden apple"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanted_golden_apple"
+    },
+    "title": {
+      "translate": "Overpowered"
+    }
+  },
+  "requirements": [
+    [
+      "overpowered"
+    ]
+  ]
+}

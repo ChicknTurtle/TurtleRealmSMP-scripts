@@ -92,6 +92,17 @@ on death of wandering trader:
     grantAdvancement("turtle:adventure/kill_wandering_trader", attacker)
 
 # Under the Sea
+every 5 seconds:
+    loop all players where [biome at input is warm ocean]:
+        set {_blocks::*} to (blocks in chunk at loop-player)
+        if any:
+            {_blocks::*} contains tube coral block
+            {_blocks::*} contains brain coral block
+            {_blocks::*} contains bubble coral block
+            {_blocks::*} contains fire coral block
+            {_blocks::*} contains horn coral block
+        then:
+            grantAdvancement("turtle:adventure/under_the_sea", loop-player)
 
 # Bullet Train
 # tweaks/entities/minecart.sk
@@ -135,3 +146,6 @@ on consume of nether wart:
 
 # Loadstone
 # tweaks/blocks/loadstone.sk
+
+# Overpowered
+# datapacks/TurtleSMP/data/turtle/advancement/combat/overpowered.json
