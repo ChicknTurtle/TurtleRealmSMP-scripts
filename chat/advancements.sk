@@ -85,7 +85,7 @@ on death of warden:
     grantAdvancement("turtle:adventure/kill_warden", attacker)
 
 # Kidnapping
-# items/bundle.sk
+# customItems/items/mob_bundle.sk
 
 # Wandering Ripoff
 on death of wandering trader:
@@ -94,7 +94,7 @@ on death of wandering trader:
 # Under the Sea
 
 # Bullet Train
-# entities/minecart.sk
+# tweaks/entities/minecart.sk
 
 # On a Rail
 import:
@@ -124,3 +124,14 @@ on damage of player:
     (biome at victim) is ("jungle" parsed as biome, sparse jungle, or bamboo jungle)
     grantAdvancement("turtle:adventure/tarzan", victim)
 
+# Feeling Blue
+on consume of nether wart:
+    wait 1 tick
+    player has potion nausea
+    set {_nauseas::*} to ((potion effects of player) where [type of input is nausea])
+    set {_nauseas::*} to {_nauseas::*} where [seconds of (potion duration of input) is 15]
+    (size of {_nauseas::*}) > 0
+    grantAdvancement("turtle:nether/feeling_blue", player)
+
+# Loadstone
+# tweaks/blocks/loadstone.sk
