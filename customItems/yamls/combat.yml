@@ -1,0 +1,25 @@
+minecraft:
+  items:
+    trident:
+      max_damage: 300
+      attributes:
+        attack_damage:
+          id: minecraft:base_attack_damage
+          amount: 8
+          slot: mainhand
+          operation: add_value
+        attack_speed:
+          id: minecraft:base_attack_speed
+          amount: -2.9000000953674316
+          slot: mainhand
+          operation: add_value
+        entity_interaction_range:
+          id: minecraft:base_entity_interaction_range
+          amount: 2
+          slot: mainhand
+          operation: add_value
+        block_interaction_range:
+          id: minecraft:base_block_interaction_range
+          amount: 2
+          slot: mainhand
+          operation: add_value

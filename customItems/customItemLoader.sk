@@ -307,7 +307,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
         replace " " with "_" in {_attr_id}
         
         # amount
-        set {_attr_amount} to getInteger({_path}, {_yaml}, "attributes.%loop-value%.amount", {_item})
+        set {_attr_amount} to getNumber({_path}, {_yaml}, "attributes.%loop-value%.amount", {_item})
         set {_attr_amount} to {_attr_amount} ? 1
         
         # equipslot
