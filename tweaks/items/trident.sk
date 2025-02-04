@@ -1,0 +1,18 @@
+
+on riptide:
+    set {-playerdata::%player%::riptideitem} to event-item
+
+on damage:
+    # check impaling
+    victim is wet
+    set {_direct} to (direct entity of damage source)
+    set {_weapon} to (({_direct}'s tool) ? (item of {_direct}))
+    if ({_direct} is riptiding):
+        set {_weapon} to ({-playerdata::%{_direct}%::riptideitem} ? {_weapon})
+    set {_lvl} to (level of impaling of {_weapon})
+    {_lvl} is set
+    # add damage
+    set {_added} to ({_lvl}*2)
+    set {_cooldown} to (({_direct}'s attack cooldown) ? 1)^2
+    set {_added} to ({_added} * {_cooldown})
+    add {_added} to damage

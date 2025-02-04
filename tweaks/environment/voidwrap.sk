@@ -8,34 +8,22 @@ local function warp(e:entity, world:text, coord:number):
     set {_dest} to location({_x}, {_coord}, {_z}, {_world}, {_yaw}, {_pitch})
     set {_v} to {_e}'s velocity
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
-    make 15 of witch at {_loc}
+    make 15 of witch at {_loc} with force
     teleport {_e} to {_dest}
     set {_e}'s velocity to {_v}
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
-    make 15 of witch at {_dest}
+    make 15 of witch at {_dest} with force
+
+on entity remove from world:
+    str(event-entityremovecause) is "out_of_world"
+    (environment of event-world) is end
+    warp(event-entity, "world", 500)
 
 on damage:
     damage cause is void
     cancel event
-    (world of victim) is "world_the_end"
+    (environment of event-world) is end
     warp(victim, "world", 500)
-
-on spawn of dropped item:
-    while (event-entity is alive):
-        if ((y-coord of event-entity) < ((min height of (world of event-entity)) - 64)):
-            (world of event-entity) is "world_the_end"
-            warp(event-entity, "world", 500)
-        wait 1 tick
-
-on entity added to world:
-    event-entity is a dropped item
-    while (chunk at event-entity is loaded):
-        if ((y-coord of event-entity) < ((min height of (world of event-entity)) - 64)):
-            (world of event-entity) is "world_the_end"
-            warp(event-entity, "world", 500)
-        if (event-entity isn't alive):
-            stop
-        wait 1 tick
 
 on join:
     while (player is online):
