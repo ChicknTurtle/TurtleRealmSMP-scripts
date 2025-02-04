@@ -6,9 +6,10 @@ on load:
     set {-features::protecteditems::icon} to glowstone dust
 
 function protectItem(e:entity):
-    {enabledFeatures::protectdeathitems} is true
+    {enabledFeatures::protecteditems} is true
     {_e} is a dropped item
     set boolean tag "custom;protectedItem" of full nbt of {_e} to true
+    protectedItemGlowLoop({_e})
 
 function isProtectedItem(e:entity) :: boolean:
     if all:
@@ -48,9 +49,5 @@ on entity pickup:
 
 on entity added to world:
     event-entity is a dropped item
-    if isProtectedItem(event-entity) is true:
-        protectedItemGlowLoop(event-entity)
-    # for newly spawned items
-    wait 1 tick
     if isProtectedItem(event-entity) is true:
         protectedItemGlowLoop(event-entity)
