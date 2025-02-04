@@ -390,13 +390,14 @@ local function loadItem(namespace:string, id:string, yaml:string):
 
         # can always eat
         set {_can_always_eat} to getBoolean({_path}, {_yaml}, "food.can_always_eat", {_item})
-        set {_can_always_eat} to false if {_can_always_eat} isn't set
+        set {_can_always_eat} to {_can_always_eat} ? false
         
         # set food
         apply food component to {_item}:
             nutrition: {_nutrition}
             saturation: {_saturation}
-            can_always_eat: {_can_always_eat}
+            #can_always_eat: {_can_always_eat}
+        set boolean tag "minecraft:food;can_always_eat" of vanilla nbt of {_item} to true # can_always_eat hotfix
         
         # ensure item is edible
         if yaml value "%{_path}%.consumable" of {_yaml} isn't set:

@@ -38,6 +38,7 @@ on right click on lodestone:
             remove 1 of echo shard from player's tool
     add event-block to {loadstones::*}
     play sound "minecraft:block.beacon.activate" at event-block
+    grantAdvancement("turtle:nether/loadstone", player)
     cancel event
     make player swing their hand
     make 20 of sculk_charge using 0 at event-block with extra 0.1
