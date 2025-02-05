@@ -806,4 +806,6 @@ on load:
     loop all recursive files in "plugins/Skript/scripts/customItems/yamls":
         load yaml loop-file as loop-file
         loadYaml(loop-file)
+    set {_s} to "" if (size of {-customItems::*} is 1) else "s"
+    log info "Loaded &b%size of {-customItems::*}% &rcustom item%{_s}%."
     customItemsUpdateAllRecipes()
