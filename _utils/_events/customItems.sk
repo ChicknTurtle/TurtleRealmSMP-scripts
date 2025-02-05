@@ -17,15 +17,6 @@ event "slotLoad":
         [on] [inv[entory]] (item|slot) load[ed]
     event-values: item, inventory, integer, string
 
-#on slot load:
-#    set {_id} to getId(event-item)
-#    actionbar("&3%{_id}% loaded")
-
-#on entity add to world:
-#    event-entity is a dropped item
-#    set {_id} to getId(item of event-entity)
-#    actionbar("&6%{_id}% loaded")
-
 local function callEvent(item:item, inv:inventory, slot:integer, source:string=""):
     if {_item} isn't set:
         if {_source} is "player join":
@@ -45,6 +36,7 @@ function loadChunkSlots(chunk:chunk):
     set {_start} to now
     set {_totalslots} to 0
     set {_blocks::*} to (...{_chunk}.getTileEntities(true)) where [inventory of input is set]
+    set {_blocks::*} to {_blocks::*} where [input doesn't have a loottable]
     set {_entities::*} to ((...{_chunk}.getEntities()) where [input is an instance of InventoryHolder]) where [input isn't a player]
     loop {_blocks::*}:
         set {_inv} to inventory of loop-value
@@ -69,6 +61,13 @@ function loadChunkSlots(chunk:chunk):
 on chunk load:
     loadChunkSlots(event-chunk)
 
+# chest loot generating
+on loot generate:
+    loop loot:
+        add updateItem(loop-value) to {_newloot::*}
+    set loot to {_newloot::*}
+    # can't really call event here, since no inventory
+
 # player joining
 on join:
     loop (amount of slots of player's inventory) times:
@@ -81,38 +80,6 @@ on inventory slot change:
     set {_slot} to index of event-slot
     callEvent(event-item, player's inventory, {_slot}, "slot change")
 
-###
-# crafting
-on preparing craft:
-    callEvent(event-item, event-inventory, 0, "crafting")
-
-# smelting
-#on smelt:
-#    set {_inv} to inventory of event-block
-#    callEvent(slot 2 of {_inv}, {_inv}, 2, "smelting")
-
-# hoppers
-on inventory pickup:
-    loop (amount of slots of event-inventory) times:
-        set {_item} to (slot loop-value of event-inventory)
-        callEvent({_item}, event-inventory, loop-value, "hopper from dropped")
-
-# hoppers, droppers
-on inventory item move:
-    # from block
-    #loop (amount of slots of event-inventory) times:
-    #    set {_slot} to (loop-value) - 1
-    #    set {_item} to (slot {_slot} of event-inventory)
-    #    callEvent({_item}, event-inventory, {_slot})
-    # to block
-    set {_inv} to inventory of future event-block
-    loop (amount of slots of {_inv}) times:
-        set {_slot} to (loop-value) - 1
-        set {_item} to (slot {_slot} of {_inv})
-        callEvent({_item}, {_inv}, {_slot}, "hopper/dropper")
-###
-
 on book edit:
     set {_slot} to 40 if event.getSlot() is -1 else event.getSlot()
     callEvent(event-item, player's inventory, {_slot}, "book edit")
-
