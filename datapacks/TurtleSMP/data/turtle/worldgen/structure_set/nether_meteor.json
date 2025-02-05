@@ -1,17 +1,15 @@
 {
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1646207470,
+    "separation": 12,
+    "spacing": 38,
+    "spread_type": "linear"
+  },
   "structures": [
     {
       "structure": "turtle:nether_meteor",
       "weight": 1
     }
-  ],
-  "placement": {
-    "type": "minecraft:random_spread",
-    "spacing": 50,
-    "separation": 20,
-    "spread_type": "linear",
-    "salt": 1646207470,
-    "frequency_reduction_method": "default",
-    "frequency": 0.5
-  }
+  ]
 }
