@@ -20,3 +20,13 @@ turtle:
       rarity: uncommon
       model: "turtle:blazing_pickaxe"
       damage_resistant: "minecraft:is_fire"
+    chorium_cluster:
+      base: netherite_scrap
+      name: "Chorium Cluster"
+      rarity: epic
+      model: "turtle:chorium_cluster"
+    chorium_ingot:
+      base: netherite_scrap
+      name: "Chorium Ingot"
+      rarity: epic
+      model: "turtle:chorium_ingot"

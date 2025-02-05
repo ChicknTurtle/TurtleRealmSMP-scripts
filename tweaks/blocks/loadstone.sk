@@ -13,7 +13,8 @@ function deactivateLoadstone(block:block):
 
 on load:
     set {_s} to "" if (size of {loadstones::*} is 1) else "s"
-    log info "There are §b%size of {loadstones::*}% §rloadstone%{_s}% active."
+    set {_are} to "is" if (size of {loadstones::*} is 1) else "are"
+    log info "There %{_are}% §b%size of {loadstones::*}% §rloadstone%{_s}% active."
 
 every tick:
     loop {loadstones::*}:
