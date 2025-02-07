@@ -30,3 +30,30 @@ turtle:
       name: "Chorium Ingot"
       rarity: epic
       model: "turtle:chorium_ingot"
+    chorium_upgrade_smithing_template:
+      base: netherite_upgrade_smithing_template
+      name: "Chorium Upgrade"
+      rarity: rare
+      lore:
+        - "§fSmithing Template"
+        - ""
+        - "§fApplies to:"
+        - "§9 Elytra"
+        - "§fIngredients:"
+        - "§9 Chorium Ingot"
+      hide_additional_tooltip: true
+      model: "turtle:chorium_upgrade_smithing_template"
+    chorium_elytra:
+      base: minecraft:elytra
+      name: "Chorium Plated Elytra"
+      rarity: epic
+      model: "turtle:chorium_elytra"
+      max_damage: 900
+      repairable:
+        - turtle:chorium_ingot
+      enchantable: 3
+      equippable:
+        slot: chest
+        asset_id: "turtle:chorium_elytra"
+        equip_sound: "minecraft:item.armor.equip_diamond"
+        damage_on_hurt: false

@@ -100,6 +100,13 @@ local function updateRecipe(id:string) :: object:
 on slot load:
     set {_item} to updateItem(event-item)
     set (slot event-integer of event-inventory) to {_item}
+
+# chest loot generating
+# not called in 'on slot load'
+on loot generate:
+    loop loot:
+        add updateItem(loop-value) to {_newloot::*}
+    set loot to {_newloot::*}
     
 on entity add to world:
     event-entity is a dropped item

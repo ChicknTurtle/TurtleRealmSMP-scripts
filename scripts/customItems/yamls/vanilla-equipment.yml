@@ -1,5 +1,8 @@
 minecraft:
   items:
+    elytra:
+      max_damage: 450
+      enchantable: 3
     trident:
       max_damage: 300
       attributes:

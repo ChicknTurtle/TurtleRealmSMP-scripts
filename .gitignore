@@ -1,4 +1,14 @@
+# System files
 .DS_Store
-test.sk
-env.sk
-customItems/yamls/example-items.yml
+
+# Skript files
+/variables.csv
+/config.sk
+/features.sk
+/backups
+/lang
+
+# Custom hidden files
+/scripts/test.sk
+/scripts/env.sk
+/scripts/customItems/yamls/example-items.yml
