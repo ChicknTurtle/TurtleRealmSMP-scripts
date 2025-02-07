@@ -236,7 +236,13 @@ local function loadItem(namespace:string, id:string, yaml:string):
     # hide additional tooltip
     set {_hide_additional_tooltip} to getBoolean({_path}, {_yaml}, "hide_additional_tooltip", {_item})
     if {_hide_additional_tooltip} is set:
-        set boolean tag "minecraft:hide_additional_tooltip" of vanilla nbt of {_item} to {_hide_additional_tooltip}
+        if {_hide_additional_tooltip} is true:
+            compound tag "minecraft:hide_additional_tooltip" of vanilla nbt of {_item} isn't set
+            set compound tag "minecraft:hide_additional_tooltip" of nbt of {_item} to empty nbt compound
+        else:
+            compound tag "minecraft:hide_additional_tooltip" of vanilla nbt of {_item} is set
+            delete compound tag "minecraft:hide_additional_tooltip" of nbt of {_item}
+            set compound tag "!minecraft:hide_additional_tooltip" of nbt of {_item} to empty nbt compound
     
     # hide tooltip
     set {_hide_tooltip} to getBoolean({_path}, {_yaml}, "hide_tooltip", {_item})

@@ -61,13 +61,6 @@ function loadChunkSlots(chunk:chunk):
 on chunk load:
     loadChunkSlots(event-chunk)
 
-# chest loot generating
-on loot generate:
-    loop loot:
-        add updateItem(loop-value) to {_newloot::*}
-    set loot to {_newloot::*}
-    # can't really call event here, since no inventory
-
 # player joining
 on join:
     loop (amount of slots of player's inventory) times:

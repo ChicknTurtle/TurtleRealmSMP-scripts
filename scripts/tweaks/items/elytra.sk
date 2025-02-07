@@ -10,4 +10,7 @@ on toggle gliding:
     player is gliding
     player is on ground
     player is pressing jump key
+    player isn't sneaking
     cancel event
+    # make sure cloud jump is reset
+    set {-playerdata::%player%::canCloudJump} to true
