@@ -2,38 +2,41 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "bonus_rolls": 0.0,
+      "bonus_rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
           "name": "minecraft:ender_pearl",
-          "weight": 10
+          "weight": 10,
+          "quality": 1
         },
         {
           "type": "minecraft:item",
+          "quality": 1,
           "functions": [
             {
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "minecraft:diamond",
-          "weight": 3
+          "weight": 4
         },
         {
           "type": "minecraft:item",
+          "quality": 1,
           "functions": [
             {
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 1.0
+                "max": 5,
+                "min": 1
               },
               "function": "minecraft:set_count"
             }
@@ -43,13 +46,14 @@
         },
         {
           "type": "minecraft:item",
+          "quality": 1,
           "functions": [
             {
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               },
               "function": "minecraft:set_count"
             }
@@ -64,8 +68,8 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 9.0,
-                "min": 4.0
+                "max": 9,
+                "min": 4
               },
               "function": "minecraft:set_count"
             }
@@ -80,8 +84,8 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               },
               "function": "minecraft:set_count"
             }
@@ -96,8 +100,8 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               },
               "function": "minecraft:set_count"
             }
@@ -137,7 +141,8 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_apple"
+          "name": "minecraft:golden_apple",
+          "quality": 2
         },
         {
           "type": "minecraft:item",
@@ -153,7 +158,8 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_horse_armor"
+          "name": "minecraft:diamond_horse_armor",
+          "quality": 1
         },
         {
           "type": "minecraft:item",
@@ -161,10 +167,11 @@
         },
         {
           "type": "minecraft:item",
+          "quality": 2,
           "functions": [
             {
               "function": "minecraft:enchant_with_levels",
-              "levels": 30.0,
+              "levels": 30,
               "options": "#minecraft:on_random_loot"
             }
           ],
@@ -173,12 +180,12 @@
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 3.0,
-        "min": 2.0
+        "max": 5,
+        "min": 4
       }
     },
     {
-      "bonus_rolls": 0.0,
+      "bonus_rolls": 0,
       "entries": [
         {
           "type": "minecraft:empty",
@@ -189,7 +196,7 @@
           "name": "minecraft:eye_armor_trim_smithing_template"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:chests/stronghold_corridor"

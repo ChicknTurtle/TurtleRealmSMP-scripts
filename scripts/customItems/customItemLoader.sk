@@ -199,6 +199,7 @@ local function loadItem(namespace:string, id:string, yaml:string):
     set {_item} to material from key {_basekey}
     set {_item} to (material from key (namespaced key from {_fullid})) ? {_item}
     set string tag "customId" of custom nbt of {_item} to {_fullid}
+    set int tag "minecraft:damage" of nbt of {_item} to 0
     if {_item} isn't set:
         set {_basekey} to {_base} if {_basekey} isn't set
         log error "Invalid base for %{_fullid}%: %{_basekey}%"
@@ -305,21 +306,21 @@ local function loadItem(namespace:string, id:string, yaml:string):
         set {_attr} to formatNamespacedType2(loop-value, attribute type, {_item})
         if {_attr} isn't set:
             continue this loop
+
+        # equipslot
+        set {_attr_equipslot} to getEquipSlotGroup({_path}, {_yaml}, "attributes.%loop-value%.slot", {_item})
+        if {_attr_equipslot} isn't set:
+            continue this loop
         
         # attrid
         set {_attr_id} to getNamespaced({_path}, {_yaml}, "attributes.%loop-value%.id", {_item})
         if {_attr_id} isn't set:
-            set {_attr_id} to "%{_namespace}%:%loop-value%"
+            set {_attr_id} to "%{_namespace}%:%loop-value%.%{_attr_equipslot}%"
         replace " " with "_" in {_attr_id}
         
         # amount
         set {_attr_amount} to getNumber({_path}, {_yaml}, "attributes.%loop-value%.amount", {_item})
         set {_attr_amount} to {_attr_amount} ? 1
-        
-        # equipslot
-        set {_attr_equipslot} to getEquipSlotGroup({_path}, {_yaml}, "attributes.%loop-value%.slot", {_item})
-        if {_attr_equipslot} isn't set:
-            continue this loop
         
         # operation
         set {_attr_operation} to getAttrOperation({_path}, {_yaml}, "attributes.%loop-value%.operation", {_item})
