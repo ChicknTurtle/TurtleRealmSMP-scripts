@@ -26,3 +26,47 @@ minecraft:
           amount: 2
           slot: mainhand
           operation: add_value
+    golden_helmet:
+      attributes:
+        armor:
+          id: minecraft:armor.helmet
+          amount: 2
+          slot: head
+          operation: add_value
+        luck:
+          amount: 0.25
+          slot: head
+          operation: add_value
+    golden_chestplate:
+      attributes:
+        armor:
+          id: minecraft:armor.chestplate
+          amount: 5
+          slot: chest
+          operation: add_value
+        luck:
+          amount: 0.25
+          slot: chest
+          operation: add_value
+    golden_leggings:
+      attributes:
+        armor:
+          id: minecraft:armor.leggings
+          amount: 3
+          slot: legs
+          operation: add_value
+        luck:
+          amount: 0.25
+          slot: legs
+          operation: add_value
+    golden_boots:
+      attributes:
+        armor:
+          id: minecraft:armor.boots
+          amount: 1
+          slot: feet
+          operation: add_value
+        luck:
+          amount: 0.25
+          slot: feet
+          operation: add_value

@@ -2,10 +2,11 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "bonus_rolls": 0,
+      "bonus_rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
+          "quality": 1,
           "functions": [
             {
               "add": false,
@@ -86,6 +87,7 @@
         },
         {
           "type": "minecraft:item",
+          "quality": 1,
           "functions": [
             {
               "function": "minecraft:enchant_randomly",
@@ -346,7 +348,7 @@
       "rolls": {
         "type": "minecraft:uniform",
         "max": 8,
-        "min": 8
+        "min": 7
       }
     },
     {

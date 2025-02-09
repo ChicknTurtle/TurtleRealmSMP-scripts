@@ -9,6 +9,6 @@
 /lang
 
 # Custom hidden files
-/scripts/test.sk
+/scripts/test/
 /scripts/env.sk
 /scripts/customItems/yamls/example-items.yml

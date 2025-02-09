@@ -8,8 +8,9 @@ brig command /turtle:givecustom <players:players>:
         register namespacedkey arg "item" using indexes of {-customItems::*}
         register optional int arg "count" with min 1 and max javaInteger.MAX_VALUE
     trigger:
-        set {_count} to 1 if {_count} isn't set
+        set {_item} to {_item} ? ""
+        set {_count} to {_count} ? 1
         if {-customItems::%{_item}%} isn't set:
-            send "§cUnknown custom item '%{_item}%'" to player
+            send "§cUnknown custom item '%{_item}%'" to command sender
             stop
         give or drop {_count} of {-customItems::%{_item}%} to {_players::*}
