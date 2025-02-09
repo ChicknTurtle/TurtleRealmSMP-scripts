@@ -107,7 +107,7 @@
             }
           ],
           "name": "minecraft:book",
-          "weight": 3
+          "weight": 1
         },
         {
           "type": "minecraft:item",
