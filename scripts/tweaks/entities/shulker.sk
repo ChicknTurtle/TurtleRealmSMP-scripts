@@ -1,0 +1,21 @@
+
+on entity add to world:
+    event-entity is shulker
+    event-entity.getTicksLived() is 0
+    chance of 1/500
+    set color of event-entity to pink
+
+on chunk generate:
+    environment of event-world is end
+    set {_snapshot} to event-chunk.getChunkSnapshot()
+    if any:
+        {_snapshot}.contains(purple shulker box[facing=north]) is true
+        {_snapshot}.contains(purple shulker box[facing=south]) is true
+        {_snapshot}.contains(purple shulker box[facing=east]) is true
+        {_snapshot}.contains(purple shulker box[facing=west]) is true
+    then:
+        loop (blocks in event-chunk where [input is purple shulker box]) where [block under input is end rod[facing=up]]:
+            chance of 0.2
+            set block at loop-block to air
+            spawn shulker at (block under loop-block):
+                set color of event-entity to purple

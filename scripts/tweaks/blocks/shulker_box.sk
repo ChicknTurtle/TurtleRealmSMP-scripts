@@ -1,0 +1,40 @@
+
+# shulkers can't explode
+on explode:
+    loop exploded blocks:
+        (tag values of block tag "shulker_boxes") contains loop-block
+        remove loop-block from exploded blocks
+on block explode:
+    loop ...event.blockList():
+        (tag values of block tag "shulker_boxes") contains loop-value
+        event.blockList().remove(loop-value)
+
+# keep components nbt when broken
+on mine:
+    block tag "shulker_boxes" contains event-block
+    player's gamemode isn't creative
+    (compound tag "components" of (full nbt of event-block)) is set
+    set {_componentsnbt} to compound tag "components" of full nbt of event-block
+    set {_drops::*} to (drops of event-block using player's tool)
+    loop {_drops::*}:
+        set {_item} to loop-value
+        add {_componentsnbt} to nbt of {_item}
+        set {_drops::%loop-iteration%} to {_item}
+    size of {_drops::*} > 0
+    clear drops
+    drop {_drops::*} at location of event-block ~ vector(0.5,0.5,0.5)
+
+import:
+    io.papermc.paper.event.block.BlockBreakBlockEvent
+on BlockBreakBlockEvent:
+    block tag "shulker_boxes" contains event.getBlock()
+    (compound tag "components" of (full nbt of event.getBlock())) is set
+    set {_componentsnbt} to compound tag "components" of full nbt of event.getBlock()
+    set {_drops::*} to ...event.getDrops()
+    loop {_drops::*}:
+        set {_item} to loop-value
+        add {_componentsnbt} to nbt of {_item}
+        set {_drops::%loop-iteration%} to {_item}
+    size of {_drops::*} > 0
+    event.getDrops().clear()
+    drop {_drops::*} at location of event.getBlock() ~ vector(0.5,0.5,0.5)

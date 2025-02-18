@@ -1,0 +1,14 @@
+
+# chest packing
+on right click:
+    event-block is chest
+    player's tool is shulker shell
+    player's offhand tool is shulker shell
+    getId(player's tool) is getId(player's offhand tool)
+    cancel event
+    set {_col} to (dye color str of (dye color of player's tool)) ? ""
+    set {_shulker} to ("%{_col}% shulker box" parsed as itemtype)
+    set block only of event-block to {_shulker}
+    set blockdata tag "facing" of (block at event-block) to "up"
+    play sound "minecraft:entity.shulker.close" in player category at event-block
+    make 10 of poof at event-block with extra 0.2

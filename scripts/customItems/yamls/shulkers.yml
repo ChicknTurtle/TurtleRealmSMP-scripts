@@ -1,0 +1,70 @@
+turtle:
+  items:
+    shulker_soul:
+      base: phantom_membrane
+      name: "Shulker Soul"
+      model: "turtle:shulker_soul"
+    shulker_shell_red:
+      base: shulker_shell
+      name: "Red Shulker Shell"
+      model: "turtle:shulker_shell_red"
+    shulker_shell_orange:
+      base: shulker_shell
+      name: "Orange Shulker Shell"
+      model: "turtle:shulker_shell_orange"
+    shulker_shell_yellow:
+      base: shulker_shell
+      name: "Yellow Shulker Shell"
+      model: "turtle:shulker_shell_yellow"
+    shulker_shell_lime:
+      base: shulker_shell
+      name: "Lime Shulker Shell"
+      model: "turtle:shulker_shell_lime"
+    shulker_shell_green:
+      base: shulker_shell
+      name: "Green Shulker Shell"
+      model: "turtle:shulker_shell_green"
+    shulker_shell_cyan:
+      base: shulker_shell
+      name: "Cyan Shulker Shell"
+      model: "turtle:shulker_shell_cyan"
+    shulker_shell_light_blue:
+      base: shulker_shell
+      name: "Light Blue Shulker Shell"
+      model: "turtle:shulker_shell_light_blue"
+    shulker_shell_blue:
+      base: shulker_shell
+      name: "Blue Shulker Shell"
+      model: "turtle:shulker_shell_blue"
+    shulker_shell_purple:
+      base: shulker_shell
+      name: "Purple Shulker Shell"
+      model: "turtle:shulker_shell_purple"
+    shulker_shell_magenta:
+      base: shulker_shell
+      name: "Magenta Shulker Shell"
+      model: "turtle:shulker_shell_magenta"
+    shulker_shell_pink:
+      base: shulker_shell
+      name: "Pink Shulker Shell"
+      model: "turtle:shulker_shell_pink"
+    shulker_shell_black:
+      base: shulker_shell
+      name: "Black Shulker Shell"
+      model: "turtle:shulker_shell_black"
+    shulker_shell_gray:
+      base: shulker_shell
+      name: "Gray Shulker Shell"
+      model: "turtle:shulker_shell_gray"
+    shulker_shell_light_gray:
+      base: shulker_shell
+      name: "Light Gray Shulker Shell"
+      model: "turtle:shulker_shell_light_gray"
+    shulker_shell_white:
+      base: shulker_shell
+      name: "White Shulker Shell"
+      model: "turtle:shulker_shell_white"
+    shulker_shell_brown:
+      base: shulker_shell
+      name: "Brown Shulker Shell"
+      model: "turtle:shulker_shell_brown"

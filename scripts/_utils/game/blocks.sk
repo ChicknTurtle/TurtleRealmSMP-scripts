@@ -1,0 +1,18 @@
+
+# Block only
+# Change a block's type while keeping all blockdata and nbt
+# e.g. changing the color of a shulker box
+expression:
+    patterns:
+        [the] block only of %block%
+        %block%'s block only
+    get:
+        return "%expr-1%" parsed as blockdata
+    set:
+        loop blockdata tags of expr-1:
+            set {_blockdata::%loop-value%} to blockdata tag loop-value of expr-1
+        set {_nbt} to nbt copy of expr-1
+        set nbt-block at expr-1 to change value with nbt {_nbt}
+        loop blockdata tags of (block at expr-1):
+            {_blockdata::%loop-value%} is set
+            set blockdata tag loop-value of (block at expr-1) to {_blockdata::%loop-value%}

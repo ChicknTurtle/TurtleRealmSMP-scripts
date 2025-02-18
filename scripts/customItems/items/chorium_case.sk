@@ -1,0 +1,173 @@
+
+options:
+    maxAmount: 6400
+    maxDistance: 30
+
+when ready to load recipes:
+    register smithing transform recipe:
+        id: "turtle:chorium_case_smithing"
+        result: getItem("turtle:chorium_case")
+        template: getItem("turtle:chorium_upgrade_smithing_template")
+        base: heart of the sea
+        addition: getItem("turtle:chorium_ingot")
+
+local function updateCase(case:item) :: item:
+    set {_amount} to (int tag "storedPearls" of (custom nbt of {_case}))
+    set lore of {_case} to ("§5%{_amount}%/{@maxAmount}")
+    if {_amount} <= 0:
+        set string tag "minecraft:item_model" of (nbt of {_case}) to "turtle:chorium_case"
+        set string tag "customId" of (custom nbt of {_case}) to "turtle:chorium_case"
+    else:
+        set string tag "minecraft:item_model" of (nbt of {_case}) to "turtle:chorium_case_filled"
+        set string tag "customId" of (custom nbt of {_case}) to "turtle:chorium_case_filled"
+    return {_case}
+
+# teleport
+on right click:
+    # setup/checks
+    if event.getHand() is off_hand_slot:
+        set {_tool} to player's offhand tool
+    else:
+        set {_tool} to player's tool
+    getId({_tool}) is "turtle:chorium_case_filled"
+    player.hasCooldown(1 of {_tool}) is false
+    cancel event
+    ###
+    # shoot pearl
+    make player shoot ender pearl with speed 1.5
+    play sound "minecraft:entity.ender_pearl.throw" in neutral category with volume 0.5 and pitch 0.4 at player
+    ###
+    # teleport
+    set {_ray} to raytrace from player with max distance {@maxDistance} with ray size 1 while ignoring passable blocks
+    set {_hit} to (hit location of {_ray}) ? (location {@maxDistance} blocks in front of player)
+    set {_startLoc} to (player's location)
+    relative tp player to {_hit}
+    set fall distance of player to 0
+    set boolean tag "ignore_fall_damage_from_current_explosion" of full nbt of player to false
+    set {_v} to normalized (vector from {_startLoc} to {_hit})
+    set {_amount} to ceil(distance between {_startLoc} and {_hit})
+    set {_amount} to max({_amount}, 1)
+    set {_loc} to {_startLoc}
+    loop {_amount} times:
+        make 5 of portal at {_loc}
+        make 5 of witch at {_loc}
+        set {_loc} to ({_loc} ~ {_v})
+    play sound "minecraft:entity.player.teleport" in player category at player
+    # cooldown / swing
+    player.setCooldown(1 of {_tool}, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of {_tool})))
+    if event.getHand() is off_hand_slot:
+        make player swing their offhand
+    else:
+        make player swing their hand
+    # lower count
+    player's gamemode isn't creative
+    set {_amount} to ((int tag "storedPearls" of custom nbt of {_tool}) ? 1)
+    set {_newamount} to {_amount} - 1
+    set (int tag "storedPearls" of (custom nbt of {_tool})) to {_newamount}
+    set {_tool} to updateCase({_tool})
+    # update tool and swing hand
+    if event.getHand() is off_hand_slot:
+        set player's offhand tool to ({_tool} ? player's tool)
+    else:
+        set player's tool to ({_tool} ? player's tool)
+
+# insert/extract pearls
+on inventory click:
+    # case in inv
+    if getId(event-slot) is "turtle:chorium_case" or "turtle:chorium_case_filled":
+        # insert
+        if (player's cursor slot) is ender pearl:
+            event-clicktype is left mouse button
+            cancel event
+            # set vars
+            set {_amount} to ((int tag "storedPearls" of custom nbt of event-slot) ? 0)
+            set {_addamount} to (item amount of (player's cursor slot))
+            set {_newamount} to {_amount} + {_addamount}
+            if {_newamount} > {@maxAmount}:
+                set {_remaining} to {_newamount} - {@maxAmount}
+                set {_newamount} to {@maxAmount}
+            else:
+                set {_remaining} to 0
+            # update item
+            set (int tag "storedPearls" of (custom nbt of event-slot)) to {_newamount}
+            set event-slot to updateCase(event-slot)
+            set (player's cursor slot) to ({_remaining} of ender pearl)
+            # effects
+            play sound "minecraft:item.bundle.insert" in players category at player to player
+        # extract
+        else if (player's cursor slot) is air:
+            event-clicktype is right mouse button
+            cancel event
+            # set vars
+            set {_amount} to ((int tag "storedPearls" of custom nbt of event-slot) ? 0)
+            set {_newamount} to {_amount} - 16
+            if {_newamount} < 0:
+                set {_take} to 16 + {_newamount}
+                set {_newamount} to 0
+            else:
+                set {_take} to 16
+            # update item
+            set (int tag "storedPearls" of (custom nbt of event-slot)) to {_newamount}
+            set event-slot to updateCase(event-slot)
+            set (player's cursor slot) to ({_take} of ender pearl)
+            # effects
+            play sound "minecraft:item.bundle.remove_one" in players category at player to player
+    # case in cursor
+    else if getId((player's cursor slot)) is "turtle:chorium_case" or "turtle:chorium_case_filled":
+        # insert
+        if event-slot is ender pearl:
+            event-clicktype is left mouse button
+            cancel event
+            # set vars
+            set {_amount} to ((int tag "storedPearls" of custom nbt of (player's cursor slot)) ? 0)
+            set {_addamount} to (item amount of event-slot)
+            set {_newamount} to {_amount} + {_addamount}
+            if {_newamount} > {@maxAmount}:
+                set {_remaining} to {_newamount} - {@maxAmount}
+                set {_newamount} to {@maxAmount}
+            else:
+                set {_remaining} to 0
+            # update item
+            set (int tag "storedPearls" of (custom nbt of (player's cursor slot))) to {_newamount}
+            set (player's cursor slot) to updateCase(player's cursor slot)
+            set event-slot to ({_remaining} of ender pearl)
+            # effects
+            play sound "minecraft:item.bundle.insert" in players category at player to player
+        # extract
+        else if event-slot is air:
+            event-clicktype is right mouse button
+            cancel event
+            # set vars
+            set {_amount} to ((int tag "storedPearls" of custom nbt of (player's cursor slot)) ? 0)
+            set {_newamount} to {_amount} - 16
+            if {_newamount} < 0:
+                set {_take} to 16 + {_newamount}
+                set {_newamount} to 0
+            else:
+                set {_take} to 16
+            # update item
+            set (int tag "storedPearls" of (custom nbt of (player's cursor slot))) to {_newamount}
+            set (player's cursor slot) to updateCase(player's cursor slot)
+            set event-slot to ({_take} of ender pearl)
+            # effects
+            play sound "minecraft:item.bundle.remove_one" in players category at player to player
+
+# collect pearls from ground
+on entity added to world:
+    event-entity is a dropped item
+    getId(item of event-entity) is "turtle:chorium_case" or "turtle:chorium_case_filled"
+    while chunk at event-entity is loaded:
+        wait 1 tick
+        if event-entity isn't alive:
+            exit trigger
+        # check pearls
+        set {_pearls::*} to ((dropped items in radius 1.5 of event-entity) where [item of input is ender pearl])
+        set {_amount} to (int tag "storedPearls" of (custom nbt of (item of event-entity)))
+        loop (shuffled {_pearls::*}):
+            set {_size} to (item amount of (item of loop-value))
+            ({_amount} + {_size}) <= {@maxAmount}
+            delete (entity within loop-value)
+            set (int tag "storedPearls" of (custom nbt of (item of event-entity))) to ({_amount} + {_size})
+            set (item of event-entity) to updateCase(item of event-entity)
+            play sound "minecraft:item.bundle.insert" in players category at event-entity
+            exit loop
