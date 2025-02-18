@@ -16,6 +16,8 @@ local function setExplosionImpactPos(p:player, x:number, y:number, z:number):
 function cloudJumpBoost(p:player):
     # boost
     if {_p} is gliding:
+        if {_p} is sneaking:
+            exit trigger
         # tailwind
         push {_p} forwards with force 0.4 + 2*0.15
         push {_p} up with force 0.4 + 2*0.15

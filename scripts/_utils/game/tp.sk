@@ -1,0 +1,15 @@
+
+import:
+    io.papermc.paper.entity.TeleportFlag
+
+# Relative tp
+effect:
+    patterns:
+        (relative|passenger) (teleport|tp) %entities% to %location% [(with|while (keep[ing]|retain[ing])) passengers]
+    trigger:
+        set {_entities::*} to expr-1
+        loop {_entities::*}:
+            set {_loc} to expr-2
+            set yaw of {_loc} to (yaw of loop-value)
+            set pitch of {_loc} to (pitch of loop-value)
+            loop-value.teleport({_loc}, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION, TeleportFlag.EntityState.RETAIN_OPEN_INVENTORY, TeleportFlag.EntityState.RETAIN_PASSENGERS, TeleportFlag.EntityState.RETAIN_VEHICLE)

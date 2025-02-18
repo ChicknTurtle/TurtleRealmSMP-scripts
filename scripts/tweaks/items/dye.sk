@@ -1,0 +1,45 @@
+
+on load:
+    set {-features::dyeing::name} to "Dyeing"
+    set {-features::dyeing::desc} to "Allows using dye on blocks and mobs you normally can't\nWorks for: wool, wool carpets, shulker boxes, and live shulkers)"
+    set {-features::dyeing::icon} to blue dye
+
+local function dyeBlock(what:string, block:block, p:player) :: boolean:
+    set {_dyecol} to (dye color of ({_p}'s tool))
+    {_dyecol} is set
+    set {_colstr} to dye color str from {_dyecol}
+    set {_newblock} to ("%{_colstr}% %{_what}%" parsed as itemtype)
+    {_block} isn't {_newblock}
+    set block only of (block within {_block}) to ({_newblock} ? {_block})
+    play sound "minecraft:item.dye.use" in player category at {_block}
+    make {_p} swing their hand
+    if {_p}'s gamemode isn't creative:
+        remove (1 of ({_p}'s tool)) from ({_p}'s tool)
+    return true
+
+local function dyeMob(e:entity, p:player) :: boolean:
+    set {_col} to (dye color of ({_p}'s tool))
+    {_col} is set
+    (color of {_e}) isn't {_col}
+    set color of (entity within {_e}) to {_col}
+    play sound "minecraft:item.dye.use" in player category at {_e}
+    make {_p} swing their hand
+    if {_p}'s gamemode isn't creative:
+        remove (1 of ({_p}'s tool)) from ({_p}'s tool)
+    return true
+
+on right click:
+    {enabledFeatures::dyeing} is true
+    (tag values of item tag "dyes") contains player's tool
+    if block tag "wool" contains event-block:
+        dyeBlock("wool", event-block, player) is true
+        cancel event
+    if block tag "wool_carpets" contains event-block:
+        dyeBlock("carpet", event-block, player) is true
+        cancel event
+    if block tag "shulker_boxes" contains event-block:
+        dyeBlock("shulker box", event-block, player) is true
+        cancel event
+    if event-entity is a shulker:
+        dyeMob(event-entity, player) is true
+        cancel event
