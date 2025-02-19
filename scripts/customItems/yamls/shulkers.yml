@@ -4,6 +4,7 @@ turtle:
       base: phantom_membrane
       name: "Shulker Soul"
       model: "turtle:shulker_soul"
+      max_stack_size: 16
     shulker_shell_red:
       base: shulker_shell
       name: "Red Shulker Shell"

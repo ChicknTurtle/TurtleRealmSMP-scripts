@@ -2,6 +2,7 @@
 options:
     maxAmount: 6400
     maxDistance: 30
+    maxDistanceSneaking: 15
 
 when ready to load recipes:
     register smithing transform recipe:
@@ -22,15 +23,19 @@ local function updateCase(case:item) :: item:
         set string tag "customId" of (custom nbt of {_case}) to "turtle:chorium_case_filled"
     return {_case}
 
+# show tp indicator
+on player tick:
+    getId(player's tool) is "turtle:chorium_case_filled"
+    set {_dist} to ({@maxDistanceSneaking} if player is sneaking else {@maxDistance})
+    set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
+    set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
+    make 1 of witch at {_hit} for player
+
 # teleport
 on right click:
     # setup/checks
-    if event.getHand() is off_hand_slot:
-        set {_tool} to player's offhand tool
-    else:
-        set {_tool} to player's tool
-    getId({_tool}) is "turtle:chorium_case_filled"
-    player.hasCooldown(1 of {_tool}) is false
+    getId(player's tool) is "turtle:chorium_case_filled"
+    player.hasCooldown(1 of player's tool) is false
     cancel event
     ###
     # shoot pearl
@@ -38,8 +43,9 @@ on right click:
     play sound "minecraft:entity.ender_pearl.throw" in neutral category with volume 0.5 and pitch 0.4 at player
     ###
     # teleport
-    set {_ray} to raytrace from player with max distance {@maxDistance} with ray size 1 while ignoring passable blocks
-    set {_hit} to (hit location of {_ray}) ? (location {@maxDistance} blocks in front of player)
+    set {_dist} to ({@maxDistanceSneaking} if player is sneaking else {@maxDistance})
+    set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
+    set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
     set {_startLoc} to (player's location)
     relative tp player to {_hit}
     set fall distance of player to 0
@@ -54,22 +60,17 @@ on right click:
         set {_loc} to ({_loc} ~ {_v})
     play sound "minecraft:entity.player.teleport" in player category at player
     # cooldown / swing
-    player.setCooldown(1 of {_tool}, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of {_tool})))
+    player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
     if event.getHand() is off_hand_slot:
         make player swing their offhand
     else:
         make player swing their hand
     # lower count
     player's gamemode isn't creative
-    set {_amount} to ((int tag "storedPearls" of custom nbt of {_tool}) ? 1)
+    set {_amount} to ((int tag "storedPearls" of custom nbt of player's tool) ? 1)
     set {_newamount} to {_amount} - 1
-    set (int tag "storedPearls" of (custom nbt of {_tool})) to {_newamount}
-    set {_tool} to updateCase({_tool})
-    # update tool and swing hand
-    if event.getHand() is off_hand_slot:
-        set player's offhand tool to ({_tool} ? player's tool)
-    else:
-        set player's tool to ({_tool} ? player's tool)
+    set (int tag "storedPearls" of (custom nbt of player's tool)) to {_newamount}
+    set player's tool to updateCase(player's tool)
 
 # insert/extract pearls
 on inventory click:
