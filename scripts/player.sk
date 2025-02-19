@@ -12,51 +12,49 @@ on join:
     set {-playerdata::%player%::velocityloc} to player's location
     set {-playerdata::%player%::lastonground} to 1
     set {-playerdata::%player%::lastmoved} to now
-    while player is online:
 
-        # velocity
-        set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
-        set {-playerdata::%player%::velocityloc} to player's location
-        set {-playerdata::%player%::velocity} to {_v}
+on player tick:
+    # velocity
+    set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
+    set {-playerdata::%player%::velocityloc} to player's location
+    set {-playerdata::%player%::velocity} to {_v}
 
-        # last on ground
-        add 1 to {-playerdata::%player%::lastonground}
-        if player is on ground:
-            set {-playerdata::%player%::lastonground} to 0
-        
-        # last moved
-        if any:
-            player is pressing jump key
-            player is pressing sneak key
-            player is pressing forward key
-            player is pressing backward key
-            player is pressing left key
-            player is pressing right key
-        then:
-            set {-playerdata::%player%::lastmoved} to now
-        
-        # afk, name pain
-        if any:
-            player's gamemode is creative
-            player's gamemode is spectator
-        then:
-            set {_health} to 1
-        else:
-            set {_health} to player's health/player's max health
-        set {_health} to round({_health}*255)
-        set {_gb} to {_health}
-        set {_r} to 255
-        if {-playerdata::%player%::lastmoved} < (now - 5 minutes):
-            set {_r} to round({_r}/2)
-            set {_gb} to round({_gb}/2)
-        set {_hex} to rgbToHex({_r}, {_gb}, {_gb})
-        set {_name} to colored "<%{_hex}%>%player's name%"
-        set player's tablist name to {_name}
-        
-        # tablist
-        updateTablist(player)
-        
-        wait 1 tick
+    # last on ground
+    add 1 to {-playerdata::%player%::lastonground}
+    if player is on ground:
+        set {-playerdata::%player%::lastonground} to 0
+    
+    # last moved
+    if any:
+        player is pressing jump key
+        player is pressing sneak key
+        player is pressing forward key
+        player is pressing backward key
+        player is pressing left key
+        player is pressing right key
+    then:
+        set {-playerdata::%player%::lastmoved} to now
+    
+    # afk, name pain
+    if any:
+        player's gamemode is creative
+        player's gamemode is spectator
+    then:
+        set {_health} to 1
+    else:
+        set {_health} to player's health/player's max health
+    set {_health} to round({_health}*255)
+    set {_gb} to {_health}
+    set {_r} to 255
+    if {-playerdata::%player%::lastmoved} < (now - 5 minutes):
+        set {_r} to round({_r}/2)
+        set {_gb} to round({_gb}/2)
+    set {_hex} to rgbToHex({_r}, {_gb}, {_gb})
+    set {_name} to colored "<%{_hex}%>%player's name%"
+    set player's tablist name to {_name}
+    
+    # tablist
+    updateTablist(player)
 
 on death of player:
     # drop skull
@@ -64,6 +62,9 @@ on death of player:
         attacker is player
         set {_head} to nbt skull of "%victim%"
         drop {_head} at victim's location
+        {enabledFeatures::protectdeathloot} is true
+        protectItem(last dropped item)
+    
     # protected items
     if {enabledFeatures::protectdeathloot} is true:
         set {_loc} to head location of victim

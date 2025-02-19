@@ -1,4 +1,9 @@
 
+options:
+    overworld: "world"
+    endWorld: "world_the_end"
+    upWrapY: 500
+
 local function warp(e:entity, world:text, coord:number):
     set {_loc} to {_e}'s location
     set {_x} to (x-coord of {_loc})
@@ -6,29 +11,31 @@ local function warp(e:entity, world:text, coord:number):
     set {_yaw} to (yaw of {_loc})
     set {_pitch} to (pitch of {_loc})
     set {_dest} to location({_x}, {_coord}, {_z}, {_world}, {_yaw}, {_pitch})
-    set {_v} to {_e}'s velocity
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
     make 15 of witch at {_loc} with force
-    teleport {_e} to {_dest}
-    set {_e}'s velocity to {_v}
+    relative tp {_e} to {_dest}
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
     make 15 of witch at {_dest} with force
 
 on entity remove from world:
     str(event-entityremovecause) is "out_of_world"
     (environment of event-world) is end
-    warp(event-entity, "world", 500)
+    warp(event-entity, {@overworld}, {@upWrapY})
 
 on damage:
     damage cause is void
     cancel event
     (environment of event-world) is end
-    warp(victim, "world", 500)
+    warp(victim, {@overworld}, {@upWrapY})
+    loop 3 times:
+        push victim down with force 0.25
+        wait 1 tick
 
-on join:
-    while (player is online):
-        if ((y-coord of player) > 505):
-            {dragonDefeated} is true
-            (world of player) is "world"
-            warp(player, "world_the_end", -59)
+on player tick:
+    (y-coord of player) > ({@upWrapY}+5)
+    {dragonDefeated} is true
+    (world of player) is {@overworld}
+    warp(player, {@endWorld}, -59)
+    loop 3 times:
+        push player up with force 0.5
         wait 1 tick
