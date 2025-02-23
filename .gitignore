@@ -3,8 +3,6 @@
 
 # Skript files
 /variables.csv
-/config.sk
-/features.sk
 /backups
 /lang
 
@@ -12,4 +10,4 @@
 /scripts/test/
 /scripts/env.sk
 /scripts/customItems/yamls/example-items.yml
-/scripts/uploads
+/scripts/uploads/
