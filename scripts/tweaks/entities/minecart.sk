@@ -312,7 +312,7 @@ on redstone change:
         play sound "minecraft:block.copper_bulb.turn_off" at event-block
 
 # Recipes
-on load:
+when ready to load recipes:
     {enabledFeatures::railrecipes} is true
     register shapeless recipe:
         id: "minecraft:activator_rail"

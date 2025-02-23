@@ -23,6 +23,7 @@ function getItem(item:object) :: item:
             log error "getItem() called with unknown custom item id '%{_id}%'"
     else if (skript type of {_item}) is "item type":
         return updateItem({_item})
+    log warn "getItem() found no item for '%{_id}%' (%skript type of {_item}%), returning self"
     return {_item}
 
 # Update recipes (needs to be updated for PredicateChoice when it's implemented)
