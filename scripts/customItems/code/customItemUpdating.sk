@@ -1,0 +1,110 @@
+
+import:
+    org.bukkit.inventory.InventoryHolder
+    org.bukkit.event.inventory.BrewEvent
+
+options:
+    chunkWarn: 1.5
+    chunkTimeout: 2.5
+
+function updateItem(item:item) :: item:
+    set {_id} to getId({_item})
+    set {_rawitem} to getItem({_id}) ? {_item}
+    if nbt of {_item} is nbt of {_rawitem}:
+        return {_item}
+    set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
+    add nbt of {_item} to nbt of {_newitem}
+    add nbt of {_rawitem} to nbt of {_newitem}
+    return {_newitem}
+    
+on entity add to world:
+    event-entity is a dropped item
+    set {_item} to updateItem(item of event-entity)
+    set item of event-entity to {_item}
+
+# Update Inventory Slots
+
+# helper function when needed
+local function updateItemSlot(item:item, inv:inventory, slot:integer, source:string=""):
+    if {_item} isn't set:
+        if {_source} is "player join":
+            {_slot} >= 36
+            {_slot} <= 39
+            exit 2 sections
+        log error "Item unset when calling for slot %{_slot}% of %{_inv}%"
+        exit trigger
+    {_item} isn't air
+    set {_item} to updateItem({_item})
+    set (slot {_slot} of {_inv}) to {_item}
+
+function loadChunkSlots(chunk:chunk):
+    set {_start} to now
+    set {_totalslots} to 0
+    set {_hasWarned} to false
+    set {_blocks::*} to (...{_chunk}.getTileEntities(true)) where [inventory of input is set]
+    set {_blocks::*} to {_blocks::*} where [input doesn't have a loottable]
+    set {_entities::*} to ((...{_chunk}.getEntities()) where [input is an instance of InventoryHolder]) where [input isn't a player]
+    # loop inventory slots of all blocks in chunk
+    loop {_blocks::*}:
+        set {_inv} to inventory of loop-value
+        loop (amount of slots of {_inv}) times:
+            set {_slot} to (loop-value-2) - 1
+            set {_item} to (slot {_slot} of {_inv})
+            updateItemSlot({_item}, {_inv}, {_slot}, "load chunk block")
+        # warn/timeout when slots take a long time
+        if seconds of (time since {_start}) > {@chunkWarn}:
+            if {_hasWarned} isn't true:
+                log warn "%{_chunk}% is taking a long time to load slots (%(chunk x of {_chunk})*16% ~ %(chunk z of {_chunk})*16%)"
+                set {_hasWarned} to true
+            seconds of (time since {_start}) > {@chunkTimeout}
+            log error "%{_chunk}% took too long to load slots (%(chunk x of {_chunk})*16% ~ %(chunk z of {_chunk})*16%)"
+            exit trigger
+    # loop inventory slots of all entities in chunk
+    loop {_entities::*}:
+        set {_inv} to loop-value.getInventory()
+        loop (amount of slots of {_inv}) times:
+            set {_slot} to (loop-value-2) - 1
+            set {_item} to (slot {_slot} of {_inv})
+            updateItemSlot({_item}, {_inv}, {_slot}, "load chunk entity")
+        # warn/timeout when slots take a long time
+        if seconds of (time since {_start}) > {@chunkWarn}:
+            if {_hasWarned} isn't true:
+                log warn "%{_chunk}% is taking a long time to load slots (%(chunk x of {_chunk})*16% ~ %(chunk z of {_chunk})*16%)"
+                set {_hasWarned} to true
+            seconds of (time since {_start}) > {@chunkTimeout}
+            log error "%{_chunk}% took too long to load slots (%(chunk x of {_chunk})*16% ~ %(chunk z of {_chunk})*16%)"
+            exit trigger
+
+# chunk loading
+on chunk load:
+    loadChunkSlots(event-chunk)
+
+# player joining
+on join:
+    loop (amount of slots of player's inventory) times:
+        set {_item} to (slot (loop-value)-1 of player's inventory)
+        updateItemSlot({_item}, player's inventory, (loop-value)-1, "player join")
+
+# /give etc
+on inventory slot change:
+    gamemode of player isn't creative # messes with cursor slot in creative
+    set {_slot} to index of event-slot
+    set (slot {_slot} of player's inventory) to updateItem(event-item)
+
+on book edit:
+    set {_slot} to 40 if event.getSlot() is -1 else event.getSlot()
+    set (slot {_slot} of player's inventory) to updateItem(event-item)
+
+# chest loot generating
+# called before slots are actually set, so can't use function
+on loot generate:
+    loop loot:
+        add updateItem(loop-value) to {_newloot::*}
+    set loot to {_newloot::*}
+
+# brewing
+on BrewEvent:
+    set {_block} to event.getBlock()
+    loop ...event.getResults():
+        set {_item} to updateItem(loop-value)
+        event.getResults().set((loop-iteration)-1, {_item})

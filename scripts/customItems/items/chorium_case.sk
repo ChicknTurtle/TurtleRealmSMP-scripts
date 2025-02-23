@@ -26,7 +26,7 @@ local function updateCase(case:item) :: item:
 # show tp indicator
 on player tick:
     getId(player's tool) is "turtle:chorium_case_filled"
-    set {_dist} to ({@maxDistanceSneaking} if player is sneaking else {@maxDistance})
+    set {_dist} to ({@maxDistanceSneaking} if player is pressing sneak key else {@maxDistance})
     set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
     set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
     make 1 of witch at {_hit} for player
@@ -43,7 +43,7 @@ on right click:
     play sound "minecraft:entity.ender_pearl.throw" in neutral category with volume 0.5 and pitch 0.4 at player
     ###
     # teleport
-    set {_dist} to ({@maxDistanceSneaking} if player is sneaking else {@maxDistance})
+    set {_dist} to ({@maxDistanceSneaking} if player is pressing sneak key else {@maxDistance})
     set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
     set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
     set {_startLoc} to (player's location)

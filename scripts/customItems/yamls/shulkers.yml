@@ -1,7 +1,7 @@
 turtle:
   items:
     shulker_soul:
-      base: phantom_membrane
+      base: quartz
       name: "Shulker Soul"
       model: "turtle:shulker_soul"
       max_stack_size: 16
