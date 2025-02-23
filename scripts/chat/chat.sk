@@ -1,15 +1,29 @@
 
 on load:
     set {-features::joinleavemsgs::name} to "Join/leave messages"
-    set {-features::customchat::desc} to "Better looking join and leave messages"
+    set {-features::joinleavemsgs::desc} to "Better looking join and leave messages"
     set {-features::joinleavemsgs::icon} to oak door
+
     set {-features::deathmsgs::name} to "Death messages"
     set {-features::deathmsgs::desc} to "Better looking death messages"
     set {-features::deathmsgs::warn} to "Doesn't work for pets"
     set {-features::deathmsgs::icon} to skeleton skull
+
     set {-features::customchat::name} to "Custom chat"
     set {-features::customchat::desc} to "Better looking and colorable chat messages\n[item] is replaced with your held item"
     set {-features::customchat::icon} to oak sign
+
+    set {-features::chatfilter::name} to "Chat filter"
+    set {-features::chatfilter::desc} to "Filter out bad words from chat"
+    set {-features::chatfilter::icon} to barrier
+
+    # Create badwords list
+    if {-env::dev} is true:
+        set {_url} to "https://gist.githubusercontent.com/lasagnaphil/7667eaeddb6ed0c565f0cb653d756942/raw/e05dbc73062aa1679b733e8f9f9b32e003c59d0e/fruits.txt"
+    else:
+        set {_url} to "https://raw.githubusercontent.com/adam-dziedzic/list-of-banned-words/refs/heads/master/en"
+    async run 0 ticks later:
+        set {-badwords::*} to urlfetch {_url}
 
 on join:
     {enabledFeatures::joinleavemsgs} is true
@@ -32,6 +46,7 @@ on async chat:
     {enabledFeatures::customchat} is true
     set {_msg} to async chat message
     # create format
+    # {_msg} is used for discord
     set {_p} to player
     set {_c::1} to text component from "§7%display name of {_p}%"
     set {_c::2} to text component from "§7: &r"
@@ -47,12 +62,14 @@ on async chat:
         set color format of {_c} to {_col}
         set hover event of {_c} to hover event showing player's tool
         component replace "\[item]" with {_c} in {_format}
+    replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # replace bad words
-    loop {-badwords::*}:
-        component replace loop-index with loop-value in {_format}
+    if {enabledFeatures::chatfilter} is true:
+        loop {-badwords::*}:
+            replace regex "(?i)%loop-value%" with "\\****" in {_msg}
+            component replace "(?i)%loop-value%" with "§c****" in {_format}
 
     # send message
     set async chat format to {_format}
-    replace "[item]" with "**[%{_name}%]**" in {_msg}
     discordChat({_msg}, player)

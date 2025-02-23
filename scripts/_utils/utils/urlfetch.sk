@@ -1,0 +1,46 @@
+
+import:
+    java.lang.StringBuffer
+    java.io.InputStreamReader
+    java.io.BufferedReader
+    java.net.URL
+    java.net.HttpURLConnection
+
+# Get content of an url
+# Will block main thread of server if not used in an async section
+plural expression:
+    patterns:
+        (lines|content) of (url|link|[web]site) %string% [with time[ |-]out %-timespan%]
+        urlfetch %string% [with time[ |-]out %-timespan%]
+    loop of: line
+    get:
+        set {_url} to expr-1
+        set {_timeout} to expr-2 ? 1 second
+        set {_timeout} to (50 * ticks of {_timeout})
+
+        set {_urlobject} to try new URL({_url})
+        set {_con} to {_urlobject}.openConnection()
+        {_con}.setRequestMethod("GET")
+        {_con}.setRequestProperty("User-Agent", "Skript/Reflect")
+        {_con}.setConnectTimeout({_timeout})
+        {_con}.setReadTimeout({_timeout})
+        set {_responseCode} to try {_con}.getResponseCode()
+        if {_responseCode} isn't set:
+            log warn "Failed to fetch url %{_url}%%nl%%last java error%"
+            {_con}.disconnect()
+            return {_}
+        if ({_responseCode} is HttpURLConnection.HTTP_OK):
+            set {_stream} to {_con}.getInputStream()
+            set {_reader} to new InputStreamReader({_stream})
+            set {_buffer} to new BufferedReader({_reader})
+            set {_line} to {_buffer}.readLine()
+            while {_line} is set:
+                add {_line} to {_response::*}
+                set {_line} to {_buffer}.readLine()
+            {_buffer}.close()
+            {_reader}.close()
+        else:
+            log warn "Failed to fetch url %{_url}%%nl%%last java error%"
+        {_con}.disconnect()
+
+        return {_response::*} ? {_}
