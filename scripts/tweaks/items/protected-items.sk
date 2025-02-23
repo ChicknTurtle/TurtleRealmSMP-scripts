@@ -9,7 +9,7 @@ function protectItem(e:entity):
     {enabledFeatures::protecteditems} is true
     {_e} is a dropped item
     set boolean tag "custom;protectedItem" of full nbt of {_e} to true
-    protectedItemGlowLoop({_e})
+    set glowing of {_e} to true
 
 function isProtectedItem(e:entity) :: boolean:
     if all:
@@ -19,11 +19,6 @@ function isProtectedItem(e:entity) :: boolean:
         return true
     else:
         return false
-
-local function protectedItemGlowLoop(e:entity):
-    while chunk at {_e} is loaded:
-        make {_e} glow for all players
-        wait 1 tick
 
 # handle protected items
 
@@ -46,8 +41,3 @@ on entity pickup:
     event-player isn't a player
     isProtectedItem(event-dropped item) is true
     cancel event
-
-on entity added to world:
-    event-entity is a dropped item
-    if isProtectedItem(event-entity) is true:
-        protectedItemGlowLoop(event-entity)

@@ -1,4 +1,13 @@
 
+# EXAMPLE BOT DEFINITION
+# My bot is defined in env.sk to hide the token
+# 
+# define new bot named "ChatLink": 
+#     token: "<INSERT TOKEN HERE>"
+#     intents: default intents
+#     on ready:
+#         log info "🤖 Discord chat link initialized"
+
 on load:
     set {-features::discordlink::name} to "Discord link"
     set {-features::discordlink::desc} to "Links in-game chat with a discord channel"
@@ -31,8 +40,8 @@ on message received:
     set {_c::1} to text component from "%effective name of event-member%:"
     set {_c::2} to text component from " &f%event-message%"
     set color format of {_c::1} to rgb(88, 101, 242)
-    set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7%discord name of event-user%"
-    broadcast component merge components {_c::*}
+    set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7@%discord name of event-user%"
+    broadcast component (merge components {_c::*})
 
 ###
 on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
@@ -49,3 +58,110 @@ on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
 
 #on skript stop:
 #    force shutdown bot (bot named "ChatLink")
+
+local function genCode() :: string:
+    set {_code::*} to 3 random characters from "a" to "z"
+    add (3 random characters from "0" to "9") to {_code::*}
+    return (join (shuffled {_code::*}) with "")
+
+local function createLinkCode() :: string:
+    set {_code} to genCode()
+    while {-pendingDiscordLinks::*} contains {_code}:
+        set {_code} to genCode()
+    return {_code}
+
+# /discord
+brig command tree /discord:
+    #trigger:
+    #    send "§9join link"
+    literal arg "link":
+        trigger:
+            if {discordLinks::%uuid of player%} is set:
+                set {_user} to user with id {discordLinks::%uuid of player%}
+                if {_user} is set:
+                    set {_name} to "§9%{_user}%"
+                    set {_userinfo} to "§f%{_user}%%nl%§7@%discord name of {_user}%"
+                else:
+                    set {_name} to "§cUnknown User"
+                    set {_userinfo} to "§fUnknown User%nl%§7@???"
+                set {_c::1} to text component from "§7Your account is already linked to "
+                set {_c::2} to text component from {_name}
+                set {_c::3} to text component from "§7! Use "
+                set {_c::4} to text component from "§c/discord unlink"
+                set {_c::5} to text component from " §7to unlink."
+                set hover event of {_c::2} to (hover event showing {_userinfo})
+                set click event of {_c::4} to (click event to suggest command "/discord unlink")
+                send components (merge components {_c::*})
+                exit trigger
+            # link
+            set {_code} to createLinkCode()
+            set {-pendingDiscordLinks::%uuid of player%} to {_code}
+            set {_c::1} to text component from "§7Use §b/link "
+            set {_c::2} to text component from "§b§n%{_code}%"
+            set {_c::3} to text component from " §7on discord to link your account!"
+            set hover event of {_c::2} to (hover event showing "§7Copy §b%{_code}% §7to clipboard")
+            set click event of {_c::2} to (click event to copy {_code} to clipboard)
+            send components (merge components {_c::*})
+    literal arg "unlink":
+        trigger:
+            if {discordLinks::%uuid of player%} isn't set:
+                set {_c::1} to text component from " §7Your account isn't linked to discord! Use "
+                set {_c::2} to text component from "§a/discord link"
+                set {_c::3} to text component from " §7to link your account."
+                set click event of {_c::2} to (click event to suggest command "/discord link")
+                send components (merge components {_c::*})
+                exit trigger
+            # unlink
+            delete {discordLinks::%uuid of player%}
+            set {_c::1} to text component from "§7Your account has been unlinked from discord."
+            send components (merge components {_c::*})
+
+# /link discord command
+slash command link <string="code">:
+    description: Link your discord and minecraft accounts
+    bot: ChatLink
+    arguments:
+        code: The link code you were given in-game
+    trigger:
+        set {_code} to argument "code" as string
+
+        # get pending link info
+        loop indexes of {-pendingDiscordLinks::*}:
+            {-pendingDiscordLinks::%loop-value%} is {_code}
+            set {_pendinguuid} to loop-value
+            exit loop
+        set {_pendingname} to (name of ({_pendinguuid} parsed as offline player))
+
+        # get linked info
+        loop indexes of {discordLinks::*}:
+            {discordLinks::%loop-value%} is (discord id of event-user)
+            set {_linkeduuid} to loop-value
+            exit loop
+        set {_linkedname} to (name of ({_linkeduuid} parsed as offline player))
+        
+        # discord already linked
+        if {discordLinks::*} contains (discord id of event-user):
+            reply with hidden "Your account is already linked to **%{_linkedname}%**!"
+        
+        # mc already linked
+        if (indexes of {discordLinks::*}) contains {_pendinguuid}:
+            reply with hidden "The minecraft account **%{_pendingname}%** is already linked!"
+
+        # link
+        if {-pendingDiscordLinks::*} contains {_code}:
+            delete {-pendingDiscordLinks::%{_pendinguuid}%}
+            set {discordLinks::%{_pendinguuid}%} to (discord id of event-user)
+            reply with hidden "Your account has been linked to minecraft as **%{_pendingname}%**.%nl%-# Use /discord unlink in-game to unlink your account"
+            if ({_pendinguuid} parsed as player) is set:
+                set {_c::1} to text component from "§7Your account has been linked to "
+                set {_c::2} to text component from "§9%effective name of event-member%"
+                set {_c::3} to text component from "§7! If this isn't you, use "
+                set {_c::4} to text component from "§c/discord unlink"
+                set {_c::5} to text component from " §7to unlink your account."
+                set hover event of {_c::2} to (hover event showing "§f%event-member%%nl%§7@%discord name of event-member%")
+                set click event of {_c::4} to (click event to suggest command "/discord unlink")
+                send components (merge components {_c::*}) to ({_pendinguuid} parsed as player)
+        
+        # invalid code
+        else:
+            reply with hidden "Invalid code. Use `/discord link` on the minecraft server to get your link code."

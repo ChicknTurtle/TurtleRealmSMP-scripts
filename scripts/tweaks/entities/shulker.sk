@@ -5,17 +5,51 @@ on entity add to world:
     chance of 1/500
     set color of event-entity to pink
 
-on chunk generate:
-    environment of event-world is end
-    set {_snapshot} to event-chunk.getChunkSnapshot()
-    if any:
-        {_snapshot}.contains(purple shulker box[facing=north]) is true
-        {_snapshot}.contains(purple shulker box[facing=south]) is true
-        {_snapshot}.contains(purple shulker box[facing=east]) is true
-        {_snapshot}.contains(purple shulker box[facing=west]) is true
-    then:
-        loop (blocks in event-chunk where [input is purple shulker box]) where [block under input is end rod[facing=up]]:
-            chance of 0.2
-            set block at loop-block to air
-            spawn shulker at (block under loop-block):
-                set color of event-entity to purple
+# cancel special shulkers from doing stuff
+on shulker teleport:
+    boolean tag "custom;noTeleport" of nbt of event-entity is true
+    cancel event
+on vehicle enter:
+    event-entity is a shulker
+    boolean tag "custom;noTeleport" of nbt of event-entity is true
+    cancel event
+
+# ender vault boss shulker
+on shoot:
+    shooter is a shulker
+    projectile is a shulker bullet
+    (boolean tag "custom;customShoot" of nbt of projectile) isn't true
+    (string tag "custom;special" of nbt of shooter) is "vault_boss" or "vault_minion"
+    set glowing of projectile to true
+    set {_amount} to 2
+    if (string tag "custom;special" of nbt of shooter) is "vault_boss":
+        set {_amount} to 7
+    set {_projectile} to projectile
+    spawn {_amount} of shulker bullet at projectile:
+        set glowing of event-entity to true
+        set (boolean tag "custom;customShoot" of nbt of event-entity) to true
+        set (uuid tag "Owner" of nbt of event-entity) to (uuid tag "Owner" of nbt of {_projectile})
+        set (uuid tag "Target" of nbt of event-entity) to (uuid tag "Target" of nbt of {_projectile})
+        set (int tag "Steps" of nbt of event-entity) to (int tag "Steps" of nbt of {_projectile})
+        set (double tag "TXD" of nbt of event-entity) to (double tag "TXD" of nbt of {_projectile})
+        set (double tag "TYD" of nbt of event-entity) to (double tag "TYD" of nbt of {_projectile})
+        set (double tag "TZD" of nbt of event-entity) to (double tag "TZD" of nbt of {_projectile})
+
+on damage by shulker bullet:
+    (glowing of (direct entity of damage source)) is true
+    if victim is a shulker:
+        heal victim by damage
+        apply glowing without particles to victim for 5 ticks
+        cancel event
+    else:
+        set damage to ((damage+3)*2.5)
+
+on death of shulker:
+    string tag "custom;special" of nbt of victim is "vault_boss"
+    set {_amount} to (random integer from 1 to 2)
+    set {_tool} to ((direct entity of damage source)'s tool)
+    if {_tool} is enchanted with looting:
+        loop (level of looting of {_tool}) times:
+            chance of 0.33
+            add 1 to {_amount}
+    drop {_amount} of getItem("turtle:chorium_cluster") at (victim ~ vector(0.5,0.5,0.5))

@@ -1,0 +1,49 @@
+
+on chunk generate:
+    environment of event-world is end
+    set {_snapshot} to event-chunk.getChunkSnapshot()
+    if any:
+        {_snapshot}.contains(purple_shulker_box[facing=north]) is true
+        {_snapshot}.contains(purple_shulker_box[facing=south]) is true
+        {_snapshot}.contains(purple_shulker_box[facing=east]) is true
+        {_snapshot}.contains(purple_shulker_box[facing=west]) is true
+    then:
+        # End city elytra shulker mimics
+        loop (blocks in event-chunk where [input is purple shulker box]) where [block under input is end rod[facing=up]]:
+            chance of 0.1
+            set block at loop-block to air
+            spawn shulker at (block under loop-block):
+                set color of event-entity to purple
+    if any:
+        {_snapshot}.contains(sculk[]) is true
+        {_snapshot}.contains(medium_amethyst_bud[facing=up;waterlogged=false]) is true
+        {_snapshot}.contains(large_amethyst_bud[facing=up;waterlogged=false]) is true
+    then:
+        # Ender vault entrance
+        loop (blocks in event-chunk where [input is sculk]):
+            set block at loop-block to air
+            place (structure named "turtle:ender_vault_entrance") at ((loop-block's location) ~ vector(-4,-24,-4))
+        # Ender vault shulkers
+        loop (blocks in event-chunk where [input is (medium amethyst bud) or (large amethyst bud)]):
+            set {_block} to (type of block at loop-block)
+            set (block at loop-block) to air
+            # minion
+            if ({_block} is (medium amethyst bud)):
+                spawn shulker at (block under loop-block):
+                    event-entity.setRemoveWhenFarAway(false)
+                    set color of event-entity to magenta
+                    set scale attribute of event-entity to 1.5
+                    set max health of event-entity to 50
+                    heal event-entity
+                    set boolean tag "custom;noTeleport" of nbt of event-entity to true
+                    set string tag "custom;special" of nbt of event-entity to "vault_minion"
+            # boss
+            else if ({_block} is (large amethyst bud)):
+                spawn shulker at (block under loop-block):
+                    event-entity.setRemoveWhenFarAway(false)
+                    set color of event-entity to magenta
+                    set scale attribute of event-entity to 3
+                    set max health of event-entity to 100
+                    heal event-entity
+                    set boolean tag "custom;noTeleport" of nbt of event-entity to true
+                    set string tag "custom;special" of nbt of event-entity to "vault_boss"

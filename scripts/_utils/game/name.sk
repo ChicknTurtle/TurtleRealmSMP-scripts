@@ -7,6 +7,8 @@ expression:
         [the] (effective|real) name of %itemstack%
         %itemstack%'s (effective|real) name
     get:
+        if expr-1 is air:
+            return {_}
         if name of expr-1 is set:
             return (name of expr-1) + "§r"
         else if component item name of expr-1 isn't "":

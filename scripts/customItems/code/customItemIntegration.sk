@@ -5,16 +5,44 @@ import:
     org.bukkit.inventory.ShapedRecipe
     org.bukkit.inventory.RecipeChoice
 
-function updateItem(item:item) :: item:
-    set {_id} to getId({_item})
-    set {_rawitem} to getItem({_id}) ? {_item}
-    if nbt of {_item} is nbt of {_rawitem}:
-        return {_item}
-    set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
-    add nbt of {_item} to nbt of {_newitem}
-    add nbt of {_rawitem} to nbt of {_newitem}
-    return {_newitem}
+# item > id
+# Get the id of any item
+function getId(item:item) :: string:
+    set {_id} to (string tag "customId" of (custom nbt of {_item}))
+    return {_id} if {_id} is set else (raw name of {_item})
 
+# id/item > custom/updated item
+function getItem(item:object) :: item:
+    if (skript type of {_item}) is "text":
+        set {_id} to namespaced key from {_item}
+        if {-customItems::%{_id}%} is set:
+            return {-customItems::%{_id}%}
+        else if (itemtype from key {_id}) is set:
+            return itemtype from key {_id}
+        else:
+            log error "getItem() called with unknown custom item id '%{_id}%'"
+    else if (skript type of {_item}) is "item type":
+        return updateItem({_item})
+    return {_item}
+
+# Update recipes (needs to be updated for PredicateChoice when it's implemented)
+function customItemsUpdateAllRecipes():
+    ###
+    log info "‍🔥 Updating all recipes..."
+    Bukkit.resetRecipes()
+    loop all recipes:
+        updateRecipe(loop-value)
+        if mod(loop-iteration,100) is 0:
+            wait 1 tick
+    delete {-ingredients::*}
+    log info "Finished updating all §b%size of all recipes% §rrecipes!"
+    ###
+    wait 1 tick
+    call custom event "recipesReady"
+    unlock recipes all recipes for all players
+    update server recipes
+
+# Update recipes function
 local function updateRecipe(id:string) :: object:
     set {_key} to namespaced key from {_id}
     set {_recipe} to Bukkit.getRecipe({_key})
@@ -96,35 +124,3 @@ local function updateRecipe(id:string) :: object:
     else:
         log error "Unknown recipe type %{_type}% for recipe %{_id}%"
     return {_newrecipe}
-
-on slot load:
-    set {_item} to updateItem(event-item)
-    set (slot event-integer of event-inventory) to {_item}
-
-# chest loot generating
-# not called in 'on slot load'
-on loot generate:
-    loop loot:
-        add updateItem(loop-value) to {_newloot::*}
-    set loot to {_newloot::*}
-    
-on entity add to world:
-    event-entity is a dropped item
-    set {_item} to updateItem(item of event-entity)
-    set item of event-entity to {_item}
-
-# update recipes
-function customItemsUpdateAllRecipes():
-    ###
-    log info "‍🔥 Updating all recipes..."
-    Bukkit.resetRecipes()
-    loop all recipes:
-        updateRecipe(loop-value)
-        if mod(loop-iteration,100) is 0:
-            wait 1 tick
-    delete {-ingredients::*}
-    update server recipes
-    log info "Finished updating all §b%size of all recipes% §rrecipes!"
-    ###
-    call custom event "recipesReady"
-    unlock recipes all recipes for all players
