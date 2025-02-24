@@ -49,19 +49,23 @@ on player tick:
     # tablist
     updateTablist(player)
 
+# handle player death
 on death of player:
-    # drop skull
-    if {enabledFeatures::dropskull} is true:
-        attacker is player
-        set {_head} to nbt skull of "%victim%"
-        drop {_head} at victim's location
-        {enabledFeatures::protectdeathloot} is true
-        protectItem(last dropped item)
-    
-    # protected items
-    if {enabledFeatures::protectdeathloot} is true:
-        set {_loc} to head location of victim
-        wait 1 tick
-        loop all dropped items in radius 2 of {_loc}:
-            short tag "Age" of full nbt of loop-value is 0
-            protectItem(loop-value)
+    set {_e} to enchantment from key "turtle:soulbound"
+    if event.getKeepInventory() is false:
+        set {_drops::*} to ...event.getDrops()
+        event.getDrops().clear()
+        # drop skull
+        if {enabledFeatures::dropskull} is true:
+            attacker is a player
+            add (nbt skull of "%victim%").getRandom() to {_drops::*}
+        loop {_drops::*}:
+            # soulbound
+            if loop-value is enchanted with {_e}:
+                event.getItemsToKeep().add(loop-value)
+            # protected items
+            else:
+                if {enabledFeatures::protectdeathloot} is true:
+                    event.getDrops().add(protectItemStack(loop-value))
+                else:
+                    event.getDrops().add(loop-value)

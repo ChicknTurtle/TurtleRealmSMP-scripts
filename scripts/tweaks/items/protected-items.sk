@@ -5,6 +5,11 @@ on load:
     set {-features::protecteditems::warn} to "When disabled, previously protected items will stay protected"
     set {-features::protecteditems::icon} to glowstone dust
 
+function protectItemStack(item:item) :: item:
+    {enabledFeatures::protecteditems} is true
+    set boolean tag "protectedItem" of custom nbt of {_item} to true
+    return {_item}
+
 function protectItem(e:entity):
     {enabledFeatures::protecteditems} is true
     {_e} is a dropped item
@@ -19,6 +24,12 @@ function isProtectedItem(e:entity) :: boolean:
         return true
     else:
         return false
+
+# convert protected itemstacks to protected items
+on spawn of dropped item:
+    (boolean tag "Item;components;minecraft:custom_data;protectedItem" of (nbt of event-entity)) is true
+    delete (boolean tag "Item;components;minecraft:custom_data;protectedItem" of (nbt of event-entity))
+    protectItem(event-entity)
 
 # handle protected items
 
