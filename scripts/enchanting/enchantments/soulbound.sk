@@ -1,12 +1,4 @@
 
-on death of player:
-    set {_e} to enchantment from key "turtle:soulbound"
-    gamerule keepInventory of victim's world is false
-    loop drops:
-        loop-value is enchanted with {_e}
-        remove loop-value from drops
-        event.getItemsToKeep().add(loop-value)
-
 on drop:
     player isn't sneaking
     set {_e} to enchantment from key "turtle:soulbound"
