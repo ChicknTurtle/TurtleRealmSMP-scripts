@@ -23,20 +23,19 @@ function cloudJumpBoost(p:player):
         push {_p} up with force 0.4 + 2*0.15
     else:
         # cloud jump
-        set {_v} to {-playerdata::%{_p}%::velocity}
-        set {_x} to (x of {_v})
-        set {_z} to (z of {_v})
+        set {_x} to 0
+        set {_z} to 0
         set {_y} to 0.575
         add 0.1 * (level of jump boost of {_p}) to {_y}
         add 0.05 to exhaustion of {_p}
         if {_p} is sprinting:
-            add 0-sin(yaw of {_p})*0.325 to {_x}
-            add cos(yaw of {_p})*0.325 to {_z}
+            add 0-sin(yaw of {_p})*0.6 to {_x}
+            add cos(yaw of {_p})*0.6 to {_z}
             add 0.125 to {_y}
             add 0.2-0.05 to exhaustion of {_p}
-        if y of {_v} > {_y}:
-            set {_y} to y of {_v}
-        set velocity of {_p} to vector({_x},{_y},{_z})
+        set {_y} to max({_y}, y of {_p}'s velocity)
+        add vector({_x},0,{_z}) to ({_p}'s velocity)
+        set y of ({_p}'s velocity) to {_y}
     # fall damage
     set boolean tag "ignore_fall_damage_from_current_explosion" of full nbt of {_p} to true
     set {_xpos} to x-coord of {_p}
@@ -56,6 +55,7 @@ on join:
 
 on player press of jump key:
     player isn't climbing
+    player isn't riding
     player isn't in water
     player isn't in lava
     player isn't in bubble column

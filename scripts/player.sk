@@ -8,17 +8,10 @@ on load:
     set {-features::protectdeathloot::icon} to chest
 
 on join:
-    set {-playerdata::%player%::velocity} to vector(0,0,0)
-    set {-playerdata::%player%::velocityloc} to player's location
     set {-playerdata::%player%::lastonground} to 1
     set {-playerdata::%player%::lastmoved} to now
 
 on player tick:
-    # velocity
-    set {_v} to vector from {-playerdata::%player%::velocityloc} to player's location
-    set {-playerdata::%player%::velocityloc} to player's location
-    set {-playerdata::%player%::velocity} to {_v}
-
     # last on ground
     add 1 to {-playerdata::%player%::lastonground}
     if player is on ground:
