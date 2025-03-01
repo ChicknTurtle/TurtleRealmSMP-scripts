@@ -27,15 +27,19 @@ on damage:
     cancel event
     (environment of event-world) is end
     warp(victim, {@overworld}, {@upWrapY})
-    loop 3 times:
+    while (y-coord of victim) > ({@upWrapY}-10):
         push victim down with force 0.25
         wait 1 tick
+        if loop-iteration > 100:
+            exit loop
 
 on player tick:
     (y-coord of player) > ({@upWrapY}+5)
     {dragonDefeated} is true
     (world of player) is {@overworld}
     warp(player, {@endWorld}, -59)
-    loop 3 times:
-        push player up with force 0.5
+    while (y-coord of player) < -49:
+        push player up with force 0.1
         wait 1 tick
+        if loop-iteration > 100:
+            exit loop
