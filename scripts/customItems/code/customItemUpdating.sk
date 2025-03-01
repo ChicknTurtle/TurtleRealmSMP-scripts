@@ -10,6 +10,9 @@ options:
 function updateItem(item:item) :: item:
     set {_id} to getId({_item})
     set {_rawitem} to getItem({_id}) ? {_item}
+    if int tag "minecraft:damage" of nbt of {_item} is 0:
+        int tag "minecraft:damage" of vanilla nbt of {_rawitem} isn't set
+        delete int tag "minecraft:damage" of nbt of {_item}
     if nbt of {_item} is nbt of {_rawitem}:
         return {_item}
     set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
