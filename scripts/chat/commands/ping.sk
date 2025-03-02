@@ -1,25 +1,22 @@
 
 on load:
     set {-features::commands::name} to "Commands"
-    set {-features::commands::desc} to "Simple but useful commands\n/ping /heal /repair"
+    set {-features::commands::desc} to "Simple but useful commands\nType '/turtle:' to show tab-completion for all commands"
     set {-features::commands::warn} to "If disabled, commands will still be visible but not do anything"
     set {-features::commands::icon} to command block
 
-command /ping [<string>]:
+brig command /turtle:ping:
+    arguments:
+        register optional player arg "players"
     trigger:
         {enabledFeatures::commands} is true
-        if arg-1 is set:
-            set {_p} to arg-1 parsed as player
+        set {_player} to ({_player} ? player)
+        set {_ping} to ({_player}'s ping)
+        if {_player} is player:
+            set {_c::2} to (text component from "Your ping is ")
         else:
-            set {_p} to player
-        if {_p} isn't set:
-            send "§cNo player was found for '%arg-1%'"
-            exit
-        if {_p} is player:
-            send "§7Your ping is §3%{_p}'s ping%ms"
-        else:
-            send "§7%{_p}%'s ping is §3%{_p}'s ping%ms"
-
-on tab complete of "/ping", "/skript:ping":
-	set tab completions for position 1 to all players
-			
+            set {_c::1} to playerComponent({_player})
+            set {_c::2} to (text component from "'s ping is ")
+        set {_c::2} to (text component from "%{_ping}%ms")
+        set color format of {_c::2} to (ping color of {_ping})
+        send component (merge components {_c::*})

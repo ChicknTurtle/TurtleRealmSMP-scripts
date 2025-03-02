@@ -27,12 +27,20 @@ on load:
 
 on join:
     {enabledFeatures::joinleavemsgs} is true
-    set join message to "§a+ §7| &f%player% joined the game"
+    set {_c::1} to "§a+ §7| "
+    set {_c::2} to playerComponent(player)
+    set {_c::3} to " joined the game"
+    clear join message
+    broadcast components (merge components {_c::*})
     discordSend("**+** %player%")
 
 on leave:
     {enabledFeatures::joinleavemsgs} is true
-    set leave message to "§c- §7| &f%player% left the game"
+    set {_c::1} to "§c- §7| "
+    set {_c::2} to playerComponent(player)
+    set {_c::3} to " left the game"
+    clear leave message
+    broadcast components (merge components {_c::*})
     discordSend("**-** %player%")
 
 on death of player:
@@ -48,7 +56,8 @@ on async chat:
     # create format
     # {_msg} is used for discord
     set {_p} to player
-    set {_c::1} to text component from "§7%display name of {_p}%"
+    set {_c::1} to playerComponent({_p})
+    set color format of {_c::1} to light gray
     set {_c::2} to text component from "§7: &r"
     set {_c::3} to colored async chat message
     set click event of {_c::1} to click event to suggest command "/msg %name of {_p}% "

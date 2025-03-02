@@ -1,8 +1,4 @@
 
-# Made for 1.21.4
-
-using item_component
-
 import:
     java.lang.Integer as javaInteger
     java.lang.Float as javaFloat
