@@ -1,0 +1,7 @@
+
+import:
+    com.google.gson.JsonParser
+
+function valueFromJson(json:string, key:string) :: object:
+    set {_jsonObject} to JsonParser.parseString({_json}).getAsJsonObject()
+    return {_jsonObject}.get({_key}).getAsString()

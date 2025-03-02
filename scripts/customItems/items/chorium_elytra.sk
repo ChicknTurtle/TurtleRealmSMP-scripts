@@ -29,12 +29,11 @@ on toggle gliding:
         set {_rightwing} to (location 1.25 blocks right of {_loc})
         make 1 of witch at {_leftwing} with extra 0 with force
         make 1 of witch at {_rightwing} with extra 0 with force
-        set {_e::*} to (entities in radius 2.5 of player)
+        set {_e::*} to (entities in radius 2.5 of (location 0.5 blocks under player))
         set {_e::*} to ({_e::*} where [input isn't player])
         set {_source} to (damage source of player_attack caused by player directly by player at player)
         damage {_e::*} by (3.5*{_speed}) with {_source}
         loop {_e::*}:
-            set {_kb} to ({_speed}*(1-(knockback resistance attribute of loop-value)))
-            push loop-value (player's velocity) with force {_kb}
+            push loop-value (player's velocity) with force (1-(knockback resistance attribute of loop-value))
             if loop-value is ("end crystal" parsed as entity type):
                 make player attack loop-value
