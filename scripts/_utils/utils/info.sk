@@ -1,0 +1,21 @@
+
+local function playerInfo(p:player) :: string:
+    if (time played of {_p}) is set:
+        add "Playtime: §6%hours of time played of {_p}%h" to {_lines::*}
+    if {discordLinks::%uuid of {_p}%} is set:
+        set {_user} to user with id {discordLinks::%uuid of {_p}%}
+        if {_user} is set:
+            add "Discord: §9%{_user}% §7(@%discord name of {_user}%)" to {_lines::*}
+        else:
+            add "Discord: §cUnknown User%nl%§7@???" to {_lines::*}
+    else:
+        add "Discord: §cNot linked" to {_lines::*}
+    if (uuid of {_p}) is set:
+        add "§8%uuid of {_p}%" to {_lines::*}
+    return (join {_lines::*} with "§r%nl%")
+
+function playerComponent(p:offline player) :: object:
+    set {_c} to text component from ({_p}'s display name)
+    set hover event of {_c} to (hover event showing (playerInfo({_p})))
+    set click event of {_c} to (click event to suggest command "/msg %{_p}%")
+    return {_c}

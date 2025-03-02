@@ -1,6 +1,4 @@
 
-using item_component
-
 options:
     # Mobs that can be picked up by mob bundle
     AllowedMobs: allay, armadillo, bat, bee, cat, "chicken" parsed as entity type, cow, dolphin, fox, frog, goat, mooshroom, ocelot, panda, parrot, pig, polar bear, "rabbit" parsed as entity type, sheep, strider, villager, wolf

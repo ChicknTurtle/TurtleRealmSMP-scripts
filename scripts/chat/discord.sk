@@ -71,7 +71,7 @@ local function createLinkCode() :: string:
     return {_code}
 
 # /discord
-brig command tree /discord:
+brig command tree /turtle:discord:
     #trigger:
     #    send "§9join link"
     literal arg "link":

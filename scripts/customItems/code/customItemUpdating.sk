@@ -86,6 +86,7 @@ on chunk load:
 on join:
     loop (amount of slots of player's inventory) times:
         set {_item} to (slot (loop-value)-1 of player's inventory)
+        {_item} is set
         updateItemSlot({_item}, player's inventory, (loop-value)-1, "player join")
 
 # /give etc

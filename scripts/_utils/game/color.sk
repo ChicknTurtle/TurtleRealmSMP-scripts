@@ -55,3 +55,38 @@ expression:
         set {_return2} to (dark gray if {_return2} is "gray" else ({_return2} parsed as color))
         set {_return3} to (dark gray if {_return3} is "gray" else ({_return3} parsed as color))
         return {_return1} ? {_return2} ? {_return3}
+
+# Ping color
+# Get a color based on the ping value
+# Based on functionality from Better Ping Display mod
+expression:
+    patterns:
+        ping color (of|from) %integer%
+        %integer%'s ping color
+    get:
+        set {_ping} to expr-1
+        set {_PING_START} to 0
+        set {_PING_MID} to 150
+        set {_PING_END} to 300
+
+        set {_COLOR_GREY} to rgb(83, 83, 83)
+        set {_COLOR_START} to rgb(0, 230, 118)
+        set {_COLOR_MID} to rgb(214, 205, 48)
+        set {_COLOR_END} to rgb(229, 57, 53)
+
+        if ({_ping} < {_PING_START}):
+            return {_COLOR_GREY}
+        else if ({_ping} < {_PING_MID}):
+            return interpolate({_COLOR_START}, {_COLOR_MID}, computeOffset({_PING_START}, {_PING_MID}, {_ping}))
+        else:
+            return interpolate({_COLOR_MID}, {_COLOR_END}, computeOffset({_PING_MID}, {_PING_END}, min({_ping}, {_PING_END})))
+
+local function computeOffset(start:integer, end:integer, value:integer) :: number:
+    set {_offset} to ({_value}-{_start}) / ({_end}-{_start})
+    return max(0, min(1, {_offset}))
+
+local function interpolate(color1:color, color2:color, offset:number) :: color:
+    set {_r} to ({_color1}.getRed() + ({_color2}.getRed() - {_color1}.getRed()) * {_offset})
+    set {_g} to ({_color1}.getGreen() + ({_color2}.getGreen() - {_color1}.getGreen()) * {_offset})
+    set {_b} to ({_color1}.getBlue() + ({_color2}.getBlue() - {_color1}.getBlue()) * {_offset})
+    return rgb({_r}, {_g}, {_b})

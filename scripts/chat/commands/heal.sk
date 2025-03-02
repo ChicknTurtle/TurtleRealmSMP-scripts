@@ -1,23 +1,16 @@
 
-command /heal [<string>]:
+brig command /turtle:heal:
     permission: op
-    permission message: §cYou don't have permission!
+    arguments:
+        register optional entities arg "entities"
     trigger:
         {enabledFeatures::commands} is true
-        if arg-1 is set:
-            set {_p} to arg-1 parsed as player
+        set {_entities::*} to ({_entities::*} ? player)
+        loop {_entities::*}:
+            heal loop-value
+            feed loop-value
+            set saturation of loop-value to 20
+        if size of {_entities::*} is 1:
+            send "Healed %name of first element of {_entities::*}%"
         else:
-            set {_p} to player
-        if {_p} isn't set:
-            send "§cNo player was found for '%arg-1%'"
-            exit
-        heal {_p}
-        feed {_p}
-        set saturation of {_p} to 20
-        if player is {_p}:
-            send "§7Healed!" to player
-        else:
-            send "§7Healed §6%{_p}%§7!" to player
-
-on tab complete of "/heal", "/skript:heal":
-    set tab completions for position 1 to all players
+            send "Healed %size of {_entities::*}% entities"

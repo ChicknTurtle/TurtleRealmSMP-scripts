@@ -1,6 +1,4 @@
 
-using item_component
-
 on load:
     set {-features::anvil::name} to "Anvil cost/renaming"
     set {-features::anvil::desc} to "Item repair costs do not build up,\nand item renaming is free and can be colored"

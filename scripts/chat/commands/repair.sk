@@ -1,24 +1,15 @@
 
-command /repair [<string>]:
+brig command /turtle:repair:
     permission: op
-    permission message: §cYou don't have permission!
+    arguments:
+        register optional entities arg "entities"
     trigger:
         {enabledFeatures::commands} is true
-        if arg-1 is set:
-            set {_p} to arg-1 parsed as player
+        set {_entities::*} to ({_entities::*} ? player)
+        loop {_entities::*}:
+            (max durability of (loop-value's tool)) isn't 0
+            repair (loop-value's tool)
+        if size of {_entities::*} is 1:
+            send "Repaired tool of %name of first element of {_entities::*}%"
         else:
-            set {_p} to player
-        if {_p} isn't set:
-            send "§cNo player was found for '%arg-1%'"
-            exit
-        if max durability of {_p}'s tool is 0:
-            send "§c%type of {_p}'s tool% does not have durability!" to player
-            stop
-        repair {_p}'s tool
-        if player is {_p}:
-            send "§7Repaired your §3%type of {_p}'s tool%§7!" to player
-        else:
-            send "§7Repaired §6%{_p}%§7's §3%type of {_p}'s tool%§7!" to player
-
-on tab complete of "/repair", "/skript:repair":
-    set tab completions for position 1 to all players		
+            send "Repaired tool of %size of {_entities::*}% entities"
