@@ -13,3 +13,6 @@ brig command /turtle:repair:
             send "Repaired tool of %name of first element of {_entities::*}%"
         else:
             send "Repaired tool of %size of {_entities::*}% entities"
+        set {_c::1} to (text component from "Tool repaired by ")
+        set {_c::2} to playerComponent(player) ? "console"
+        send components (merge components {_c::*}) to {_entities::*}

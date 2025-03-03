@@ -11,12 +11,15 @@ brig command /turtle:ping:
     trigger:
         {enabledFeatures::commands} is true
         set {_player} to ({_player} ? player)
+        if {_player} isn't set:
+            send "&cNo player was found"
+            exit trigger
         set {_ping} to ({_player}'s ping)
         if {_player} is player:
             set {_c::2} to (text component from "Your ping is ")
         else:
             set {_c::1} to playerComponent({_player})
             set {_c::2} to (text component from "'s ping is ")
-        set {_c::2} to (text component from "%{_ping}%ms")
-        set color format of {_c::2} to (ping color of {_ping})
+        set {_c::3} to (text component from "%{_ping}%ms")
+        set color format of {_c::3} to (ping color of {_ping})
         send component (merge components {_c::*})

@@ -1,63 +1,13 @@
 
-# EXAMPLE BOT DEFINITION
-# My bot is defined in env.sk to hide the token
-# 
-# define new bot named "ChatLink": 
-#     token: "<INSERT TOKEN HERE>"
-#     intents: default intents
-#     on ready:
-#         log info "🤖 Discord chat link initialized"
-
-on load:
-    set {-features::discordlink::name} to "Discord link"
-    set {-features::discordlink::desc} to "Links in-game chat with a discord channel"
-    set {-features::discordlink::warn} to "If formatting of chat, join/leave, or death messages is disabled,\nthose messages won't show up on discord"
-    set {-features::discordlink::icon} to purple dye
-
-function discordSend(msg:string):
-    {enabledFeatures::discordlink} is true
-    post {_msg} to text channel with id {-env::discordLinkChannel}
-
-function discordChat(msg:string, p:player):
-    # waypoint
-    if {_msg} contains "xaero-waypoint:":
-        set {_parts::*} to {_msg} split at ":"
-        loop {_parts::*}:
-            loop-value is "xaero-waypoint"
-            set {_name} to {_parts::%loop-iteration+1%}
-            stop loop
-        set {_name} to "Shared Waypoint" if {_name} is ""
-        discordSend(":round_pushpin: %{_p}'s name% shared a waypoint called **%{_name}%**")
-        stop
-    # chat
-    set {_msg} to mcToMarkdown({_msg})
-    discordSend("%{_p}'s name%: %{_msg}%")
-
-on message received:
-    {enabledFeatures::discordlink} is true
-    event-user isn't a discord bot
-    discord id of event-channel is {-env::discordLinkChannel}
-    set {_c::1} to text component from "%effective name of event-member%:"
-    set {_c::2} to text component from " &f%event-message%"
-    set color format of {_c::1} to rgb(88, 101, 242)
-    set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7@%discord name of event-user%"
-    broadcast component (merge components {_c::*})
-
-###
-on command "/stop" or "/minecraft:stop" or "/restart" or "/spigot:restart":
-    {enabledFeatures::discordlink} is true
-    cancel event
-    send "§cStopping server..." to all players
-    log info "Sending stop msg and stopping server..." to console
-    discordSend("**:octagonal_sign: Server Stopped**")
-    wait 1 second
-    shutdown bot (bot named "ChatLink")
-    wait 1 second
-    stop server
-###
-
-#on skript stop:
-#    force shutdown bot (bot named "ChatLink")
+# make sure the command is only responded to by one bot instance
+function checkDiscordChannel(channel:object) :: boolean:
+    if ({-env::dev} is true):
+        {-env::discordLinkChannel} is (discord id of {_channel})
+        return true
+    else:
+        {-env::discordLinkChannelDev} isn't (discord id of {_channel})
+        return true
+    return false
 
 local function genCode() :: string:
     set {_code::*} to 3 random characters from "a" to "z"
@@ -123,6 +73,8 @@ slash command link <string="code">:
     arguments:
         code: The link code you were given in-game
     trigger:
+        checkDiscordChannel(event-channel) is true
+        broadcast "test true"
         set {_code} to argument "code" as string
 
         # get pending link info

@@ -14,3 +14,6 @@ brig command /turtle:heal:
             send "Healed %name of first element of {_entities::*}%"
         else:
             send "Healed %size of {_entities::*}% entities"
+        set {_c::1} to (text component from "Healed by ")
+        set {_c::2} to playerComponent(player) ? "console"
+        send components (merge components {_c::*}) to {_entities::*}
