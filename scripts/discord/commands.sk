@@ -1,14 +1,4 @@
 
-# make sure the command is only responded to by one bot instance
-function checkDiscordChannel(channel:object) :: boolean:
-    if ({-env::dev} is true):
-        {-env::discordLinkChannel} is (discord id of {_channel})
-        return true
-    else:
-        {-env::discordLinkChannelDev} isn't (discord id of {_channel})
-        return true
-    return false
-
 local function genCode() :: string:
     set {_code::*} to 3 random characters from "a" to "z"
     add (3 random characters from "0" to "9") to {_code::*}
@@ -22,8 +12,12 @@ local function createLinkCode() :: string:
 
 # /discord
 brig command tree /turtle:discord:
-    #trigger:
-    #    send "§9join link"
+    trigger:
+        set {_c::1} to text component from "§7Join the TurtleRealm Discord: "
+        set {_c::2} to text component from "§b§ndiscord.gg/qHEvpheAs9"
+        set hover event of {_c::2} to (hover event showing "§fClick to join!")
+        set click event of {_c::2} to (click event to open url "https://discord.gg/qHEvpheAs9")
+        send components (merge components {_c::*})
     literal arg "link":
         trigger:
             if {discordLinks::%uuid of player%} is set:
@@ -73,8 +67,6 @@ slash command link <string="code">:
     arguments:
         code: The link code you were given in-game
     trigger:
-        checkDiscordChannel(event-channel) is true
-        broadcast "test true"
         set {_code} to argument "code" as string
 
         # get pending link info
