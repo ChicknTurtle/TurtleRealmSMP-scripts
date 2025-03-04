@@ -1,0 +1,55 @@
+
+on load:
+    set {-features::whitelist::name} to "Whitelist"
+    set {-features::whitelist::desc} to "Enable a whitelist that players can add to"
+    set {-features::whitelist::warn} to "If disabled, anybody will be able to join"
+    set {-features::whitelist::icon} to paper
+
+    server is whitelisted
+    set the whitelist to false
+    log info "Vanilla whitelist has been disabled in place of custom whitelist feature."
+
+brig command tree /turtle:whitelist:
+    literal arg "add":
+        string arg "player":
+            trigger:
+                {enabledFeatures::whitelist} is true
+                if any:
+                    (length of {_player}) > 33
+                    (length of {_player}) < 3
+                then:
+                    send "§cInvalid username! Make sure you have the correct username."
+                    exit trigger
+                else if any:
+                    (indexes of {pendingWhitelist::*} contains (lowercase {_player}))
+                    {whitelist::*} contains (lowercase {_player})
+                then:
+                    send "&cPlayer '%{_player}%' is already whitelisted"
+                else:
+                    set {pendingWhitelist::%lowercase {_player}%} to (uuid of player)
+                    set {_c::1} to (text component from "§aPlayer '%lowercase {_player}% has been whitelisted. §fWrong username? Use ")
+                    set {_c::2} to (text component from "§3§n/whitelist undo %lowercase {_player}%")
+                    set click event of {_c::2} to (click event to suggest command "/whitelist undo %lowercase {_player}%")
+                    send components (merge components {_c::*})
+    literal arg "undo":
+        string arg "player":
+            suggestions:
+                apply suggestions (indexes of {pendingWhitelist::*} where [{pendingWhitelist::%input%} is (uuid of player)])
+            trigger:
+                {enabledFeatures::whitelist} is true
+                if {pendingWhitelist::%lowercase {_player}%} is set:
+                    delete {pendingWhitelist::%lowercase {_player}%}
+                    send "&fPlayer '%{_player}%' removed from your pending whitelist"
+                else:
+                    send "&cYou have no pending whitelist for '%{_player}%'!"
+
+on player connect:
+    if all:
+        {whitelist::*} doesn't contain (lowercase name of player)
+        (indexes of {pendingWhitelist::*}) doesn't contain (lowercase name of player)
+        {enabledFeatures::whitelist} is true
+    then:
+        kick player due to "&cYou aren't whitelisted!§r%nl%%nl%Get someone to whitelist you with §b/whitelist add %name of player%§r"
+    if (indexes of {pendingWhitelist::*}) contains (lowercase name of player):
+        delete {pendingWhitelist::%lowercase name of player%}
+        add (lowercase name of player) to {whitelist::*}
