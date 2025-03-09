@@ -35,7 +35,7 @@ on damage:
 
 on player tick:
     (y-coord of player) > ({@upWrapY}+5)
-    {dragonDefeated} is true
+    (world {@endWorld}).getEnderDragonBattle().hasBeenPreviouslyKilled() is true
     (world of player) is {@overworld}
     warp(player, {@endWorld}, -59)
     while (y-coord of player) < -49:
