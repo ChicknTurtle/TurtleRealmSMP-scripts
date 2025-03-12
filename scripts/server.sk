@@ -1,4 +1,10 @@
 
+options:
+    resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealm.zip"
+    resourcePackHash: "c1a8db0152b23a64a4e38abda847aa958a84eb66"
+    resourcePackPrompt: "§bRequired to see custom item textures and other important things"
+    resourcePackDeclineMsg: "§cYou have declined the server resource pack. You can fix this by changing the setting on your server list."
+
 # gamerules
 on load:
     loop all worlds:
@@ -8,9 +14,19 @@ on load:
 # unlock recipes
 # send resource pack
 on join:
-    if {-env::dev} isn't true:
-        send resource pack {-env::resourcePack} to player
+    sendResourcePack(player)
+    player.getResourcePackStatus() is decline
+    send {@resourcePackDeclineMsg} to player
+
     unlock recipes all recipes for player
+
+import:
+    java.util.UUID
+function sendResourcePack(p:player):
+    send resource pack {@resourcePackUrl} with id str(UUID.nameUUIDFromBytes("§aTurtleRealm".getBytes())) with hash {@resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
+
+on resource pack decline:
+    send {@resourcePackDeclineMsg} to player
 
 function updateTablist(p:player):
     set {_players} to real online player count
