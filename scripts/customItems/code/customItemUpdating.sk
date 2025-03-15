@@ -79,7 +79,8 @@ function loadChunkSlots(chunk:chunk):
             exit trigger
 
 # chunk loading
-on chunk load:
+# on generate instead of load, which could cause outdated items but much less lag
+on chunk generate:
     loadChunkSlots(event-chunk)
 
 # player joining

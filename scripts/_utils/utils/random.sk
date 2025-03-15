@@ -1,0 +1,11 @@
+
+# Random of world
+# Get a vector from a cardinal direction
+expression:
+    patterns:
+        [next] random [float|num[ber]] (of|from) %world%
+        %world%'s [next] random [float|num[ber]]
+    get:
+        if expr-1 isn't set:
+            return 0
+        return expr-1.getHandle().getRandom().nextFloat()

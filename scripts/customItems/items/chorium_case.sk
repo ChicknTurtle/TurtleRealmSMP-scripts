@@ -29,6 +29,8 @@ on player tick:
     set {_dist} to ({@maxDistanceSneaking} if player is pressing sneak key else {@maxDistance})
     set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
     set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
+    set {_portalhit::*} to ((blocks between (player's head) and {_hit}) where [input is a nether portal])
+    {_portalhit::*} isn't set
     make 1 of witch at {_hit} for player
 
 # teleport
@@ -37,19 +39,17 @@ on right click:
     getId(player's tool) is "turtle:chorium_case_filled"
     player.hasCooldown(1 of player's tool) is false
     cancel event
-    ###
-    # shoot pearl
-    make player shoot ender pearl with speed 1.5
-    play sound "minecraft:entity.ender_pearl.throw" in neutral category with volume 0.5 and pitch 0.4 at player
-    ###
     # teleport
-    set {_dist} to ({@maxDistanceSneaking} if player is pressing sneak key else {@maxDistance})
-    set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks
+    set {_dist} to (({@maxDistanceSneaking} if (player is pressing sneak key) else {@maxDistance}))
+    set {_ray} to (raytrace from player with max distance {_dist} while ignoring passable blocks)
     set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
+    set {_portalhit} to (first element of ((blocks between (player's head) and {_hit}) where [input is a nether portal]))
+    set {_portalhit} to ({_portalhit} ~ vector(-0,-0.5,-0))
+    set {_hit} to ({_portalhit} ? {_hit})
     set {_startLoc} to (player's location)
     relative tp player to {_hit}
     set fall distance of player to 0
-    set boolean tag "ignore_fall_damage_from_current_explosion" of full nbt of player to false
+    set (boolean tag "ignore_fall_damage_from_current_explosion" of (full nbt of player)) to false
     set {_v} to normalized (vector from {_startLoc} to {_hit})
     set {_amount} to ceil(distance between {_startLoc} and {_hit})
     set {_amount} to max({_amount}, 1)
