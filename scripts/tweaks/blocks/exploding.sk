@@ -1,0 +1,18 @@
+
+local function shouldCancelExplode(b:block) :: boolean:
+    if any:
+        (tag values of block tag "shulker_boxes") contains {_b}
+        raw name of {_b} is "minecraft:spawner"
+    then:
+        return true
+    return false
+
+# certain blocks can't explode
+on explode:
+    loop exploded blocks:
+        shouldCancelExplode(loop-block) is true
+        remove loop-block from exploded blocks
+on block explode:
+    loop ...event.blockList():
+        shouldCancelExplode(loop-value) is true
+        event.blockList().remove(loop-value)

@@ -1,7 +1,10 @@
 minecraft:
   items:
     elytra:
-      max_damage: 450
+      max_damage: 400
+      enchantable: 3
+    shears:
+      max_damage: 250
       enchantable: 3
     trident:
       max_damage: 300
@@ -18,12 +21,12 @@ minecraft:
           operation: add_value
         entity_interaction_range:
           id: minecraft:base_entity_interaction_range
-          amount: 2
+          amount: 1
           slot: mainhand
           operation: add_value
         block_interaction_range:
           id: minecraft:base_block_interaction_range
-          amount: 2
+          amount: 1
           slot: mainhand
           operation: add_value
     golden_helmet:

@@ -5,17 +5,8 @@ event "playerTick":
         [on] player tick
     event-values: player, world
 
-# Called every 20 ticks for every player online
-event "playerTickSlow":
-    patterns:
-        [on] slow player tick
-    event-values: player, world
-
 every tick:
-    set {_slow} to (true if (mod(gametick of "world", 20) is 0) else false)
     loop all players:
         set {_event-values::player} to loop-player
         set {_event-values::world} to world of loop-player
         call custom event "playerTick" using event-values {_event-values::*}
-        if {_slow} is true:
-            call custom event "playerTickSlow" using event-values {_event-values::*}

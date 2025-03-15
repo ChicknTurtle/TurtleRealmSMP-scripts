@@ -33,6 +33,8 @@ turtle:
     chorium_case:
       base: netherite_scrap
       name: "Chorium Case"
+      lore:
+          - "§50/6400"
       rarity: epic
       model: "turtle:chorium_case"
       max_stack_size: 1
@@ -66,7 +68,7 @@ turtle:
       name: "Chorium Plated Elytra"
       rarity: epic
       model: "turtle:chorium_elytra"
-      max_damage: 900
+      max_damage: 800
       repairable:
         - turtle:chorium_ingot
       enchantable: 3

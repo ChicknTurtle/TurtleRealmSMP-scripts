@@ -4,8 +4,10 @@ on load:
     set {-features::bossmusic::desc} to "Plays music during bosses\nAdjusted using jukebox/noteblock sound slider"
     set {-features::bossmusic::icon} to music disc cat with nbt from "{item_model:""turtle:music_disc_milky_ways"",jukebox_playable:{song:""minecraft:cat"",show_in_tooltip:false}}"
 
-on slow player tick:
+on player tick:
     {enabledFeatures::bossmusic} is true
+    # only every second
+    mod(gametick of "world", 20) is 0
     # dragon
     set {_dragon} to (nearest ender dragon to event-player)
     if event-player is within 200 blocks of {_dragon}:

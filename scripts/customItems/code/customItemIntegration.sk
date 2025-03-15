@@ -26,6 +26,10 @@ function getItem(item:object) :: item:
     log warn "getItem() found no item for '%{_id}%' (%skript type of {_item}%), returning self"
     return {_item}
 
+on consume with priority lowest:
+    (boolean tag "infinite" of (custom nbt of event-item)) is true
+    event.setReplacement(event-item)
+
 # Update recipes (needs to be updated for PredicateChoice when it's implemented)
 function customItemsUpdateAllRecipes():
     ###

@@ -72,7 +72,7 @@ local function formatEntityTagOrId(value:string, item:item) :: object:
 # get nbt
 local function getNbt(path:string, yaml:string, index:string, item:item) :: object:
     set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
-    set {_value} to "{}" if {_value} isn't set
+    {_value} is set
     set {_value_nbt} to nbt compound from {_value}
     if {_value} is set:
         if {_value_nbt} is set:
@@ -84,7 +84,7 @@ local function getNbt(path:string, yaml:string, index:string, item:item) :: obje
 # get attribute operation
 local function getAttrOperation(path:string, yaml:string, index:string, item:item) :: object:
     set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
-    set {_value} to "add_value" if {_value} isn't set
+    set {_value} to {_value} ? "add_value"
     if {_value} is "add_value":
         set {_value} to "add_number"
     else if {_value} is "add_multiplied_base":
@@ -102,7 +102,7 @@ local function getAttrOperation(path:string, yaml:string, index:string, item:ite
 # get equipment slot group
 local function getEquipSlotGroup(path:string, yaml:string, index:string, item:item) :: object:
     set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
-    set {_value} to "any" if {_value} isn't set
+    set {_value} to {_value} ? "any"
     set {_value_group} to "%{_value}%_slot_group" parsed as equipment slot group
     if {_value} is set:
         if {_value_group} is set:
@@ -126,8 +126,8 @@ local function getNamespaced(path:string, yaml:string, index:string, item:item) 
 local function getInteger(path:string, yaml:string, index:string, item:item, min:number={_}, max:number={_}) :: object:
     set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
     set {_value_int} to str({_value}) parsed as integer
-    set {_min} to {_value_int} if {_min} isn't set
-    set {_max} to {_value_int} if {_max} isn't set
+    set {_min} to {_min} ? {_value_int}
+    set {_max} to {_max} ? {_value_int}
     set {_min} to max({_min}, javaInteger.MIN_VALUE)
     set {_max} to min({_max}, javaInteger.MAX_VALUE)
     if {_value} is set:
@@ -145,8 +145,8 @@ local function getInteger(path:string, yaml:string, index:string, item:item, min
 local function getNumber(path:string, yaml:string, index:string, item:item, min:number={_}, max:number={_}) :: object:
     set {_value} to yaml value "%{_path}%.%{_index}%" of {_yaml}
     set {_value_num} to str({_value}) parsed as number
-    set {_min} to {_value_num} if {_min} isn't set
-    set {_max} to {_value_num} if {_max} isn't set
+    set {_min} to {_min} ? {_value_num}
+    set {_max} to {_max} ? {_value_num}
     set {_min} to max({_min}, javaInteger.MIN_VALUE)
     set {_max} to min({_max}, javaInteger.MAX_VALUE)
     if {_value} is set:
@@ -539,20 +539,14 @@ local function loadItem(namespace:string, id:string, yaml:string):
     # use remainder
     set {_use_remainder} to getNamespaced({_path}, {_yaml}, "use_remainder", {_item})
     if {_use_remainder} is set:
-        set {_use_remainder} to formatItemId({_use_remainder}, {_item})
-        {_use_remainder} is set
-        set {_use_remainder} to (full nbt of {_use_remainder})
-    
-    # use remainder nbt
-    if {_use_remainder} is set:
+        getItem({_use_remainder}) is set
+        # use remainder nbt
         set {_use_remainder_nbt} to getNbt({_path}, {_yaml}, "use_remainder_nbt", {_item})
-        set {_use_remainder_nbt2} to empty nbt compound
-        set compound tag "components" of {_use_remainder_nbt2} to {_use_remainder_nbt}
-        add {_use_remainder_nbt2} to {_use_remainder}
-        
-    # set use remainder
-    if {_use_remainder} is set:
-        set {_item} to setNbt({_item}, compound tag, "minecraft:use_remainder", {_use_remainder})
+        if {_use_remainder_nbt} is set:
+            set {_use_remainder_nbt2} to empty nbt compound
+            set compound tag "components" of {_use_remainder_nbt2} to {_use_remainder_nbt}
+            add {_use_remainder_nbt2} to {_use_remainder}
+        set use remainder of {_item} to getItem({_use_remainder})
     
     # equippable
     if yaml value "%{_path}%.equippable" of {_yaml} is set:
@@ -792,6 +786,17 @@ local function loadItem(namespace:string, id:string, yaml:string):
         # set jukebox playable
         set {_item} to setNbt({_item}, compound tag, "minecraft:jukebox_playable", {_jukebox_playable_nbt})
     
+    # infinite
+    set {_infinite} to getBoolean({_path}, {_yaml}, "infinite", {_item})
+    if {_infinite} is set:
+        if {_infinite} is true:
+            set boolean tag "infinite" of custom nbt of {_item} to true
+    
+    # add additional nbt
+    set {_additional_nbt} to getNbt({_path}, {_yaml}, "nbt", {_item})
+    if {_additional_nbt} is set:
+        add {_additional_nbt} to {_item}
+        
     # finalize custom item
     set {-customItems::%{_fullid}%} to {_item}
     log debug "Loaded custom item &a%{_fullid}%"
