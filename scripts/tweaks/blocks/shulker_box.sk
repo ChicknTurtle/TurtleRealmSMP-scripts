@@ -1,14 +1,4 @@
 
-# shulkers can't explode
-on explode:
-    loop exploded blocks:
-        (tag values of block tag "shulker_boxes") contains loop-block
-        remove loop-block from exploded blocks
-on block explode:
-    loop ...event.blockList():
-        (tag values of block tag "shulker_boxes") contains loop-value
-        event.blockList().remove(loop-value)
-
 # keep components nbt when broken
 on mine:
     block tag "shulker_boxes" contains event-block

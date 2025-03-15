@@ -1,0 +1,37 @@
+
+import:
+    org.bukkit.entity.TNTPrimed
+    org.bukkit.entity.minecart.ExplosiveMinecart
+
+# shears
+on right click:
+    getId(player's tool) is "minecraft:shears"
+    set {_e} to clicked entity
+    if all:
+        {_e} isn't instance of TNTPrimed
+        {_e} isn't instance of ExplosiveMinecart
+    then:
+        exit trigger
+    if {_e} is instance of TNTPrimed:
+        set {_loc} to ({_e}'s location ~ vector(0.5,0.75,0.5))
+        drop 1 of tnt at {_loc}
+    else if {_e} is instance of ExplosiveMinecart:
+        set {_loc} to ({_e}'s location ~ vector(0.5,0.5,0.5))
+        drop 1 of (material from key "tnt_minecart") at {_loc}
+    play sound "minecraft:block.growing_plant.crop" in blocks category with volume 0.5 at ({_e}'s location)
+    make player swing their hand
+    kill entity within {_e}
+    player's gamemode isn't creative
+    player.damageItemStack(hand_slot, 1)
+
+# flint and steel
+on right click:
+    getId(player's tool) is "minecraft:flint_and_steel"
+    set {_e} to clicked entity
+    {_e} is a living entity
+    {_e} isn't ignited
+    ignite {_e}
+    play sound "minecraft:item.flintandsteel.use" in blocks category with volume 1 with pitch ((random of (world of {_e}))*0.4+0.8) at {_e}
+    make player swing their hand
+    player's gamemode isn't creative
+    player.damageItemStack(hand_slot, 1)
