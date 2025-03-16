@@ -1,11 +1,4 @@
 
-import:
-    java.lang.StringBuffer
-    java.io.InputStreamReader
-    java.io.BufferedReader
-    java.net.URL
-    java.net.HttpURLConnection
-
 command /catfact:
     trigger:
         async run 0 ticks later:

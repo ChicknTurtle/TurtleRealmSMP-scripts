@@ -15,12 +15,12 @@ on BlockPreDispenseEvent:
     set {_e::*} to {_e::*} where [input can breed]
     set {_e::*} to {_e::*} where [love time of input is 0 seconds]
     set {_e} to first element of {_e::*}
-    dispenserSmoke({_block})
-    if {_e} isn't set:
-        play sound "minecraft:block.dispenser.fail" in block category with pitch 1.2 at {_block}
+    if {_e} is set:
+        dispenserEvent({_block})
+    else:
+        dispenserEventFail({_block})
         exit trigger
     # set love mode, remove item
     remove 1 of event.getItemStack() from (slot event.getSlot() of inventory of {_block})
-    play sound "minecraft:block.dispenser.dispense" at {_block}
     set love time of {_e} to 30 seconds
     play entity effect love_hearts on {_e}
