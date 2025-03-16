@@ -1,36 +1,43 @@
 
 import:
-    net.minecraft.network.protocol.game.ClientboundLevelEventPacket
     net.minecraft.core.BlockPos
 
-# Send game event packets to players
+# Send game events to players
 # https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#World_Event
 effect:
     patterns:
-        (send|play) (game|level)[ ]event %integer% at %block% [with [[extra ]data] %number%] [to %players%]
+        (send|play) (game|level)[ ]event %integer% at %block% [with [[extra ]data] %-number%]
     trigger:
         set {_event} to expr-1
         set {_block} to expr-2
         set {_data} to expr-3 ? 0
-        set {_players::*} to expr-4 ? (all players in world of {_block})
-        set {_packet} to (new ClientboundLevelEventPacket({_event}, new BlockPos(floor(x-coord of {_block}),floor(y-coord of {_block}),floor(z-coord of {_block})), {_data}, false))
-        transform {_players::*} using input.getHandle().connection.send({_packet})
+        (world of {_block}).getHandle().levelEvent({_event}, new BlockPos(floor(x-coord of {_block}),floor(y-coord of {_block}),floor(z-coord of {_block})), {_data})
 
 # Use this for entity statuses:
 # https://skripthub.net/docs/?id=10516
 
-function dispenserSmoke(block:block):
-    set {_facing} to facing of {_block}
+function getBlockGameEventDir(facing:direction) :: integer:
     if {_facing} is below:
-        set {_data} to 0
+        return 0
     else if {_facing} is above:
-        set {_data} to 1
+        return 1
     else if {_facing} is north:
-        set {_data} to 2
+        return 2
     else if {_facing} is south:
-        set {_data} to 3
+        return 3
     else if {_facing} is west:
-        set {_data} to 4
+        return 4
     else if {_facing} is east:
-        set {_data} to 5
-    play game event (2000) at ({_block}) with data ({_data}) to (all players in (world of {_block}))
+        return 5
+
+function dispenserEvent(block:block):
+    {_block} is a dispenser
+    set {_data} to getBlockGameEventDir(facing of {_block})
+    play game event 1000 at {_block} with data {_data}
+    play game event 2000 at {_block} with data {_data}
+
+function dispenserEventFail(block:block):
+    {_block} is a dispenser
+    set {_data} to getBlockGameEventDir(facing of {_block})
+    play game event 1001 at {_block} with data {_data}
+    play game event 2000 at {_block} with data {_data}

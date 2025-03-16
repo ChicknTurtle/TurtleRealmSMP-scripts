@@ -25,8 +25,7 @@ local function playerBonemeal(p:player):
 local function dispenserBonemeal(event:object):
     {_event}.setCancelled(true)
     remove 1 bone meal from (slot {_event}.getSlot() of inventory of {_event}.getBlock())
-    play sound "minecraft:block.dispenser.dispense" in block category at {_event}.getBlock()
-    dispenserSmoke({_event}.getBlock())
+    dispenserEvent({_event}.getBlock())
 
 # handle each type of block
 
