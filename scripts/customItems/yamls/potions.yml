@@ -1,0 +1,460 @@
+minecraft:
+  items:
+    potion:
+      max_stack_size: 16
+turtle:
+  items:
+    # Haste
+    haste_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 180
+    long_haste_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 480
+    strong_haste_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 2
+            duration: 90
+    splash_haste_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 180
+    long_splash_haste_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 480
+    strong_splash_haste_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 2
+            duration: 90
+    lingering_haste_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 45
+    long_lingering_haste_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 1
+            duration: 120
+    strong_lingering_haste_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#D9C043"
+        custom_name: "haste"
+        custom_effects:
+          minecraft:haste:
+            amplifier: 2
+            duration: 22
+    # Mining Fatigue
+    mining_fatigue_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 90
+    long_mining_fatigue_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 240
+    strong_mining_fatigue_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 4
+            duration: 20
+    splash_mining_fatigue_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 90
+    long_splash_mining_fatigue_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 240
+    strong_splash_mining_fatigue_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 4
+            duration: 20
+    lingering_mining_fatigue_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 22
+    long_lingering_mining_fatigue_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 1
+            duration: 60
+    strong_lingering_mining_fatigue_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#4A4217"
+        custom_name: "mining_fatigue"
+        custom_effects:
+          minecraft:mining_fatigue:
+            amplifier: 4
+            duration: 5
+    # Levitation
+    levitation_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 20
+    long_levitation_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 40
+    strong_levitation_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 2
+            duration: 20
+    splash_levitation_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 20
+    long_splash_levitation_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 40
+    strong_splash_levitation_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 2
+            duration: 20
+    lingering_levitation_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 5
+    long_lingering_levitation_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 1
+            duration: 10
+    strong_lingering_levitation_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#CEFFFF"
+        custom_name: "levitation"
+        custom_effects:
+          minecraft:levitation:
+            amplifier: 2
+            duration: 5
+    # Blindness
+    blindness_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 90
+    long_blindness_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 240
+    splash_blindness_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 90
+    long_splash_blindness_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 240
+    lingering_blindness_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 22
+    long_lingering_blindness_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#1F1F23"
+        custom_name: "blindness"
+        custom_effects:
+          minecraft:blindness:
+            amplifier: 1
+            duration: 60
+    # Glowing
+    glowing_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 90
+    long_glowing_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 240
+    splash_glowing_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 90
+    long_splash_glowing_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 240
+    lingering_glowing_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 22
+    long_lingering_glowing_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#94A061"
+        custom_name: "glowing"
+        custom_effects:
+          minecraft:glowing:
+            amplifier: 1
+            duration: 60
+    # Wither
+    wither_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 90
+    long_wither_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 240
+    strong_wither_potion:
+      base: potion
+      max_stack_size: 16
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 4
+            duration: 20
+    splash_wither_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 90
+    long_splash_wither_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 240
+    strong_splash_wither_potion:
+      base: splash_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 4
+            duration: 20
+    lingering_wither_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 22
+    long_lingering_wither_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 1
+            duration: 60
+    strong_lingering_wither_potion:
+      base: lingering_potion
+      potion_contents:
+        custom_color: "#736156"
+        custom_name: "wither"
+        custom_effects:
+          minecraft:wither:
+            amplifier: 4
+            duration: 5
