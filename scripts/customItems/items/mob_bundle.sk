@@ -63,7 +63,6 @@ local function throwMob(event:object, e:entity, tool:item) :: item:
     custom nbt of {_tool} has tag "bundled"
     {_event}.setCancelled(true)
     set {_nbt} to compound tag "bundled" of custom nbt of {_tool}
-    clear bundle contents of {_tool}
     # spawn mob
     delete tag "Pos" of {_nbt}
     delete tag "Rotation" of {_nbt}
@@ -84,8 +83,9 @@ local function throwMob(event:object, e:entity, tool:item) :: item:
         push event-entity forward with force {_force}
         add {_p}'s velocity to event-entity's velocity
     # remove nbt
-    delete tag "bundled" of custom nbt of {_tool}
-    delete tag "bundled_type" of custom nbt of {_tool}
+    delete tag "minecraft:bundle_contents" of (nbt of {_tool})
+    delete tag "bundled" of (custom nbt of {_tool})
+    delete tag "bundled_type" of (custom nbt of {_tool})
     clear lore of {_tool}
     # play sound
     play sound "minecraft:item.bundle.drop_contents" at {_p}
@@ -121,6 +121,7 @@ import:
 
 # cancel bundle spitting out item
 on PlayerInteractEvent:
+    str(event.action) isn't "PHYSICAL"
     set {_p} to event.getPlayer()
     if event.getHand() is off_hand_slot:
         set {_tool} to {_p}'s offhand tool
@@ -134,8 +135,10 @@ on PlayerInteractEvent:
 on inventory click:
     if click type is right mouse button:
         if getId(event-item) is "turtle:mob_bundle":
+            player's cursor slot is air
             custom nbt of event-item has tag "bundled"
             cancel event
         if getId(player's cursor slot) is "turtle:mob_bundle":
+            event-item is air
             custom nbt of player's cursor slot has tag "bundled"
             cancel event

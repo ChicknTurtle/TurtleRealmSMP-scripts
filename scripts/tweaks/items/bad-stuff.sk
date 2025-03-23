@@ -1,0 +1,10 @@
+
+# disable stuff that shouldn't be possible to get/use
+on place of barrier:
+    player's gamemode isn't creative
+    cancel event
+on right click:
+    event-item is tagged with (item tag "spawn_eggs")
+    player's gamemode isn't creative
+    cancel event
+# ^ doesn't work with offhand
