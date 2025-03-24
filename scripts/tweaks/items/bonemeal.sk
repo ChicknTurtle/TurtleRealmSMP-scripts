@@ -1,10 +1,7 @@
 
-import:
-    io.papermc.paper.event.block.BlockPreDispenseEvent
-
 on load:
     set {-features::bonemealing::name} to "Bonemealing"
-    set {-features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't\nWorks for: sugar cane, cactus, nether wart, pumpkins, melons,\nchorus flower, and small flowers (excluding wither rose and torchflower)"
+    set {-features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't.\nWorks for: sugar cane, cactus, nether wart, pumpkins,\nmelons, chorus flower, and small flowers\n(excluding wither rose and torchflower)"
     set {-features::bonemealing::icon} to bone meal
 
 # bonemeal effects
@@ -22,14 +19,9 @@ local function playerBonemeal(p:player):
     {_p}'s gamemode isn't creative
     remove 1 of bone meal from {_p}'s tool
 
-local function dispenserBonemeal(event:object):
-    {_event}.setCancelled(true)
-    remove 1 bone meal from (slot {_event}.getSlot() of inventory of {_event}.getBlock())
-    dispenserEvent({_event}.getBlock())
-
 # handle each type of block
 
-local function bonemealVerticalGrowthBlock(block:block) :: boolean:
+function bonemealVerticalGrowthBlock(block:block) :: boolean:
     set {_type} to type of {_block}
     loop blocks between {_block} and location 1000 blocks above {_block}:
         if loop-block is {_type}:
@@ -41,7 +33,7 @@ local function bonemealVerticalGrowthBlock(block:block) :: boolean:
             return true
         return false
 
-local function bonemealCropBlock(block:block) :: boolean:
+function bonemealCropBlock(block:block) :: boolean:
     if (age of {_block}) isn't (max age of {_block}):
         add 1 to age of {_block}
         {_block}.tick()
@@ -50,7 +42,7 @@ local function bonemealCropBlock(block:block) :: boolean:
     else:
         return false
 
-local function bonemealStemBlock(block:block, amount:integer=1) :: boolean:
+function bonemealStemBlock(block:block, amount:integer=1) :: boolean:
     if (age of {_block}) is (max age of {_block}):
         loop {_amount} times:
             {_block}.randomTick()
@@ -58,14 +50,14 @@ local function bonemealStemBlock(block:block, amount:integer=1) :: boolean:
         return true
     return false
 
-local function bonemealSingleTickBlock(block:block) :: boolean:
+function bonemealSingleTickBlock(block:block) :: boolean:
     if (age of {_block}) isn't (max age of {_block}):
         {_block}.randomTick()
         bonemealEffect({_block})
         return true
     return false
 
-local function bonemealFlowerBlock(block:block) :: boolean:
+function bonemealFlowerBlock(block:block) :: boolean:
     loop shuffled (blocks within ({_block} ~ vector(-1,0,-1)) and ({_block} ~ vector(1,0,1))):
         loop-block is air
         (block tags of (block under loop-block)) contains (block tag "minecraft:dirt")
@@ -74,7 +66,8 @@ local function bonemealFlowerBlock(block:block) :: boolean:
         return true
     return false
 
-# bonemeal events
+# bonemeal via right-click
+# dispenser functionality in /tweaks/blocks/dispenser.sk
 
 on right click:
     {enabledFeatures::bonemealing} is true
@@ -99,28 +92,3 @@ on right click:
     else if (tag values of block tag "small_flowers" where [(wither rose, torchflower) doesn't contain input]) contains (type of event-block):
         bonemealFlowerBlock(event-block) is true
         playerBonemeal(player)
-
-on BlockPreDispenseEvent:
-    {enabledFeatures::bonemealing} is true
-    event.getItemStack() is bone meal
-    set {_block} to (block in front of event.getBlock())
-    # vertical growth block
-    if (sugar cane, cactus) contains (type of {_block}):
-        bonemealVerticalGrowthBlock({_block}) is true
-        dispenserBonemeal(event)
-    # crop block
-    else if (nether wart) contains (type of {_block}):
-        bonemealCropBlock({_block}) is true
-        dispenserBonemeal(event)
-    # stem block
-    else if (pumpkin stem, melon stem) contains (type of {_block}):
-        bonemealStemBlock({_block}) is true
-        dispenserBonemeal(event)
-    # single tick block
-    else if (chorus flower) contains (type of {_block}):
-        bonemealSingleTickBlock({_block}) is true
-        dispenserBonemeal(event)
-    # flower block
-    else if (tag values of block tag "small_flowers" where [(wither rose, torchflower) doesn't contain input]) contains (type of {_block}):
-        bonemealFlowerBlock({_block}) is true
-        dispenserBonemeal(event)

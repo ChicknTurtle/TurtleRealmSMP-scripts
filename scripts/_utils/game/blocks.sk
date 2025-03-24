@@ -1,4 +1,11 @@
 
+import:
+    net.minecraft.core.BlockPos
+    net.minecraft.core.Direction
+    net.minecraft.world.phys.Vec3
+    net.minecraft.world.phys.BlockHitResult
+    net.minecraft.world.item.context.DirectionalPlaceContext
+
 # Block only
 # Change a block's type while keeping all blockdata and nbt
 # e.g. changing the color of a shulker box
@@ -16,3 +23,43 @@ expression:
         loop blockdata tags of (block at expr-1):
             {_blockdata::%loop-value%} is set
             set blockdata tag loop-value of (block at expr-1) to {_blockdata::%loop-value%}
+
+local function naturallyPlaceItem(item:itemtype, loc:location) :: boolean:
+    set {_dir} to facing of loc {_loc}
+    set {_dir} to "up" if {_dir} is above
+    set {_dir} to "below" if {_dir} is below
+    set {_nmsDir} to Direction.byName(str({_dir}))
+    set {_level} to (world of {_loc}).getHandle()
+    set {_nmsItem} to {_item}.getRandom().asNMSCopy()
+    set {_x} to floor(x-coord of {_loc})
+    set {_y} to floor(y-coord of {_loc})
+    set {_z} to floor(z-coord of {_loc})
+    set {_pos} to new BlockPos({_x},{_y},{_z})
+    set {_hitVec} to new Vec3(0.5,0.5,0.5)
+    set {_hitResult} to new BlockHitResult({_hitVec}, {_nmsDir}, {_pos}, false)
+    set {_context} to new DirectionalPlaceContext({_level}, {_pos}, {_nmsDir}, {_nmsItem}, {_nmsDir})
+    set {_placed} to try {_nmsItem}.getItem().place({_context}).consumesAction()
+    return {_placed} ? false
+
+# Place an item naturally
+# Will automatically use valid blockdata, prioritizing the direction of the location
+# Fails if an entity is in the way, just like normal placing
+effect:
+    patterns:
+        [naturally] place %itemtype% at %location%
+    trigger:
+        set {_item} to expr-1
+        set {_loc} to expr-2
+        naturallyPlaceItem({_item}, {_loc})
+
+# Place an item naturally, but also check if the block was successfully placed
+# Same as above
+condition:
+    patterns:
+        [naturally] placing %itemtype% at %location% (was (successful|a success)|succeeded)
+    check:
+        set {_item} to expr-1
+        set {_loc} to expr-2
+        if naturallyPlaceItem({_item}, {_loc}) is false:
+            exit
+        continue

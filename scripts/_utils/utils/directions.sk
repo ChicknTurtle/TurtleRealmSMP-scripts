@@ -1,4 +1,13 @@
 
+# Facing of location
+# Get the cardinal direction of a location
+expression:
+    patterns:
+        [the] facing of [loc[ation]] %location%
+        [loc[ation]] %location%'[s] facing
+    get:
+        return (facing of vector (vector from expr-1 to (location 1 block in front of expr-1)))
+
 # Facing of vector
 # Get the cardinal direction of a vector
 expression:
