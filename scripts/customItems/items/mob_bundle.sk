@@ -76,7 +76,7 @@ local function throwMob(event:object, e:entity, tool:item) :: item:
     delete tag "TileY" of {_nbt}
     delete tag "TileZ" of {_nbt}
     set {_loc} to location 1 block above {_p}'s location
-    spawn (entity type from key (string tag "bundled_type" of custom nbt of {_tool})) at {_loc}:
+    mc spawn (minecraft entity type from key (string tag "bundled_type" of custom nbt of {_tool})) at {_loc}:
         add {_nbt} to full nbt of event-entity
         set {_size} to event-entity.getBoundingBox().getVolume()
         set {_force} to max(0.75,1.5-{_size})
