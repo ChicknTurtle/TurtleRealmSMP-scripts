@@ -8,5 +8,9 @@ effect:
     trigger:
         exit
 
+expression colon:
+    get:
+        return ":"
+
 function str(val:object) :: string:
     return "%{_val}%"

@@ -61,10 +61,7 @@ on right click:
     play sound "minecraft:entity.player.teleport" in player category at player
     # cooldown / swing
     player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
-    if event.getHand() is off_hand_slot:
-        make player swing their offhand
-    else:
-        make player swing their hand
+    make player swing their hand
     # lower count
     player's gamemode isn't creative
     set {_amount} to ((int tag "storedPearls" of custom nbt of player's tool) ? 1)

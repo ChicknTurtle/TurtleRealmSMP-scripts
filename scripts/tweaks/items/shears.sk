@@ -30,4 +30,4 @@ on right click:
     make player swing their hand
     kill entity within {_e}
     player's gamemode isn't creative
-    player.damageItemStack(hand_slot, 1)
+    player.damageItemStack(hand slot, 1)

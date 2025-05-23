@@ -93,7 +93,7 @@ local function throwMob(event:object, e:entity, tool:item) :: item:
 
 local function mobBundle(event:object, e:entity):
     set {_p} to {_event}.getPlayer()
-    if {_event}.getHand() is off_hand_slot:
+    if {_event}.getHand() is off hand slot:
         set {_tool} to {_p}'s offhand tool
     else:
         set {_tool} to {_p}'s tool
@@ -108,7 +108,7 @@ local function mobBundle(event:object, e:entity):
         set {_tool} to pickupMob({_event}, {_e}, {_tool}) ? {_tool}
     else:
         set {_tool} to throwMob({_event}, {_e}, {_tool}) ? {_tool}
-    if {_event}.getHand() is off_hand_slot:
+    if {_event}.getHand() is off hand slot:
         set {_p}'s offhand tool to ({_tool} ? {_p}'s tool)
     else:
         set {_p}'s tool to ({_tool} ? {_p}'s tool)
@@ -123,7 +123,7 @@ import:
 on PlayerInteractEvent:
     str(event.action) isn't "PHYSICAL"
     set {_p} to event.getPlayer()
-    if event.getHand() is off_hand_slot:
+    if event.getHand() is off hand slot:
         set {_tool} to {_p}'s offhand tool
     else:
         set {_tool} to {_p}'s tool

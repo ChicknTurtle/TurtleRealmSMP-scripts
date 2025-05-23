@@ -26,14 +26,14 @@ every tick:
 
 on right click on lodestone:
     {enabledFeatures::loadstone} is true
-    if event.getHand() is off_hand_slot:
+    if event.getHand() is off hand slot:
         set {_tool} to player's offhand tool
     else:
         set {_tool} to player's tool
     {_tool} is echo shard
     {loadstones::*} doesn't contain event-block
     if player's gamemode isn't creative:
-        if event.getHand() is off_hand_slot:
+        if event.getHand() is off hand slot:
             remove 1 of echo shard from player's offhand tool
         else:
             remove 1 of echo shard from player's tool

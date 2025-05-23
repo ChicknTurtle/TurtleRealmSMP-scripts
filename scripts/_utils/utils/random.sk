@@ -1,6 +1,5 @@
 
 # Random of world
-# Get a vector from a cardinal direction
 expression:
     patterns:
         [next] random [float|num[ber]] (of|from) %world%

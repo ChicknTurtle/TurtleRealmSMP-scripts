@@ -18,4 +18,4 @@ on right click:
     play sound "minecraft:item.flintandsteel.use" in blocks category with volume 1 with pitch ((random of (world of {_e}))*0.4+0.8) at {_e}
     make player swing their hand
     player's gamemode isn't creative
-    player.damageItemStack(hand_slot, 1)
+    player.damageItemStack(hand slot, 1)
