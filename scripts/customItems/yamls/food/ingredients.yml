@@ -1,9 +1,0 @@
-turtle:
-  items:
-    cheese:
-      base: minecraft:apple
-      model: turtle:cheese
-      name: "Cheese"
-      food:
-        nutrition: 4
-        saturation: 2.4

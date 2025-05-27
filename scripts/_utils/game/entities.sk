@@ -1,0 +1,28 @@
+
+import:
+    org.bukkit.util.BoundingBox
+
+# Entities touching block
+# Get all entities touching a certain block
+plural expression:
+    patterns:
+        [all] [[of] the] entities (touching|within|inside [of]) [block] %block%['s (hit|bounding[ ])box]
+    loop of: entity
+    get:
+        set {_block} to expr-1
+        set {_x} to (x-coord of {_block}) - 0.5
+        set {_y} to (y-coord of {_block}) - 0.5
+        set {_z} to (z-coord of {_block}) - 0.5
+        set {_box} to new BoundingBox({_x},{_y},{_z},({_x}+1),({_y}+1),({_z}+1))
+        return ...(world of {_block}).getNearbyEntities({_box})
+
+# Spawn item
+# Get the item used to spawn an entity
+expression:
+    patterns:
+        [the] [effective|real] spawn[ ](item|egg) of %entity%
+        %entity%'s [effective|real] spawn[ ](item|egg)
+    get:
+        if spawn egg of expr-1 is set:
+            return spawn egg of expr-1
+        return ((str(type of expr-1) parsed as item type) ? {_})

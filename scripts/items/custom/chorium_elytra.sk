@@ -1,0 +1,48 @@
+
+when ready to register custom items:
+    set (custom item "turtle:chorium_elytra") to (elytra with nbt from "{""minecraft:item_model"":""turtle:chorium_elytra"",""minecraft:item_name"":""Chorium Plated Elytra"",""minecraft:rarity"":""epic"",""minecraft:max_damage"":600,""minecraft:enchantable"":{value:3}}")
+    set repairable items of (custom item "turtle:chorium_elytra") to (custom item "turtle:chorium_ingot")
+    apply equippable component to (custom item "turtle:chorium_elytra"):
+        slot: chest slot
+        equip_sound: "minecraft:item.armor.equip_diamond"
+        asset_id: "turtle:chorium_elytra"
+        damage_on_hurt: false
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:chorium_upgrade_smithing_template"
+        result: 2 of custom item "turtle:chorium_upgrade_smithing_template"
+        category: "misc"
+        shape: "#S#", "#C#", "###"
+        ingredients:
+            set ingredient of "#" to diamond
+            set ingredient of "C" to end stone
+            set ingredient of "S" to custom item "turtle:chorium_upgrade_smithing_template"
+    register smithing transform recipe:
+        id: "turtle:chorium_elytra_smithing"
+        result: custom item "turtle:chorium_elytra"
+        template: custom item "turtle:chorium_upgrade_smithing_template"
+        base: elytra
+        addition: custom item "turtle:chorium_ingot"
+
+on toggle gliding:
+    wait 1 tick
+    while player is gliding:
+        wait 1 tick
+        item id of (player's chestplate) is "turtle:chorium_elytra"
+        set {_speed} to (vector length of (player's velocity))
+        {_speed} > 0.8
+        set {_loc} to (location 1 block in front of player)
+        set {_loc} to {_loc} ~ vector(0,0.5,0)
+        set {_leftwing} to (location 1.25 blocks left of {_loc})
+        set {_rightwing} to (location 1.25 blocks right of {_loc})
+        make 1 of witch at {_leftwing} with extra 0 with force
+        make 1 of witch at {_rightwing} with extra 0 with force
+        set {_e::*} to (entities in radius 2.5 of (location 0.5 blocks under player))
+        set {_e::*} to ({_e::*} where [input isn't player])
+        set {_source} to (damage source of player_attack caused by player directly by player at player)
+        damage {_e::*} by (3.5*{_speed}) with {_source}
+        loop {_e::*}:
+            push loop-value (player's velocity) with force (1-(knockback resistance attribute of loop-value))
+            if loop-value is ("end crystal" parsed as entity type):
+                make player attack loop-value

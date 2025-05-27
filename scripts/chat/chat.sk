@@ -65,12 +65,8 @@ on async chat:
 
     # replace [item]
     if "%{_format}%" contains "[item]":
-        set {_col} to rarity color of player's tool
         set {_name} to effective name of player's tool
-        set {_c} to text component from "[%{_name}%]"
-        set color format of {_c} to {_col}
-        set hover event of {_c} to hover event showing player's tool
-        component replace "\[item]" with {_c} in {_format}
+        component replace "\[item]" with (item chat component of (player's tool)) in {_format}
     replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # replace bad words

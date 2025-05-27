@@ -1,0 +1,22 @@
+
+# Called when custom items are ready to be defined
+event "customItemsReady":
+    patterns:
+        [on|when] [custom] item[s] [are] ready to be (loaded|defined|created|registered)
+        [on|when] ready [to] (load|define|create|register) [custom] item[s]
+
+# Called when custom recipes are ready to be loaded
+event "recipesReady":
+    patterns:
+        [on|when] recipe[s] [are] ready to (load|be loaded)
+        [on|when] ready [to] load recipe[s]
+
+# Called when an item with a custom interact is interacted with
+event "customItemInteract":
+    event-values: player, item, world, string, equipmentslot
+    patterns:
+        [on] custom item (interact[ion]|use[d]) [(using|with) %-string%]
+    check:
+        if event-string isn't expr-1:
+            stop
+        continue

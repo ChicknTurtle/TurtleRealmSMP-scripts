@@ -1,0 +1,91 @@
+    
+when ready to register custom items:
+    # potion
+    set (custom item "minecraft:potion") to 1 potion
+    set (max stack size component of (custom item "minecraft:potion")) to 16
+    # elytra
+    set (custom item "minecraft:elytra") to elytra with nbt from "{""minecraft:max_damage"":300,""minecraft:enchantable"":{value:3}}"
+    # shears
+    set (custom item "minecraft:shears") to shears with nbt from "{""minecraft:max_damage"":250,""minecraft:enchantable"":{value:3}}"
+    # trident
+    set (custom item "minecraft:trident") to trident with nbt from "{""minecraft:max_damage"":300}"
+    apply attribute modifier to (custom item "minecraft:trident"):
+        attribute: generic attack damage
+        slot: mainhand_slot_group
+        id: "minecraft:base_attack_damage"
+        amount: 8
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:trident"):
+        attribute: generic attack speed
+        slot: mainhand_slot_group
+        id: "minecraft:base_attack_speed"
+        amount: -2.9
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:trident"):
+        attribute: entity interaction range
+        slot: mainhand_slot_group
+        id: "minecraft:base_entity_interaction_range"
+        amount: 1
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:trident"):
+        attribute: block interaction range
+        slot: mainhand_slot_group
+        id: "minecraft:base_block_interaction_range"
+        amount: 1
+        operation: add_number
+    # golden helmet
+    set (custom item "minecraft:golden_helmet") to golden helmet
+    apply attribute modifier to (custom item "minecraft:golden_helmet"):
+        attribute: generic armor
+        slot: head_slot_group
+        id: "minecraft:armor.helmet"
+        amount: 2
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:golden_helmet"):
+        attribute: generic luck
+        slot: head_slot_group
+        id: "turtle:luck.helmet"
+        amount: 0.25
+        operation: add_number
+    # golden chestplate
+    set (custom item "minecraft:golden_chestplate") to golden chestplate
+    apply attribute modifier to (custom item "minecraft:golden_chestplate"):
+        attribute: generic armor
+        slot: chest_slot_group
+        id: "minecraft:armor.chestplate"
+        amount: 5
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:golden_chestplate"):
+        attribute: generic luck
+        slot: chest_slot_group
+        id: "turtle:luck.chestplate"
+        amount: 0.25
+        operation: add_number
+    # golden leggings
+    set (custom item "minecraft:golden_leggings") to golden leggings
+    apply attribute modifier to (custom item "minecraft:golden_leggings"):
+        attribute: generic armor
+        slot: legs_slot_group
+        id: "minecraft:armor.leggings"
+        amount: 3
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:golden_leggings"):
+        attribute: generic luck
+        slot: legs_slot_group
+        id: "turtle:luck.leggings"
+        amount: 0.25
+        operation: add_number
+    # golden boots
+    set (custom item "minecraft:golden_boots") to golden boots
+    apply attribute modifier to (custom item "minecraft:golden_boots"):
+        attribute: generic armor
+        slot: feet_slot_group
+        id: "minecraft:armor.boots"
+        amount: 1
+        operation: add_number
+    apply attribute modifier to (custom item "minecraft:golden_boots"):
+        attribute: generic luck
+        slot: feet_slot_group
+        id: "turtle:luck.boots"
+        amount: 0.25
+        operation: add_number

@@ -1,0 +1,33 @@
+
+import:
+    org.bukkit.entity.TNTPrimed
+    org.bukkit.entity.minecart.ExplosiveMinecart
+
+on load:
+    set {-features::shears::name} to "Shears"
+    set {-features::shears::desc} to "Shears can difuse TNT and TNT minecarts"
+    set {-features::shears::icon} to shears
+
+# shears
+on right click with shears:
+    {enabledFeatures::shears} is true
+    (item id of player's tool) is "minecraft:shears"
+    set {_e} to clicked entity
+    {_e} is set
+    if all:
+        {_e} isn't instance of TNTPrimed
+        {_e} isn't instance of ExplosiveMinecart
+    then:
+        exit trigger
+    cancel event
+    if {_e} is instance of TNTPrimed:
+        set {_loc} to ({_e}'s location ~ vector(0.5,0.75,0.5))
+        drop 1 of tnt at {_loc}
+    else if {_e} is instance of ExplosiveMinecart:
+        set {_loc} to ({_e}'s location ~ vector(0.5,0.5,0.5))
+        drop 1 of (material from key "tnt_minecart") at {_loc}
+    play sound "minecraft:block.growing_plant.crop" in blocks category with volume 0.5 at ({_e}'s location)
+    make player swing their hand
+    kill entity within {_e}
+    player's gamemode isn't creative
+    player.damageItemStack(hand slot, 1)

@@ -1,0 +1,65 @@
+
+import:
+    net.minecraft.core.component.DataComponents
+
+# Item Rarity
+# Get the rarity of an item
+expression:
+    patterns:
+        [the] [item] rarity of %item%
+        %item%'s [item] rarity
+    get:
+        return "%(1 of expr-1).handle.getComponents().get(DataComponents.RARITY)%"
+    set:
+        set string tag "minecraft:rarity" of nbt of raw expr-1 to change value
+
+# Effective name
+# Get the effective name of an item
+# Will return a translate component if no custom name
+expression:
+    patterns:
+        [the] (effective|real) [item] name of %item%
+        %item%'s (effective|real) [item] name
+    get:
+        if expr-1 is air:
+            return {_}
+        if name of expr-1 is set:
+            return (name of expr-1) + "§r"
+        else if component item name of expr-1 isn't "":
+            return component item name of expr-1 + "§r"
+        else:
+            return translate component from (translation key of expr-1)
+
+# Item chat component
+# Mimics how minecraft displays items in chat
+expression:
+    patterns:
+        [the] [item] chat component of %item%
+        %item%'s [item] chat component
+    get:
+        set {_col} to rarity color of expr-1
+        set {_name} to (effective item name of expr-1)
+        set {_c} to text component from "[%{_name}%]"
+        set color format of {_c} to {_col}
+        set hover event of {_c} to hover event showing expr-1
+        return {_c}
+
+# Rarity Color
+# Get the rarity color of an item
+expression:
+    patterns:
+        [the] rarity color of %item%
+        %item%'s rarity color
+    get:
+        set {_rarity} to rarity of expr-1
+        if expr-1 is enchanted:
+            if {_rarity} isn't "EPIC":
+                return rgb(85,255,255)
+        if {_rarity} is "UNCOMMON":
+            return rgb(255,255,85)
+        else if {_rarity} is "RARE":
+            return rgb(85,255,255)
+        else if {_rarity} is "EPIC":
+            return rgb(255,85,255)
+        else:
+            return rgb(255,255,255)
