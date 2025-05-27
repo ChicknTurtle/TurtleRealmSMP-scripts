@@ -1,0 +1,62 @@
+
+when ready to register custom items:
+    set (custom item "turtle:magnifying_glass") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}") with lore "§r§7Displays info about entities."
+    apply use cooldown component to (custom item "turtle:magnifying_glass"):
+        seconds: 3 seconds
+        group: "turtle:magnifying_glass"
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:magnifying_glass"
+        result: custom item "turtle:magnifying_glass"
+        shape: "iii", "igi", " s "
+        category: "equipment"
+        ingredients:
+            set ingredient of "i" to iron ingot
+            set ingredient of "g" to material choice of (tag contents of item tag "glass")
+            set ingredient of "s" to stick
+
+on right click:
+    (item id of player's tool) is "turtle:magnifying_glass"
+    player.hasCooldown(1 of player's tool) is false
+    set {_e} to (clicked entity)
+    {_e} is set
+    if any:
+        # blacklist
+        true is false
+        true is false
+    then:
+        exit trigger
+    cancel event
+
+    # name
+    set {_real_name} to (translate component from (translation key of {_e}))
+    set {_custom_name} to (custom name of {_e})
+    set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
+    if {_variant} is set:
+        set {_variant} to (strict proper case str({_variant}))
+        set {_mob_name} to merge components "%{_variant}% " and {_real_name}
+    else:
+        set {_mob_name} to {_real_name}
+    if {_custom_name} is set:
+        add "§7🔎 §f%{_custom_name}% (%{_mob_name}%)" to {_info::*}
+    else:
+        add "§7🔎 §f%{_mob_name}%" to {_info::*}
+    
+    # health
+    if {_e} is a living entity:
+        set {_health} to ({_e}.getHealth())
+        set {_max_health} to ({_e}.getMaxHealth())
+        add "   §c❤ §7%{_health}%/%{_max_health}%" to {_info::*}
+    
+    # owner
+    if owner of {_e} is set:
+        set {_owner} to (owner of {_e})
+        set {_owner_component} to playerComponent({_owner}) if {_owner} is a player else (name of {_owner})
+        add merge components (text component from "   §7Owner: ") and {_owner_component} to {_info::*}
+    
+    send components {_info::*} to player
+
+    play sound "minecraft:entity.illusioner.prepare_mirror" in player category at player to player
+    player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
+    make player swing their hand

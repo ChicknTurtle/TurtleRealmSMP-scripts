@@ -63,9 +63,7 @@ effect:
         
         # !send Bukkit.getServer().getScoreboardManager().mainScoreboard.getHandle().getPlayerTeam("test-team")
         var scoreboardTeam: PlayerTeam? = scoreboard.getPlayerTeam(entityName)
-        if (scoreboardTeam == null) {
-            scoreboardTeam = PlayerTeam(scoreboard, entityName)
-        }
+        if (scoreboardTeam == null) {scoreboardTeam = PlayerTeam(scoreboard, entityName)}
         
         sendPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(scoreboardTeam, true), player)
         sendPacket(ClientboundSetPlayerTeamPacket.createPlayerPacket(scoreboardTeam, entityName, ClientboundSetPlayerTeamPacket.Action.ADD), player)

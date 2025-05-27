@@ -1,0 +1,9 @@
+
+# disable stuff that shouldn't be possible to get/use
+on place of barrier:
+    player's gamemode isn't creative
+    cancel event
+on player interact:
+    player's gamemode isn't creative
+    event-item is tagged with (item tag "spawn_eggs")
+    cancel event

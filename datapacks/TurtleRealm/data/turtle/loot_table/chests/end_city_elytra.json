@@ -74,9 +74,7 @@
               "function": "set_components",
               "components": {
                 "minecraft:enchantments": {
-                  "levels": {
-                    "turtle:gliding_curse": 1
-                  }
+                  "turtle:gliding_curse": 1
                 }
               }
             }

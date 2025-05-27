@@ -12,8 +12,12 @@ function hexToDecimal(hex:string) :: number:
 
 import:
     java.lang.String as javaString
+    java.awt.Color as javaColor
 function rgbToHex(r:integer, g:integer, b:integer) :: string:
     return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
+function hexToColor(hex:string) :: color:
+    set {_c} to javaColor.decode({_hex})
+    return rgb({_c}.getRed(),{_c}.getGreen(),{_c}.getBlue())
 
 # Get the dye color string from a color object
 # e.g. light green > "lime"
@@ -39,7 +43,7 @@ expression:
         [the] dye color (of|from) %itemstack%
         %itemstack%'s dye color
     get:
-        set {_id} to (last element of (getId(expr-1) split at ":"))
+        set {_id} to (last element of ((item id of expr-1) split at ":"))
         replace "_" with " " in {_id}
         set {_colors::*} to "black", "white", "light gray", "gray", "brown", "red", "orange", "yellow", "lime", "green", "cyan", "light blue", "blue", "purple", "magenta", "pink"
         sort {_colors::*} by length of input

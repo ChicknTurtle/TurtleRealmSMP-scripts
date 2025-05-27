@@ -1,0 +1,16 @@
+
+options:
+    # vanilla brew time: 400t (20s)
+    newBrewTime: 200
+
+# Shorter brew time
+import:
+    org.bukkit.event.block.BrewingStartEvent
+on BrewingStartEvent:
+    # faster brew time
+    set {_brewTime} to {@newBrewTime}
+    # disable certain recipes
+    if event.getSource() is turtle helmet:
+        set {_brewTime} to 2147483647
+    event.setRecipeBrewTime({_brewTime})
+    event.setBrewingTime({_brewTime})

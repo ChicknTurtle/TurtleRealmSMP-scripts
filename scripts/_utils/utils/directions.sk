@@ -37,11 +37,4 @@ expression:
         [the] vector of [direction] %direction%
         [direction] %direction%'[s] vector
     get:
-        if expr-1 is north:
-            return vector(0,0,-1)
-        else if expr-1 is south:
-            return vector(0,0,1)
-        else if expr-1 is east:
-            return vector(1,0,0)
-        else if expr-1 is west:
-            return vector(-1,0,0)
+        return expr-1.getDirection()

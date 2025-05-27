@@ -31,6 +31,7 @@
 # ==== General Options ====
 
 language: english
+# Which language to use. Currently English, German, Korean, French, Polish, Russian, Japanese, Simplified Chinese, Turkish, Dutch and Spanish
 # Which language to use. Currently English, German, Korean, French, Polish, Russian, Japanese, Simplified Chinese, Turkish and Dutch
 # are included in the download, but custom languages can be created as well. Use the name in lowercase and no spaces as the value.
 # Please note that not everything can be translated yet, i.e. parts of Skript will still be english if you use another language.
@@ -162,7 +163,7 @@ case-insensitive commands: false
 # When set to true, /test, /Test, and /TEST will all be equivalent.
 # This does not affect non-Skript commands.
 
-disable variable will not be saved warnings: false
+disable variable will not be saved warnings: true
 # Disables the "... i.e contents cannot be saved ..." warning when reloading and something in your scripts sets a variable(non local) to a value that is not serializable.
 # By Mirre.
 
@@ -232,6 +233,14 @@ long parse time warning threshold: 1.0 seconds
 # This setting determines how long a statement can take to parse before Skript produces a warning
 #   stating that the statement has taken a long time to parse.
 # A value of 0 seconds means that this warning should be disabled.
+#          the number of variables needing to be saved.
+#          This setting can lag your server depending on how often variables get saved and
+# WARNING: This setting should be used at your own discretion.
+# You cannot provide a value of zero or less.
+# 'set {a} to 1' is one change, 'set {b} to 2' now makes it two.
+#   until saving variables to 'variables.csv'.
+# This setting controls the total number of times that global variables need to be changed
+variable changes until save: 1000
 
 # ==== Runtime Errors ====
 runtime errors:
@@ -394,7 +403,7 @@ databases:
 		
 		# ==== Settings that should not be changed ====
 		
-version: 2.10.2
+version: 2.11.1
 # DO NOT CHANGE THIS VALUE MANUALLY!
 # This saves for which version of Skript this configuration was written for.
 # If it does not match the version of the .jar file then the config will be updated automatically.
