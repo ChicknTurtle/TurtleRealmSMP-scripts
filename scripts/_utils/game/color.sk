@@ -4,7 +4,7 @@
 function hexToDecimal(hex:string) :: number:
     if first character of {_hex} is "#":
         set {_hex} to (substring of {_hex} from index 2 to index (length of {_hex}))
-    set {_i} to 0 # make parser happy
+    set {_i} to 0
     loop reversed (split uppercase {_hex} at ""):
         set {_result} to {_result} + (first index of loop-value in "0123456789ABCDEF" - 1) * 16 ^ ({_i} - 1)
         add 1 to {_i}
