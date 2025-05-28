@@ -9,9 +9,6 @@ on entity start pathfinding:
     then:
         delete compound tag "Brain;memories;minecraft:job_site" of full nbt of target entity
 
-import:
-    java.lang.Integer as javaInteger
-
 on load:
     set {-features::infinitetrading::name} to "Infinite trading"
     set {-features::infinitetrading::desc} to "Villager trades have infinite stock and no raising demand"
@@ -26,7 +23,7 @@ on right click on villager:
     # infinite trading
     if {enabledFeatures::infinitetrading} is true:
         loop {_trades::*}:
-            loop-value.setMaxUses(javaInteger.MAX_VALUE)
+            loop-value.setMaxUses(2147483647)
             loop-value.setUses(0)
             loop-value.setDemand(0)
     # reroll trades
@@ -36,7 +33,7 @@ on right click on villager:
         if event-entity.getVillagerExperience() is 0:
             cancel event
             event-entity.resetOffers()
-            make event-entity play sound "entity.villager.trade"
+            play sound "entity.villager.trade" in neutral category from event-entity
             play sound "block.enchantment_table.use" with volume 0.2 and pitch 2
             make 15 of enchant at (event-entity's head)
             make player swing their hand

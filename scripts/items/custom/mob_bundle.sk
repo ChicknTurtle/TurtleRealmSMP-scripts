@@ -1,7 +1,7 @@
 
 options:
     # Mobs that can be picked up by mob bundle
-    AllowedMobs: allay, armadillo, bat, bee, cat, "chicken" parsed as entity type, cow, dolphin, fox, frog, goat, mooshroom, ocelot, panda, parrot, pig, polar bear, "rabbit" parsed as entity type, sheep, strider, villager, wolf
+    AllowedMobs: allay, armadillo, bat, bee, cat (entity type), chicken (entity type), cow, dolphin, fox, frog, goat, mooshroom, ocelot, panda, parrot, pig, polar bear, rabbit (entity type), sheep, strider, villager, wolf
 
     # Baby mobs that can be picked up by mob bundle
     AllowedBabyMobs: camel, donkey, hoglin, horse, mule, sniffer, turtle
@@ -21,126 +21,90 @@ when ready to load recipes:
             set ingredient of "s" to string
             set ingredient of "h" to (custom item "turtle:ravager_hide")
 
-local function pickupMob(event:object, e:entity, tool:item) :: item:
-    set {_p} to {_event}.getPlayer()
-    # check if allowed mob
+# pickup mob
+on player interact on entity:
+    (item id of (player's tool)) is "turtle:mob_bundle"
+    # checks
+    size of bundle contents of (player's tool) is 0
+    event-entity is set
+    event-entity is alive
     if all:
-        ({@AllowedMobs} and {@AllowedBabyMobs}) doesn't contain {_e}
-        {_p}'s gamemode isn't creative
+        ({@AllowedMobs}, {@AllowedBabyMobs}) doesn't contain event-entity
+        player's gamemode isn't creative
     then:
         exit trigger
     if all:
-        age of {_e} >= 0
-        ({@AllowedMobs}) doesn't contain {_e}
-        {_p}'s gamemode isn't creative
+        age of event-entity >= 0
+        ({@AllowedMobs}) doesn't contain event-entity
+        player's gamemode isn't creative
     then:
         exit trigger
     # pickup mob
-    {_event}.setCancelled(true)
-    set {_fill} to (((spawn item of {_e}) ? barrier) with nbt from "{components:{max_stack_size:1}}")
-    set {_nbt} to nbt of {_e}
-    set compound tag "bundled" of custom nbt of {_tool} to {_nbt}
-    set string tag "bundled_type" of custom nbt of {_tool} to str({_e}.getType().getKey())
-    if int tag "SleepingX" of full nbt of {_e} is set:
-        set {_x} to int tag "SleepingX" of full nbt of {_e}
-        set {_y} to int tag "SleepingY" of full nbt of {_e}
-        set {_z} to int tag "SleepingZ" of full nbt of {_e}
+    cancel event
+    wait 2 ticks
+    (item id of (player's tool)) is "turtle:mob_bundle"
+    set {_fill} to (((spawn item of event-entity) ? barrier) with nbt from "{components:{max_stack_size:1,custom_data:{from_mob_bundle:1b}}}")
+    set {_nbt} to nbt of event-entity
+    set compound tag "entityData" of custom nbt of {_fill} to {_nbt}
+    set string tag "entityType" of custom nbt of {_fill} to str(event-entity.getType().getKey())
+    # fix villager bed
+    if int tag "SleepingX" of (full nbt of event-entity) is set:
+        set {_x} to int tag "SleepingX" of (full nbt of event-entity)
+        set {_y} to int tag "SleepingY" of (full nbt of event-entity)
+        set {_z} to int tag "SleepingZ" of (full nbt of event-entity)
         set {_bedLoc} to location({_x},{_y},{_z})
         set blockdata tag "occupied" of block at {_bedLoc} to false
-    delete (entity within {_e})
-    set bundle contents of {_tool} to {_fill}
-    set lore of {_tool} to "§8Contains: %type of {_e}%"
+    delete event-entity
+    set bundle contents of (player's tool) to {_fill}
     # play sound
-    play sound "minecraft:item.bundle.insert" at {_p}
+    play sound "minecraft:item.bundle.insert" at player
     # grant advancement
     if all:
-        {_e} is a villager
-        age of {_e} < 0
+        event-entity is a villager
+        age of event-entity < 0
     then:
-        grantAdvancement("turtle:adventure/kidnapping", {_p})
-    return {_tool}
+        grantAdvancement("turtle:adventure/kidnapping", player)
+    if event-equipmentslot is off hand slot:
+        set player's offhand tool to (player's tool)
+    else:
+        set player's tool to (player's tool)
 
-local function throwMob(event:object, e:entity, tool:item) :: item:
-    set {_p} to {_event}.getPlayer()
-    custom nbt of {_tool} has tag "bundled"
-    {_event}.setCancelled(true)
-    set {_nbt} to compound tag "bundled" of custom nbt of {_tool}
-    # spawn mob
-    delete tag "Pos" of {_nbt}
-    delete tag "Rotation" of {_nbt}
-    delete tag "Motion" of {_nbt}
-    delete tag "FallDistance" of {_nbt}
-    delete tag "UUID" of {_nbt}
-    delete tag "SleepingX" of {_nbt}
-    delete tag "SleepingY" of {_nbt}
-    delete tag "SleepingZ" of {_nbt}
-    delete tag "TileX" of {_nbt}
-    delete tag "TileY" of {_nbt}
-    delete tag "TileZ" of {_nbt}
-    set {_loc} to location 1 block above {_p}'s location
-    mc spawn (minecraft entity type from key (string tag "bundled_type" of custom nbt of {_tool})) at {_loc}:
+# throw mob
+on item spawn:
+    # event-entity = dropped item entity
+    # event-item = spawn egg item
+    # {_p} = thrower player
+    # {_bundle} = mob bundle item
+    (boolean tag "from_mob_bundle" of (custom nbt of event-item)) is true
+    set {_p} to (uuid tag "Thrower" of nbt of event-entity) parsed as entity
+    if all:
+        (item id of ({_p}'s tool)) isn't "turtle:mob_bundle"
+        (item id of ({_p}'s offhand tool)) isn't "turtle:mob_bundle"
+    then:
+        exit trigger
+    # get nbt and spawn mob
+    set {_nbt} to compound tag "entityData" of custom nbt of event-item
+    loop ("Pos","Rotation","Motion","FallDistance","UUID","SleepingX","SleepingY","SleepingZ","TileX","TileY","TileZ"):
+        delete tag loop-value of {_nbt}
+    mc spawn (minecraft entity type from key (string tag "entityType" of custom nbt of event-item)) at ({_p}'s location):
         add {_nbt} to full nbt of event-entity
         set {_size} to event-entity.getBoundingBox().getVolume()
         set {_force} to max(0.75,1.5-{_size})
         push event-entity forward with force {_force}
         add {_p}'s velocity to event-entity's velocity
-    # remove nbt
-    delete tag "minecraft:bundle_contents" of (nbt of {_tool})
-    delete tag "bundled" of (custom nbt of {_tool})
-    delete tag "bundled_type" of (custom nbt of {_tool})
-    clear lore of {_tool}
+    # delete spawn egg item
+    delete event-entity
     # play sound
     play sound "minecraft:item.bundle.drop_contents" at {_p}
-    return {_tool}
-
-local function mobBundle(event:object, e:entity):
-    set {_p} to {_event}.getPlayer()
-    if {_event}.getHand() is off hand slot:
-        set {_tool} to {_p}'s offhand tool
-    else:
-        set {_tool} to {_p}'s tool
-    item id of {_tool} is "turtle:mob_bundle"
-    if all:
-        # bundle is empty
-        full nbt of {_tool} doesn't have tag "components;minecraft:bundle_contents"
-        # don't pickup dying mobs
-        {_e} is set
-        {_e} is alive
-    then:
-        set {_tool} to pickupMob({_event}, {_e}, {_tool}) ? {_tool}
-    else:
-        set {_tool} to throwMob({_event}, {_e}, {_tool}) ? {_tool}
-    if {_event}.getHand() is off hand slot:
-        set {_p}'s offhand tool to ({_tool} ? {_p}'s tool)
-    else:
-        set {_p}'s tool to ({_tool} ? {_p}'s tool)
-
-on right click:
-    mobBundle(event, clicked entity)
-
-import:
-    org.bukkit.event.player.PlayerInteractEvent
-
-# cancel bundle spitting out item
-on PlayerInteractEvent:
-    str(event.action) isn't "PHYSICAL"
-    set {_p} to event.getPlayer()
-    if event.getHand() is off hand slot:
-        set {_tool} to {_p}'s offhand tool
-    else:
-        set {_tool} to {_p}'s tool
-    item id of {_tool} is "turtle:mob_bundle"
-    custom nbt of {_tool} has tag "bundled"
-    cancel event
 
 # cancel bundle in inventory
 on inventory click:
     if click type is right mouse button:
         if (item id of event-item) is "turtle:mob_bundle":
             player's cursor slot is air
-            custom nbt of event-item has tag "bundled"
+            boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of event-item))) is true
             cancel event
         if (item id of player's cursor slot) is "turtle:mob_bundle":
             event-item is air
-            custom nbt of player's cursor slot has tag "bundled"
+            boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of (player's cursor slot)))) is true
             cancel event

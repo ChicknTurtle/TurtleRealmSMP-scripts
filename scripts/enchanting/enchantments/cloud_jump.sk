@@ -29,9 +29,9 @@ function cloudJumpBoost(p:player):
         add 0.1 * (level of jump boost of {_p}) to {_y}
         add 0.05 to exhaustion of {_p}
         if {_p} is sprinting:
-            add 0-sin(yaw of {_p})*0.6 to {_x}
-            add cos(yaw of {_p})*0.6 to {_z}
-            add 0.125 to {_y}
+            add 0-sin(yaw of {_p})*0.55*(1+0.15*(level of speed of {_p})) to {_x}
+            add cos(yaw of {_p})*0.55*(1+0.15*(level of speed of {_p})) to {_z}
+            add 0.115 to {_y}
             add 0.2-0.05 to exhaustion of {_p}
         set {_y} to max({_y}, y of {_p}'s velocity)
         add vector({_x},0,{_z}) to ({_p}'s velocity)
@@ -60,7 +60,7 @@ on player press of jump key:
     player isn't in lava
     player isn't in bubble column
     player isn't flying
-    {-playerdata::%player%::lastonground} >= 2
+    {-playerdata::%player%::lastonground} >= 1
     set {_e} to enchantment from key "turtle:cloud_jump"
     player's leggings are enchanted with {_e}
     {-playerdata::%player%::canCloudJump} isn't false
