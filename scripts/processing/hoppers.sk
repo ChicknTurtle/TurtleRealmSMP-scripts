@@ -1,0 +1,39 @@
+
+# dropped item > hopper
+on inventory pickup:
+    set {_b} to (holder of event-inventory)
+    (string list tag "filter;ids" of (custom nbt of {_b})) is set
+    if (boolean tag "filter;blacklist" of (custom nbt of {_b})) is true:
+        (string list tag "filter;ids" of (custom nbt of {_b})) doesn't contain (item id of event-item)
+        exit trigger
+    else:
+        if (string list tag "filter;ids" of (custom nbt of {_b})) contains (item id of event-item):
+            exit trigger
+    cancel event
+    chance of 0.0625
+    make 1 of dust using dustOption(rgb(255,0,0),4) at {_b}
+# hopper/dropper > whatever
+on inventory item move:
+    (string list tag "filter;ids" of (custom nbt of future event-block)) is set
+    if (boolean tag "filter;blacklist" of (custom nbt of future event-block)) is true:
+        (string list tag "filter;ids" of (custom nbt of future event-block)) doesn't contain (item id of event-item)
+        exit trigger
+    else:
+        if (string list tag "filter;ids" of (custom nbt of future event-block)) contains (item id of event-item):
+            exit trigger
+    cancel event
+    chance of 0.5
+    make 1 of dust using dustOption(rgb(255,0,0),4) at (future event-block)
+
+# apply/remove filter
+on right click on hopper:
+    (item id of event-item) is "turtle:filter"
+    cancel event
+    make 10 of poof at event-block with extra 0.1
+    if (string list tag "filter;ids" of (custom nbt of event-item)) is set:
+        play sound "minecraft:entity.item_frame.add_item" in blocks category at event-block
+    else:
+        play sound "minecraft:entity.item_frame.remove_item" in blocks category at event-block
+        delete (compound tag "filter" of (custom nbt of event-block))
+        exit trigger
+    set (compound tag "filter" of (custom nbt of event-block)) to (compound tag "filter" of (custom nbt of event-item))

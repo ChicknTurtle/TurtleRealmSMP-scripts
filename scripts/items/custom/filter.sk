@@ -1,0 +1,121 @@
+
+options:
+    whitelistItem: ((white wool with nbt from "{""minecraft:item_name"":""Whitelist""}") with lore "§r§7Allow only selected items","§7Click to switch modes")
+    blacklistItem: ((black wool with nbt from "{""minecraft:item_name"":""Blacklist""}") with lore "§r§7Allow everything but selected items","§7Click to switch modes")
+
+when ready to register custom items:
+    set (custom item "turtle:filter") to (paper with nbt from "{""minecraft:item_model"":""turtle:filter"",""minecraft:item_name"":""Filter""}")
+    # line 1
+    set {_c1::1} to (text component from "§7Use ")
+    set {_c1::2} to (keybind component from "key.use")
+    set (color format of {_c1::2}) to rgb(102,217,217)
+    set {_c1::3} to (text component from "§7 to edit the filter")
+    set (italic format of {_c1::*}) to false
+    # line 2
+    set {_c2::1} to (text component from "§7Use ")
+    set {_c2::2} to (keybind component from "key.use")
+    set (color format of {_c2::2}) to rgb(102,217,217)
+    set {_c2::3} to (text component from "§7 on a hopper to apply the filter")
+    set (italic format of {_c2::*}) to false
+    set component lore of (custom item "turtle:filter") to (merge components {_c1::*}) and (merge components {_c2::*})
+    add custom interact to (custom item "turtle:filter")
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:filter"
+        result: custom item "turtle:filter"
+        shape: "nwn"
+        category: "equipment"
+        ingredients:
+            set ingredient of "n" to iron nugget
+            set ingredient of "w" to material choice of (tag contents of item tag "wool")
+    # doesn't match properly with filter nbt
+    #register shapeless recipe:
+    #    id: "turtle:filter_reset"
+    #    result: custom item "turtle:filter"
+    #    ingredients:
+    #        add (custom item "turtle:filter") to ingredients
+
+on custom item interact with "turtle:filter":
+    if event-equipmentslot is main hand:
+        make player swing their hand
+    else:
+        make player swing their offhand
+    # create inv
+    set {_inv} to (chest inventory with 2 rows named "Filter")
+    set {_filters::*} to sorted (string list tag "filter;ids" of (custom nbt of event-item))
+    set {_blacklist} to (boolean tag "filter;blacklist" of (custom nbt of event-item))
+    if {_blacklist} is true:
+        set slot 8 of {_inv} to {@blacklistItem}
+    else:
+        set slot 8 of {_inv} to {@whitelistItem}
+    # create info item
+    set slot 17 of {_inv} to (((black stained glass pane) with custom nbt from "{gui:filterEditor}") without entire tooltip)
+    set (compound tag "filter" of (custom nbt of slot 17 of {_inv})) to (compound tag "filter" of (custom nbt of event-item))
+    set (uuid tag "player" of (custom nbt of slot 17 of {_inv})) to (uuid of player)
+    set (boolean tag "offhand" of (custom nbt of slot 17 of {_inv})) to (false if (event-equipmentslot is main hand) else true)
+    loop {_filters::*}:
+        set {_item} to (custom item loop-value)
+        set max stack size component of {_item} to 1
+        add {_item} to {_inv}
+    open {_inv} to player
+
+on inventory click:
+    (string tag "gui" of custom nbt of (slot 17 of top inventory)) is "filterEditor"
+    if any:
+        event-clicktype is double click
+        event-clicktype is left mouse with shift
+        event-clicktype is right mouse with shift
+    then:
+        cancel event
+        exit trigger
+    set {_filter} to (compound tag "filter" of (custom nbt of (slot 17 of top inventory)))
+    set {_blacklist} to (boolean tag "blacklist" of {_filter})
+    set {_filters::*} to (string list tag "ids" of {_filter})
+    set {_player} to (uuid tag "player" of (custom nbt of (slot 17 of top inventory))) parsed as entity
+    set {_isOffhand} to (boolean tag "offhand" of (custom nbt of (slot 17 of top inventory)))
+    if {_isOffhand} is true:
+        set {_item} to (player's offhand tool)
+    else:
+        set {_item} to (player's tool)
+    # close inv if filter is missing
+    if any:
+        (item id of {_item}) isn't "turtle:filter"
+        (compound tag "filter" of (custom nbt of {_item})) isn't {_filter}
+    then:
+        cancel event
+        close player's inventory
+        exit trigger
+    # if filter inventory, handle filter modifying
+    clicked inventory is top inventory
+    cancel event
+    # toggle whitelist/blacklist
+    if (index of clicked slot) is 8:
+        if {_blacklist} is true:
+            set {_blacklist} to false
+            set (clicked slot) to {@whitelistItem}
+        else:
+            set {_blacklist} to true
+            set (clicked slot) to {@blacklistItem}
+        set (boolean tag "blacklist" of {_filter}) to {_blacklist}
+    # add/remove filters
+    else if (index of clicked slot) isn't 17:
+        if (player's cursor slot is air):
+            remove (item id of clicked slot) from {_filters::*}
+            set (clicked slot) to air
+        else:
+            {_filters::*} doesn't contain (item id of player's cursor slot)
+            remove (item id of clicked slot) from {_filters::*}
+            add (item id of player's cursor slot) to {_filters::*}
+            set (clicked slot) to (custom item (item id of player's cursor slot))
+        set (string list tag "ids" of {_filter}) to {_filters::*}
+    # update info item and filter item
+    set (compound tag "filter" of (custom nbt of (slot 17 of top inventory))) to {_filter}
+    set (compound tag "filter" of (custom nbt of {_item})) to {_filter}
+    if {_isOffhand} is true:
+        set (compound tag "filter" of (custom nbt of player's offhand tool)) to (compound tag "filter" of custom nbt of {_item})
+    else:
+        set (compound tag "filter" of (custom nbt of player's tool)) to (compound tag "filter" of custom nbt of {_item})
+on inventory drag:
+    (string tag "gui" of custom nbt of (slot 17 of event-inventory)) is "filterEditor"
+    cancel event

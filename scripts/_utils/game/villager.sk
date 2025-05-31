@@ -3,7 +3,10 @@
 # Gets the location of a villager's workstation.
 expression:
     patterns:
-        (work|job)[ ](station|site) [location] of %entity%
-        %entity%'s (work|job)[ ](station|site) [location]
+        [potential:(potential|wanted)] (work|job)[ ](station|site) of %entity%
+        %entity%'s [potential:(potential|wanted)] (work|job)[ ](station|site)
     get:
-        return job_site memory of expr-1
+        if (parse tags contains "potential"):
+            return block at (potential_job_site memory of expr-1)
+        else:
+            return block at (job_site memory of expr-1)
