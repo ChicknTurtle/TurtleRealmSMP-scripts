@@ -1,6 +1,12 @@
 
 when ready to register custom items:
-    set (custom item "turtle:magnifying_glass") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}") with lore "§r§7Displays info about entities."
+    set (custom item "turtle:magnifying_glass") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}")
+    set {_c::1} to (text component from "§7Use ")
+    set {_c::2} to (keybind component from "key.use")
+    set (color format of {_c::2}) to rgb(102,217,217)
+    set {_c::3} to (text component from "§7 to display info about blocks and entities")
+    set (italic format of {_c::*}) to false
+    set component lore of (custom item "turtle:magnifying_glass") to (merge components {_c::*})
     apply use cooldown component to (custom item "turtle:magnifying_glass"):
         seconds: 3 seconds
         group: "turtle:magnifying_glass"
@@ -16,47 +22,107 @@ when ready to load recipes:
             set ingredient of "g" to material choice of (tag contents of item tag "glass")
             set ingredient of "s" to stick
 
+import:
+    com.destroystokyo.paper.entity.villager.ReputationType
+
 on right click:
     (item id of player's tool) is "turtle:magnifying_glass"
     player.hasCooldown(1 of player's tool) is false
     set {_e} to (clicked entity)
-    {_e} is set
-    if any:
-        # blacklist
-        true is false
-        true is false
-    then:
+    set {_b} to (clicked block)
+    if {_e} is set:
+        cancel event
+        # name
+        set {_real_name} to (translate component from (translation key of {_e}))
+        set {_custom_name} to (custom name of {_e})
+        set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
+        if {_variant} is set:
+            if (try {_variant}.getKey()) is set:
+                set {_variant} to {_variant}.getKey().getKey()
+            set {_variant} to (strict proper case str({_variant}))
+            set {_mob_name} to merge components "%{_variant}% ", {_real_name}
+        else:
+            set {_mob_name} to {_real_name}
+        if {_custom_name} is set:
+            add "§7🔎 §f%{_custom_name}% (%{_mob_name}%)" to {_info::*}
+        else:
+            add "§7🔎 §f%{_mob_name}%" to {_info::*}
+        # health
+        if {_e} is a living entity:
+            set {_health} to ({_e}.getHealth())
+            set {_max_health} to ({_e}.getMaxHealth())
+            add "   §c❤ §7%{_health}%/%{_max_health}%" to {_info::*}
+        # owner
+        if owner of {_e} is set:
+            set {_owner} to (owner of {_e})
+            set {_owner_component} to playerComponent({_owner}) if {_owner} is a player else (name of {_owner})
+            add merge components (text component from "   §6👑 §7Owner: ") and {_owner_component} to {_info::*}
+        # villagers
+        set {_villagerLevel} to (villager level of {_e})
+        if {_villagerLevel} is set:
+            add (merge components ("   §a👤 §7Level: ",(translate component from "merchant.level.%{_villagerLevel}%"))) to {_info::*}
+        set {_reputations} to (try event-entity.getReputations())
+        if {_reputations} is set:
+            set {_cured} to whether ((...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE)]) is set)
+            set {_cured} to "Yes" if ({_cured} is true) else "No"
+            add "   §e🍎 §7Cured: §f%{_cured}%" to {_info::*}
+        set {_workstation} to (work station of {_e})
+        if {_workstation} is set:
+            set {_workstationName} to (translate component from {_workstation})
+            set {_x} to floor(x-coord of {_workstation})
+            set {_y} to floor(y-coord of {_workstation})
+            set {_z} to floor(z-coord of {_workstation})
+            set {_workstationPos} to (text component from "§3%{_x}%§7,§3%{_y}%§7,§3%{_z}%")
+            set (click event of {_workstationPos}) to (click event to run command "/turtle:lookat %{_x}% %{_y}% %{_z}%")
+            add (merge components ("   §7🏠 §fWorkstation: ",{_workstationName}," at ",{_workstationPos})) to {_info::*}
+        # wandering trader despawn
+        set {_despawnDelay} to (try {_e}.getDespawnDelay())
+        if {_despawnDelay} is set:
+            add "   §3⌛ §7Despawns in: §f%{_despawnDelay}%" to {_info::*}
+        # pandas
+        set {_mainGene} to (main gene of {_e})
+        if {_mainGene} is set:
+            set {_mainGene} to (strict proper case "%{_mainGene}%")
+            add "   §f🐼 §7Main Gene: §f%{_mainGene}%" to {_info::*}
+        set {_hiddenGene} to (hidden gene of {_e})
+        if {_hiddenGene} is set:
+            set {_hiddenGene} to (strict proper case "%{_hiddenGene}%")
+            add "   §f🐼 §7Hidden Gene: §f%{_hiddenGene}%" to {_info::*}
+        # VIBING
+        if ({_e} is dancing):
+            add "   §d🎶 §cV§6I§eB§aI§bN§dG" to {_info::*}
+        send components {_info::*} to player
+    else if {_b} is set:
+        cancel event
+        # name
+        set {_name} to (translate component of {_b})
+        set {_customName} to (name of block within {_b})
+        if {_customName} is set:
+            add (merge components ("§7🔎 §f%{_customName}% (",{_name},")")) to {_info::*}
+        else:
+            add (merge components ("§7🔎 ",{_name})) to {_info::*}
+        # hopper filter
+        if {_b} is a hopper:
+            set {_filter} to (compound tag "filter" of (custom nbt of {_b}))
+            set {_blacklist} to (boolean tag "blacklist" of {_filter})
+            set {_ids::*} to (string list tag "ids" of {_filter})
+            if all:
+                {_filter} is set
+                {_blacklist} is set
+                {_ids::*} is set
+            then:
+                loop sorted {_ids::*}:
+                    add (effective name of (custom item loop-value)) to {_names::*}
+                set {_joinNames} to (join {_names::*} with "§f, ")
+                if {_blacklist} is true:
+                    add "   §3🔻 §7Blacklist Filter: §f%{_joinNames}%" to {_info::*}
+                else:
+                    add "   §3🔻 §7Whitelist Filter: §f%{_joinNames}%" to {_info::*}
+            else:
+                add "   §3🔻 §7No Filter" to {_info::*}
+        send components {_info::*} to player
+    else:
         exit trigger
-    cancel event
-
-    # name
-    set {_real_name} to (translate component from (translation key of {_e}))
-    set {_custom_name} to (custom name of {_e})
-    set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
-    if {_variant} is set:
-        set {_variant} to (strict proper case str({_variant}))
-        set {_mob_name} to merge components "%{_variant}% " and {_real_name}
-    else:
-        set {_mob_name} to {_real_name}
-    if {_custom_name} is set:
-        add "§7🔎 §f%{_custom_name}% (%{_mob_name}%)" to {_info::*}
-    else:
-        add "§7🔎 §f%{_mob_name}%" to {_info::*}
-    
-    # health
-    if {_e} is a living entity:
-        set {_health} to ({_e}.getHealth())
-        set {_max_health} to ({_e}.getMaxHealth())
-        add "   §c❤ §7%{_health}%/%{_max_health}%" to {_info::*}
-    
-    # owner
-    if owner of {_e} is set:
-        set {_owner} to (owner of {_e})
-        set {_owner_component} to playerComponent({_owner}) if {_owner} is a player else (name of {_owner})
-        add merge components (text component from "   §7Owner: ") and {_owner_component} to {_info::*}
-    
-    send components {_info::*} to player
-
     play sound "minecraft:entity.illusioner.prepare_mirror" in player category at player to player
     player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
     make player swing their hand
