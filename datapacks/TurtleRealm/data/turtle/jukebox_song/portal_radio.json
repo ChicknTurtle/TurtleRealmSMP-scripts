@@ -1,0 +1,10 @@
+{
+  "comparator_output": 1,
+  "description": {
+    "translate": "Kelly Bailey - Still Alive (Radio Mix)"
+  },
+  "length_in_seconds": 46.0,
+  "sound_event": {
+    "sound_id": "turtle:music_disc.portal_radio"
+  }
+}
