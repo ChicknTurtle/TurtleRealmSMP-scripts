@@ -15,7 +15,7 @@ when ready to load recipes:
     register shaped recipe:
         id: "turtle:mob_bundle"
         result: custom item "turtle:mob_bundle"
-        shape: "s", "h"
+        shape: "shs","h h","hhh"
         category: "equipment"
         ingredients:
             set ingredient of "s" to string

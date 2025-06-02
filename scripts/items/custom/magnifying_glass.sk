@@ -1,6 +1,6 @@
 
 when ready to register custom items:
-    set (custom item "turtle:magnifying_glass") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}")
+    set (custom item "turtle:magnifying_glass") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}")
     set {_c::1} to (text component from "§7Use ")
     set {_c::2} to (keybind component from "key.use")
     set (color format of {_c::2}) to rgb(102,217,217)

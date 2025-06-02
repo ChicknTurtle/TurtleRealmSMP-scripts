@@ -5,11 +5,11 @@ options:
     maxDistanceSneaking: 15
 
 when ready to register custom items:
-    set (custom item "turtle:chorium_case") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:chorium_case"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}") with lore "§50/{@maxAmount}"
+    set (custom item "turtle:chorium_case") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:chorium_case"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}") with lore "§50/{@maxAmount}"
     apply use cooldown component to (custom item "turtle:chorium_case"):
         seconds: 1 second
         group: "minecraft:ender_pearl"
-    set (custom item "turtle:chorium_case_filled") to (popped chorus fruit with nbt from "{""minecraft:item_model"":""turtle:chorium_case_filled"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
+    set (custom item "turtle:chorium_case_filled") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:chorium_case_filled"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
     apply use cooldown component to (custom item "turtle:chorium_case_filled"):
         seconds: 1 second
         group: "minecraft:ender_pearl"
