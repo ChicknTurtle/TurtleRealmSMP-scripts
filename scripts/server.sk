@@ -1,6 +1,6 @@
 
 options:
-    resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealm.zip"
+    resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip"
     resourcePackHash: "c1a8db0152b23a64a4e38abda847aa958a84eb66"
     resourcePackPrompt: "§bRequired to see custom item textures and other important things"
     resourcePackDeclineMsg: "§cYou have declined the server resource pack. You can fix this by changing the setting on your server list."
