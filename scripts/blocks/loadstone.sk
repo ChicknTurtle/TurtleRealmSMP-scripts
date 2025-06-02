@@ -9,7 +9,8 @@ function deactivateLoadstone(block:block):
     {loadstones::*} contains {_block}
     remove {_block} from {loadstones::*}
     unload chunk at {_block}
-    play sound "minecraft:block.beacon.deactivate" at {_block}
+    play sound "minecraft:block.beacon.deactivate" in blocks category at {_block}
+    drop (1 of echo shard) at ({_block} ~ vector(0.5,0.5,0.5))
 
 on load:
     set {_s} to "" if (size of {loadstones::*} is 1) else "s"
@@ -30,15 +31,15 @@ on right click on lodestone:
         set {_tool} to player's offhand tool
     else:
         set {_tool} to player's tool
-    {_tool} is echo shard
+    (item id of {_tool}) is "minecraft:echo_shard"
     {loadstones::*} doesn't contain event-block
     if player's gamemode isn't creative:
         if event.getHand() is off hand slot:
-            remove 1 of echo shard from player's offhand tool
+            subtract 1 from (item amount of player's offhand tool)
         else:
-            remove 1 of echo shard from player's tool
+            subtract 1 from (item amount of player's tool)
     add event-block to {loadstones::*}
-    play sound "minecraft:block.beacon.activate" at event-block
+    play sound "minecraft:block.beacon.activate" in blocks category at event-block
     grantAdvancement("turtle:nether/loadstone", player)
     cancel event
     make player swing their hand

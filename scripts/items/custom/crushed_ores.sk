@@ -1,8 +1,8 @@
 
 when ready to register custom items:
-    set (custom item "turtle:crushed_raw_iron") to (raw iron with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_iron"",""minecraft:item_name"":""Crushed Iron Ore""}")
-    set (custom item "turtle:crushed_raw_gold") to (raw gold with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_gold"",""minecraft:item_name"":""Crushed Gold Ore""}")
-    set (custom item "turtle:crushed_raw_copper") to (raw copper with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_copper"",""minecraft:item_name"":""Crushed Copper Ore""}")
+    set (custom item "turtle:crushed_raw_iron") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_iron"",""minecraft:item_name"":""Crushed Iron Ore""}")
+    set (custom item "turtle:crushed_raw_gold") to (clock with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_gold"",""minecraft:item_name"":""Crushed Gold Ore""}")
+    set (custom item "turtle:crushed_raw_copper") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_copper"",""minecraft:item_name"":""Crushed Copper Ore""}")
 
 when ready to load recipes:
     register furnace recipe:

@@ -1,12 +1,15 @@
 
 when ready to register custom items:
-    set (custom item "turtle:experience_nugget") to (iron nugget with nbt from "{""minecraft:enchantment_glint_override"":1b,""minecraft:item_model"":""turtle:experience_nugget"",""minecraft:item_name"":""Nugget of Experience"",""minecraft:rarity"":""uncommon""}")
+    set (custom item "turtle:experience_nugget") to (echo shard with nbt from "{""minecraft:enchantment_glint_override"":1b,""minecraft:item_model"":""turtle:experience_nugget"",""minecraft:item_name"":""Nugget of Experience"",""minecraft:rarity"":""uncommon""}")
     add custom interact to (custom item "turtle:experience_nugget")
 
 on custom item interact with "turtle:experience_nugget":
     play sound "minecraft:block.amethyst_block.break" with volume 0.5 at player
-    set {_amountUsed} to (1 if (player is pressing sneak key) else (item amount of player's tool))
-    subtract {_amountUsed} from item amount of player's tool
+    set {_amountUsed} to (1 if (player is pressing sneak key) else (item amount of event-item))
+    if (event-equipmentslot is main hand):
+        subtract {_amountUsed} from (item amount of player's tool)
+    else:
+        subtract {_amountUsed} from (item amount of player's offhand tool)
     set {_total} to 3*{_amountUsed}
     set {_maxOrbs} to 1 if {_amountUsed} is 1 else 5
     set {_valuePer} to max(1, 1 + floor({_total}/{_maxOrbs}))
