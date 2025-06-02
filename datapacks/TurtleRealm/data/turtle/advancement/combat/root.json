@@ -9,7 +9,7 @@
   },
   "display": {
     "announce_to_chat": false,
-    "background": "turtle:textures/gui/advancements/backgrounds/combat.png",
+    "background": "turtle:gui/advancements/backgrounds/combat",
     "description": {
       "translate": "Sharpen your skills"
     },
