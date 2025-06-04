@@ -1,6 +1,6 @@
 
 when ready to register custom items:
-    set (custom item "turtle:experience_nugget") to (echo shard with nbt from "{""minecraft:enchantment_glint_override"":1b,""minecraft:item_model"":""turtle:experience_nugget"",""minecraft:item_name"":""Nugget of Experience"",""minecraft:rarity"":""uncommon""}")
+    set (custom item "turtle:experience_nugget") to (firework star with nbt from "{""minecraft:enchantment_glint_override"":1b,""minecraft:item_model"":""turtle:experience_nugget"",""minecraft:item_name"":""Nugget of Experience"",""minecraft:rarity"":""uncommon""}")
     add custom interact to (custom item "turtle:experience_nugget")
 
 on custom item interact with "turtle:experience_nugget":

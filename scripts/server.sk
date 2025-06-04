@@ -23,15 +23,19 @@ on join:
 import:
     java.util.UUID
 function sendResourcePack(p:player):
-    send resource pack {@resourcePackUrl} with id str(UUID.nameUUIDFromBytes("§aTurtleRealm".getBytes())) with hash {@resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
+    send resource pack {@resourcePackUrl} with id str(UUID.nameUUIDFromBytes("TurtleRealmSMP-main".getBytes())) with hash {@resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
 
 on resource pack decline:
     send {@resourcePackDeclineMsg} to player
 
+every second:
+    set {-formattedTps} to getFormattedTps()
+    set {-formattedCpu} to getFormattedCpu()
+
 function updateTablist(p:player):
     set {_players} to real online player count
-    set {_tps} to placeholder "spark_tps_5s"
-    set {_cpu} to placeholder "spark_cpu_system_10s"
+    set {_tps} to ({-formattedTps} ? "§f. . .")
+    set {_cpu} to ({-formattedCpu} ? "§f. . .")
     set {_servername} to ("§x§F§F§5§F§1§5&lTurtleRealmSMP Dev" if ({-env::dev} is true) else "§x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm§x§2§d§b§4§4§1SMP")
     set tablist header of {_p} to "                                             %nl%%{_servername}%%nl%%nl%&7Players: %{_players}%%nl%"
     set tablist footer of {_p} to "%nl%&7TPS: %{_tps}% &8- &7CPU: %{_cpu}%%nl%"

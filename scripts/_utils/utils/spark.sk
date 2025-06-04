@@ -1,0 +1,29 @@
+
+import:
+    me.lucko.spark.api.SparkProvider
+    me.lucko.spark.api.statistic.StatisticWindow
+
+function getFormattedTps() :: string:
+    set {_tps} to SparkProvider.get().tps().poll(StatisticWindow.TicksPerSecond.SECONDS_10)
+    if ({_tps} > 18.0):
+        set {_c} to "§a"
+    else if ({_tps} > 16.0):
+        set {_c} to "§e"
+    else:
+        set {_c} to "§c"
+    set {_prefix} to ("*" if {_tps} > 20 else "")
+    set {_tps} to min(20,round({_tps}*100)/100)
+    if "%{_tps}%" doesn't contain ".":
+        set {_tps} to "%{_tps}%.0"
+    return "%{_c}%%{_prefix}%%{_tps}%"
+
+function getFormattedCpu() :: string:
+    set {_usage} to SparkProvider.get().cpuSystem().poll(StatisticWindow.CpuUsage.SECONDS_10)
+    if ({_usage} > 0.9):
+        set {_c} to "§c"
+    else if ({_usage} > 0.65):
+        set {_c} to "§e"
+    else:
+        set {_c} to "§a"
+    set {_usage} to floor({_usage}*100)
+    return "%{_c}%%{_usage}%%%"

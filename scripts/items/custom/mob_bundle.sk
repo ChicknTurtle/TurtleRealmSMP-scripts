@@ -99,12 +99,12 @@ on item spawn:
 
 # cancel bundle in inventory
 on inventory click:
-    if click type is right mouse button:
-        if (item id of event-item) is "turtle:mob_bundle":
-            player's cursor slot is air
-            boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of event-item))) is true
-            cancel event
-        if (item id of player's cursor slot) is "turtle:mob_bundle":
-            event-item is air
-            boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of (player's cursor slot)))) is true
-            cancel event
+    click type is right mouse button
+    if (item id of event-item) is "turtle:mob_bundle":
+        player's cursor slot is air
+        boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of event-item))) is true
+        cancel event
+    if (item id of player's cursor slot) is "turtle:mob_bundle":
+        event-item is air
+        boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of (player's cursor slot)))) is true
+        cancel event

@@ -1,8 +1,8 @@
 
 when ready to register custom items:
-    set (custom item "turtle:chorium_cluster") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:chorium_cluster"",""minecraft:item_name"":""Chorium Cluster"",""minecraft:rarity"":""epic""}")
-    set (custom item "turtle:chorium_ingot") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:chorium_ingot"",""minecraft:item_name"":""Chorium Ingot"",""minecraft:rarity"":""epic""}")
-    set (custom item "turtle:chorium_upgrade_smithing_template") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:chorium_upgrade_smithing_template"",""minecraft:item_name"":""Chorium Upgrade"",""minecraft:rarity"":""rare""}") with lore ("§fSmithing Template","","§fApplies to:","§9 Elytra & Heart of the Sea","§fIngredients:","§9 Chorium Ingot")
+    set (custom item "turtle:chorium_cluster") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_cluster"",""minecraft:item_name"":""Chorium Cluster"",""minecraft:rarity"":""epic""}")
+    set (custom item "turtle:chorium_ingot") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_ingot"",""minecraft:item_name"":""Chorium Ingot"",""minecraft:rarity"":""epic""}")
+    set (custom item "turtle:chorium_upgrade_smithing_template") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_upgrade_smithing_template"",""minecraft:item_name"":""Chorium Upgrade"",""minecraft:rarity"":""rare""}") with lore ("§fSmithing Template","","§fApplies to:","§9 Elytra & Heart of the Sea","§fIngredients:","§9 Chorium Ingot")
 
 when ready to load recipes:
     register furnace recipe:

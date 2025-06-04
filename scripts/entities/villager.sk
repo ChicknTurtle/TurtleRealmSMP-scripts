@@ -39,7 +39,7 @@ on right click on villager:
     if {enabledFeatures::sharedcuring} is true:
         set {_reputations} to event-entity.getReputations()
         # check if any player has cure discount
-        (...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE)]) is set
+        (...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE) >= 20]) is set
         # apply cure discount for player
         set {_playerRep} to {_reputations}.get(player's uuid) ? new Reputation()
         {_playerRep}.setReputation(ReputationType.MAJOR_POSITIVE, 20)
