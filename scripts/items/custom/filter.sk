@@ -4,7 +4,7 @@ options:
     blacklistItem: ((black wool with nbt from "{""minecraft:item_name"":""Blacklist""}") with lore "§r§7Allow everything but selected items","§7Click to switch modes")
 
 when ready to register custom items:
-    set (custom item "turtle:filter") to (echo shard with nbt from "{""minecraft:item_model"":""turtle:filter"",""minecraft:item_name"":""Filter"",""minecraft:max_stack_size"":1}")
+    set (custom item "turtle:filter") to (firework star with nbt from "{""minecraft:item_model"":""turtle:filter"",""minecraft:item_name"":""Filter"",""minecraft:max_stack_size"":1}")
     # line 1
     set {_c1::1} to (text component from "§7Use ")
     set {_c1::2} to (keybind component from "key.use")
