@@ -63,7 +63,7 @@ on right click:
                 add (merge components ("   §a👤 §7Level: ",(translate component from "merchant.level.%{_villagerLevel}%"))) to {_info::*}
             set {_reputations} to (try event-entity.getReputations())
             if {_reputations} is set:
-                set {_cured} to whether ((...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE)]) is set)
+                set {_cured} to whether ((...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE) >= 20]) is set)
                 set {_cured} to "Yes" if ({_cured} is true) else "No"
                 add "   §e🍎 §7Cured: §f%{_cured}%" to {_info::*}
             set {_workstation} to (work station of {_e})
