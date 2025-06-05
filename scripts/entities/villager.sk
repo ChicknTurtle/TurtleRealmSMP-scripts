@@ -22,6 +22,7 @@ on entity start pathfinding:
     set {_workstation} to event-entity's work station
     {_workstation} is set
     if any:
+        {_workstation} is air
         world of event-entity isn't world of {_workstation}
         distance between event-entity and {_workstation} > 256
     then:
@@ -52,7 +53,7 @@ on right click on villager:
             cancel event
             event-entity.resetOffers()
             play sound "entity.villager.trade" in neutral category from event-entity
-            play sound "block.enchantment_table.use" with volume 0.2 and pitch 2
+            play sound "block.enchantment_table.use" with volume 0.5 and pitch 2
             make 15 of enchant at (event-entity's head)
             make player swing their hand
             player's gamemode isn't creative

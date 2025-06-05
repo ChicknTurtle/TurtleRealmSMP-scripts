@@ -3,7 +3,7 @@ options:
     resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip"
     resourcePackHash: "c1a8db0152b23a64a4e38abda847aa958a84eb66"
     resourcePackPrompt: "§bRequired to see custom item textures and other important things"
-    resourcePackDeclineMsg: "§cYou have declined the server resource pack. You can fix this by changing the setting on your server list."
+    resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
 # gamerules
 on load:
@@ -15,10 +15,7 @@ on load:
 # send resource pack
 on join:
     sendResourcePack(player)
-    player.getResourcePackStatus() is decline
-    send {@resourcePackDeclineMsg} to player
-
-    unlock recipes all recipes for player
+    unlock recipes (all recipes) for player
 
 import:
     java.util.UUID

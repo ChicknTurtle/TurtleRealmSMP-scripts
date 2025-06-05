@@ -147,8 +147,6 @@ expression:
         if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
             (int tag "minecraft:damage" of (vanilla nbt of {_rawitem})) isn't set
             delete (int tag "minecraft:damage" of (nbt of {_item}))
-        if (nbt of {_item}) is (nbt of {_rawitem}):
-            return {_item}
         set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
         add nbt of {_item} to nbt of {_newitem}
         add nbt of {_rawitem} to nbt of {_newitem}

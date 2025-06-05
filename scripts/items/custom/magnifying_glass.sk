@@ -32,24 +32,12 @@ on right click:
     set {_b} to (clicked block)
     if {_e} is set:
         # name
-        set {_real_name} to (translate component from (translation key of {_e}))
-        set {_custom_name} to (custom name of {_e})
-        set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
-        if {_variant} is set:
-            if (try {_variant}.getKey()) is set:
-                set {_variant} to {_variant}.getKey().getKey()
-            set {_variant} to (strict proper case str({_variant}))
-            set {_mob_name} to merge components "%{_variant}% ", {_real_name}
-        else:
-            set {_mob_name} to {_real_name}
-        if {_custom_name} is set:
-            add "§7🔎 §f%{_custom_name}% (%{_mob_name}%)" to {_info::*}
-        else:
-            add "§7🔎 §f%{_mob_name}%" to {_info::*}
+        set {_name} to (effective entity name of {_e})
+        add "§7🔎 §f%{_name}%" to {_info::*}
         # health
         if {_e} is a living entity:
-            set {_health} to ({_e}.getHealth())
-            set {_max_health} to ({_e}.getMaxHealth())
+            set {_health} to round({_e}.getHealth())
+            set {_max_health} to round({_e}.getMaxHealth())
             add "   §c❤ §7%{_health}%/%{_max_health}%" to {_info::*}
         # owner
         if owner of {_e} is set:

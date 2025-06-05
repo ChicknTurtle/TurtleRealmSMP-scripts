@@ -44,6 +44,7 @@ on player interact on entity:
     wait 2 ticks
     (item id of (player's tool)) is "turtle:mob_bundle"
     set {_fill} to (((spawn item of event-entity) ? barrier) with nbt from "{components:{max_stack_size:1,custom_data:{from_mob_bundle:1b}}}")
+    set (name of {_fill}) to "§r%effective entity name of event-entity%"
     set {_nbt} to nbt of event-entity
     set compound tag "entityData" of custom nbt of {_fill} to {_nbt}
     set string tag "entityType" of custom nbt of {_fill} to str(event-entity.getType().getKey())
@@ -65,7 +66,7 @@ on player interact on entity:
     then:
         grantAdvancement("turtle:adventure/kidnapping", player)
     if event-equipmentslot is off hand slot:
-        set player's offhand tool to (player's tool)
+        set player's offhand tool to (player's offhand tool)
     else:
         set player's tool to (player's tool)
 

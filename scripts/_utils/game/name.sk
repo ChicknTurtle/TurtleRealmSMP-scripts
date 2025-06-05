@@ -14,21 +14,42 @@ expression:
         set string tag "minecraft:rarity" of nbt of raw expr-1 to change value
 
 # Effective name
-# Get the effective name of an item
-# Will return a translate component if no custom name
+# Get the effective name of an item or entity
+# Result may contain translate components
 expression:
     patterns:
         [the] (effective|real) [item] name of %item%
         %item%'s (effective|real) [item] name
     get:
-        if expr-1 is air:
-            return {_}
-        if name of expr-1 is set:
-            return (name of expr-1) + "§r"
-        else if component item name of expr-1 isn't "":
-            return component item name of expr-1 + "§r"
+        set {_item} to expr-1
+        if {_item} is air:
+            return translate component from (translation key of {_item})
+        if name of {_item} is set:
+            return (name of {_item}) + "§r"
+        else if (component item name of {_item}) isn't "":
+            return (component item name of {_item}) + "§r"
         else:
-            return translate component from (translation key of expr-1)
+            return translate component from (translation key of {_item})
+expression:
+    patterns:
+        [the] (effective|real) [entity] name of %entity%
+        %entity%'s (effective|real) [entity] name
+    get:
+        set {_e} to expr-1
+        set {_real_name} to (translate component from (translation key of {_e}))
+        set {_custom_name} to (custom name of {_e})
+        set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
+        if {_variant} is set:
+            if (try {_variant}.getKey()) is set:
+                set {_variant} to {_variant}.getKey().getKey()
+            set {_variant} to (strict proper case str({_variant}))
+            set {_mob_name} to merge components "%{_variant}% ", {_real_name}
+        else:
+            set {_mob_name} to {_real_name}
+        if {_custom_name} is set:
+            return "%{_custom_name}% (%{_mob_name}%)"
+        else:
+            return "%{_mob_name}%"
 
 # Item chat component
 # Mimics how minecraft displays items in chat
