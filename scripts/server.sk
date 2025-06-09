@@ -1,8 +1,8 @@
 
 options:
     resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip"
-    resourcePackHash: "c1a8db0152b23a64a4e38abda847aa958a84eb66"
-    resourcePackPrompt: "§bRequired to see custom item textures and other important things"
+    resourcePackHash: "2e6ee66697bacb3ced59e5544b1d5963652eb9d3"
+    resourcePackPrompt: "§bRequired for custom textures, sounds and other features"
     resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
 # gamerules
@@ -19,7 +19,7 @@ on join:
 
 import:
     java.util.UUID
-function sendResourcePack(p:player):
+local function sendResourcePack(p:player):
     send resource pack {@resourcePackUrl} with id str(UUID.nameUUIDFromBytes("TurtleRealmSMP-main".getBytes())) with hash {@resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
 
 on resource pack decline:

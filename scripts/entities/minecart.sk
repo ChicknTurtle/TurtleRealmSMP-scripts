@@ -1,31 +1,7 @@
 
-# Better Minecarts
-# by ChicknTurtle
-
 # Made for use with the Minecart Improvements experiment
 
-# Features:
-# - Rail intersections
-# - Better rail recipes
-# - Directly apply items to make rails
-# - Display speed in action bar
-# - Immersive sounds
-# - All configurable! (See options section below)
-
-# Instructions:
-#  Speed
-#   Minecarts will slowly build up to max speed instead of instantly being max speed.
-#  Intersections
-#   Create a cross of rails with a detector rail in the center to create a rail intersection.
-#   The rail will automatically rotate when a minecart travels across it.
-#  Crafting
-#   Normal rails are crafted as usual. (6 iron ingots, 1 stick = 16 rails)
-#   Add redstone dust to a normal rail to create an activator rail
-#   Add a gold/copper ingot (depending on config) to an activator rail to create a powered rail.
-#   Add any pressure plate to an activator rail to create a detector rail.
-#   
-
-Options:
+options:
 
     # Maximum speed of minecarts.
     # Overwrites the minecartMaxSpeed gamerule.
@@ -69,7 +45,7 @@ Options:
     # Display speed in action bar?
     # Displayed in meters (blocks) per second.
     # default = false
-    showSpeed: true
+    showSpeed: false
 
     # Play skid sound when slowing down on unlit powered rails?
     # default = true
@@ -101,6 +77,10 @@ on load:
     set {-features::railrecipes::warn} to "Requires server reload when disabling"
     set {-features::railrecipes::icon} to powered rail
 
+on vehicle create:
+    event-vehicle is instance of Minecart
+    set max minecart speed of event-vehicle to {@minimumSpeed}/20
+
 on VehicleUpdateEvent:
     {enabledFeatures::minecart} is true
     set {_cart} to event.getVehicle()
@@ -116,21 +96,20 @@ on VehicleUpdateEvent:
     if {_speed} is 0:
         set max minecart speed of {_cart} to {@minimumSpeed}/20
 
-on VehicleMoveEvent:
+on vehicle move:
     {enabledFeatures::minecart} is true
-    set {_cart} to event.getVehicle()
+    set {_cart} to event-vehicle
     {_cart} is instance of Minecart
 
     # Get max speed
     if gamerule minecartMaxSpeed of world of {_cart} isn't {@maximumSpeed}:
         set gamerule minecartMaxSpeed of world of {_cart} to {@maximumSpeed}
-    set {_maxSpeed} to "%gamerule minecartMaxSpeed of world of {_cart}%" parsed as number
-    set {_maxSpeed} to {_maxSpeed}/20
+    set {_maxSpeed} to ({@maximumSpeed}/20)
 
     # Increase minecart speed
     set {_speedIncrease} to 0.001*{@speedup}
-    set max minecart speed of {_cart} to min({_maxSpeed}, max minecart speed of {_cart} + {_speedIncrease})
-    if max minecart speed of {_cart} is {_maxSpeed}:
+    set (max minecart speed of {_cart}) to min({_maxSpeed}, (max minecart speed of {_cart}) + {_speedIncrease})
+    if (max minecart speed of {_cart}) >= {_maxSpeed}:
         grantAdvancement("turtle:adventure/bullet_train", first element of {_cart}'s passengers)
 
     # Soul sand stop
