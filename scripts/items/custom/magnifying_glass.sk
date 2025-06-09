@@ -93,7 +93,7 @@ on right click:
         # hopper filter
         if {_b} is a hopper:
             set {_filter} to (compound tag "filter" of (custom nbt of {_b}))
-            set {_blacklist} to (boolean tag "blacklist" of {_filter})
+            set {_blacklist} to ((boolean tag "blacklist" of {_filter}) ? false)
             set {_ids::*} to (string list tag "ids" of {_filter})
             if all:
                 {_filter} is set
