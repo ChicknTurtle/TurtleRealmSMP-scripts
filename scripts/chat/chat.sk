@@ -65,9 +65,10 @@ on async chat:
 
     # replace [item]
     if "%{_format}%" contains "[item]":
-        set {_name} to effective name of player's tool
+        (player's tool) isn't air
+        set {_name} to (effective name of (player's tool))
         component replace "\[item]" with (item chat component of (player's tool)) in {_format}
-    replace "[item]" with "**[%{_name}%]**" in {_msg}
+        replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # replace bad words
     if {enabledFeatures::chatfilter} is true:

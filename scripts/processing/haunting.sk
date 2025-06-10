@@ -94,12 +94,6 @@ when ready to load recipes:
         group: "haunting"
         cooktime: 10 seconds
     register campfire recipe:
-        id: "turtle:haunt_cobblestone"
-        input: cobblestone
-        result: infested cobblestone
-        group: "haunting"
-        cooktime: 10 seconds
-    register campfire recipe:
         id: "turtle:haunt_stone_bricks"
         input: stone bricks
         result: infested stone bricks
