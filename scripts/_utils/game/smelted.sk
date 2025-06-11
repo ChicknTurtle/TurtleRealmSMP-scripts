@@ -8,13 +8,21 @@ import:
 expression:
     patterns:
         (smelt|cook)[ed] %item%
+        (smoke)[d] %item%
+        (blast)[ed] %item%
     get:
         if expr-1 ? air is air:
             return expr-1
         set {_nmsItem} to expr-1.asNMSCopy()
         set {_level} to (first element of (all worlds)).getHandle()
         set {_recipeInput} to new SingleRecipeInput({_nmsItem})
-        set {_smeltRecipe} to {_level}.recipeAccess().getRecipeFor(RecipeType.SMELTING, {_recipeInput}, {_level})
+        if matched pattern is 1:
+            set {_recipeType} to RecipeType.SMELTING
+        else if matched pattern is 2:
+            set {_recipeType} to RecipeType.SMOKING
+        else if matched pattern is 3:
+            set {_recipeType} to RecipeType.BLASTING
+        set {_smeltRecipe} to {_level}.recipeAccess().getRecipeFor({_recipeType}, {_recipeInput}, {_level})
         if {_smeltRecipe}.isPresent() isn't true:
             return expr-1
         set {_holder} to {_smeltRecipe}.get()

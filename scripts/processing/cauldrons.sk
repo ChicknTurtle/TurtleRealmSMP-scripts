@@ -1,0 +1,158 @@
+
+options:
+    processingTime: 600
+
+on inventory pickup:
+    if any:
+        (short tag "washingStart" of custom nbt of event-dropped item) is set
+        (short tag "blastingStart" of custom nbt of event-dropped item) is set
+        (short tag "smokingStart" of custom nbt of event-dropped item) is set
+        (short tag "hauntingStart" of custom nbt of event-dropped item) is set
+        (short tag "freezingStart" of custom nbt of event-dropped item) is set
+    then:
+        cancel event
+
+on player attempt item pickup:
+    player isn't sneaking
+    if any:
+        (short tag "washingStart" of custom nbt of event-dropped item) is set
+        (short tag "blastingStart" of custom nbt of event-dropped item) is set
+        (short tag "smokingStart" of custom nbt of event-dropped item) is set
+        (short tag "hauntingStart" of custom nbt of event-dropped item) is set
+        (short tag "freezingStart" of custom nbt of event-dropped item) is set
+    then:
+        cancel event
+
+local function dropOrHopper(items:items, hoppers:blocks, loc:location):
+    loop {_hoppers::*}:
+        loop {_items::*}:
+            if all:
+                blockdata tag "enabled" of (blockdata of loop-value-1) is true
+                (inventory of loop-value-1) has space for loop-value-2
+                checkHopperFilter(loop-value-2, loop-value-1) is false
+            then:
+                add loop-value-2 to inventory of loop-value-1
+                remove loop-value-2 from {_items::*}
+    drop {_items::*} at {_loc} without velocity
+
+local function getRecipeResults(recipe:struct) :: items:
+    loop ({_recipe}'s results field):
+        chance of (loop-value's chance field)
+        add (loop-value's count field) of (updated (loop-value's item field)) to {_items::*}
+    return {_items::*}
+
+on entity inside block:
+    event-block is tagged with (block tag "cauldrons")
+    event-entity is a dropped item
+    if event-block is lava cauldron:
+        cancel event
+    set {_item} to (item of event-entity)
+    set {_hoppers::*} to (block at (block ~ vector(0,-1,-1))),(block at (block ~ vector(1,-1,0))),(block at (block ~ vector(0,-1,1))),(block at (block ~ vector(-1,-1,0)))
+    set {_hoppers::*} to ({_hoppers::*} where [input is a hopper])
+
+    # freezing recipes
+    if all:
+        event-block is powder snow cauldron
+        {-freezingRecipes::%item id of {_item}%} is set
+    then:
+        set {_recipe} to {-freezingRecipes::%item id of {_item}%}
+        make 1 of poof at event-entity with extra 0.1
+        if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        loop (item amount of {_item}) times:
+            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            add (updated (use remainder of {_item})) to {_spawnitems::*}
+        dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # blasting recipes
+    else if all:
+        event-block is lava cauldron
+        {-bulkBlastingRecipes::%item id of {_item}%} is set
+    then:
+        set {_recipe} to {-bulkBlastingRecipes::%item id of {_item}%}
+        make 1 of lava at event-entity
+        if (short tag "blastingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "blastingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "blastingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        loop (item amount of {_item}) times:
+            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            add (updated (use remainder of {_item})) to {_spawnitems::*}
+        dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # blast smelting
+    else if event-block is lava cauldron:
+        smelted {_item} isn't {_item}
+        make 1 of lava at event-entity
+        if (short tag "blastingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "blastingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "blastingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        if (smoked {_item} is {_item}):
+            dropOrHopper(((item amount of {_item}) of smelted {_item}), {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # haunting recipes
+    else if all:
+        event-block is water cauldron
+        block under event-block is soul campfire[lit=true]
+        {-hauntingRecipes::%item id of {_item}%} is set
+    then:
+        set {_recipe} to {-hauntingRecipes::%item id of {_item}%}
+        make 1 of splash at event-entity
+        make 1 of soul at event-entity with extra 0.05
+        if (short tag "hauntingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "hauntingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "hauntingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        loop (item amount of {_item}) times:
+            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            add (updated (use remainder of {_item})) to {_spawnitems::*}
+        dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # smoking recipes
+    else if all:
+        event-block is water cauldron
+        block under event-block is campfire[lit=true]
+        {-bulkSmokingRecipes::%item id of {_item}%} is set
+    then:
+        set {_recipe} to {-bulkSmokingRecipes::%item id of {_item}%}
+        make 1 of splash at event-entity
+        if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        loop (item amount of {_item}) times:
+            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            add (updated (use remainder of {_item})) to {_spawnitems::*}
+        dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # smoker smelting
+    else if all:
+        event-block is water cauldron
+        block under event-block is campfire[lit=true]
+    then:
+        smoked {_item} isn't {_item}
+        make 1 of splash at event-entity
+        if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        dropOrHopper(((item amount of {_item}) of smelted {_item}), {_hoppers::*}, event-entity's location)
+        delete event-entity
+    
+    # washing
+    else if all:
+        event-block is water cauldron
+        {-washingRecipes::%item id of {_item}%} is set
+    then:
+        set {_recipe} to {-washingRecipes::%item id of {_item}%}
+        make 1 of splash at event-entity
+        if (short tag "washingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "washingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "washingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        loop (item amount of {_item}) times:
+            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            add (updated (use remainder of {_item})) to {_spawnitems::*}
+        dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
+        delete event-entity

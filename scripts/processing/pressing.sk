@@ -5,27 +5,6 @@ import:
 options:
     pressingRequiresObsidian: true
 
-struct play_sound:
-    id: string
-    volume: number=1
-    pitch: number=1
-local function makeSoundStruct(id:string, volume:number=1, pitch:number=1) :: struct:
-    return play_sound struct:
-        id: {_id}
-        volume: {_volume}
-        pitch: {_pitch}
-local function defaultSound() :: struct:
-    return makeSoundStruct("minecraft:block.stone.break")
-
-struct pressing_recipe_result:
-    item: string
-    count: integer=1
-    chance: number=1
-struct pressing_recipe:
-    input: string
-    results: structs
-    sound: struct=defaultSound()
-
 local function getCompactedItem(item:itemtype,amount:integer) :: objects:
     if {_amount} < 4:
         return {_}
@@ -63,23 +42,18 @@ function pressProcessBlock(b:block, dir:vector):
     set {_crusher} to (block at {_b} ~ {_dir})
     if (block under {_crusher}) is hopper:
         set {_hopper} to (block under {_crusher})
+    # try to crush each item
     loop {_e::*}:
         if true is true:
             # check recipes
-            loop {-pressingRecipes::*}:
-                set {_input} to (loop-value-2's input field)
-                replace "#" with "" in {_input}
-                if all:
-                    {_input} isn't (item id of item of loop-value-1)
-                    (raw name of tag values of item tag {_input}) doesn't contain (item id of item of loop-value-1)
-                then:
-                    continue
-                loop (loop-value-2's results field):
-                    chance of (loop-value-3's chance field)
-                    loop (loop-value-3's count field) times:
-                        add custom item (loop-value-3's item field) to {_spawnitems::*}
-                add (loop-value-2's sound field) to {_playsounds::*}
+            set {_recipe} to {-pressingRecipes::%item id of (item of loop-value)%}
+            if {_recipe} is set:
+                loop ({_recipe}'s results field):
+                    chance of (loop-value-2's chance field)
+                    loop (loop-value-2's count field) times:
+                        add custom item (loop-value-2's item field) to {_spawnitems::*}
                 add updated (use remainder of (item of loop-value-1)) to {_spawnitems::*}
+                add (break sound of (item of loop-value-1)) to {_playsounds::*}
                 make 10 of item particle using (type of item of loop-value-1) at loop-value-1 with extra 0.2
                 (loop-value-1).setItemStack((loop-value-1).getItemStack().subtract())
                 set (short tag "Age" of nbt of loop-value-1) to 0
@@ -92,6 +66,7 @@ function pressProcessBlock(b:block, dir:vector):
             add updated {_compacted} to {_spawnitems::*}
             loop {_compactedAmount} times:
                 add use remainder of (item of loop-value-1) to {_spawnitems::*}
+                add (break sound of (item of loop-value-1)) to {_playsounds::*}
             make 10 of item particle using (type of item of loop-value-1) at loop-value-1 with extra 0.2
             loop-value.setItemStack(loop-value.getItemStack().subtract({_compactedAmount}))
             set (short tag "Age" of nbt of loop-value-1) to 0
@@ -103,6 +78,7 @@ function pressProcessBlock(b:block, dir:vector):
                 {_hopper} is set
                 blockdata tag "enabled" of (blockdata of {_hopper}) is true
                 (inventory of {_hopper}) has space for loop-value-2
+                checkHopperFilter(loop-value-2, {_hopper}) is false
             then:
                 add loop-value-2 to inventory of {_hopper}
             else:
@@ -110,11 +86,8 @@ function pressProcessBlock(b:block, dir:vector):
             make 10 of item particle using (type of loop-value-2) at loop-value-1 with extra 0.2
         clear {_spawnitems::*}
     if {_somethingspawned} is true:
-        play sound "minecraft:entity.zombie.attack_wooden_door" with volume 0.5 with pitch 2 at {_b}
+        play sound "minecraft:entity.zombie.attack_wooden_door" in blocks category with volume 0.25 with pitch 2 at {_b}
     loop {_playsounds::*}:
-        set {_id} to (loop-value-1's id field)
-        {_alreadyplayed::*} doesn't contain {_id}
-        play sound {_id} with volume (loop-value-1's volume field) with pitch (loop-value-1's pitch field) at {_b}
-        add {_id} to {_alreadyplayed::*}
-    clear {_playsounds::*}
-    clear {_alreadyplayed::*}
+        {_alreadyplayed::*} doesn't contain loop-value
+        play sound loop-value in blocks category at {_b}
+        add loop-value to {_alreadyplayed::*}

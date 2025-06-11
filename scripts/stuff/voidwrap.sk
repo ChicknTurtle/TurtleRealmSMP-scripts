@@ -17,13 +17,14 @@ local function warp(e:entity, world:text, coord:number):
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
     make 15 of witch at {_loc} with force
     relative tp {_e} to {_dest}
-    {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_e}),floor(y-coord of {_e}),floor(z-coord of {_e})))
+    try {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_e}),floor(y-coord of {_e}),floor(z-coord of {_e})))
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
     make 15 of witch at {_dest} with force
 
 on entity remove from world:
     str(event-entityremovecause) is "out_of_world"
     (environment of event-world) is end
+    voidProcess(event-entity)
     warp(event-entity, {@overworld}, {@upWrapY})
 
 on damage:

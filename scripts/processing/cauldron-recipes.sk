@@ -1,0 +1,148 @@
+
+struct cauldron_recipe_result:
+    item: item
+    count: integer=1
+    chance: number=1
+struct cauldron_recipe:
+    type: string
+    results: structs
+
+local function cauldronResult(item:item, count:integer=1, chance:number=1) :: struct:
+    return cauldron_recipe_result struct:
+        item: updated {_item}
+        count: {_count}
+        chance: {_chance}
+local function addWashingRecipe(input:string, results:structs):
+    set {-washingRecipes::%{_input}%} to cauldron_recipe struct:
+        type: "washing"
+        results: {_results::*}
+local function addSmokingRecipe(input:string, results:structs):
+    set {-bulkSmokingRecipes::%{_input}%} to cauldron_recipe struct:
+        type: "smoking"
+        results: {_results::*}
+local function addHauntingRecipe(input:string, results:structs):
+    set {-hauntingRecipes::%{_input}%} to cauldron_recipe struct:
+        type: "haunting"
+        results: {_results::*}
+local function addBlastingRecipe(input:string, results:structs):
+    set {-bulkBlastingRecipes::%{_input}%} to cauldron_recipe struct:
+        type: "blasting"
+        results: {_results::*}
+local function addFreezingRecipe(input:string, results:structs):
+    set {-freezingRecipes::%{_input}%} to cauldron_recipe struct:
+        type: "freezing"
+        results: {_results::*}
+
+when ready to load recipes:
+    clear {-cauldronRecipes::*}
+    # washing
+    # concrete powder
+    addWashingRecipe("minecraft:white_concrete_powder", cauldronResult(white concrete))
+    addWashingRecipe("minecraft:light_gray_concrete_powder", cauldronResult(light gray concrete))
+    addWashingRecipe("minecraft:gray_concrete_powder", cauldronResult(gray concrete))
+    addWashingRecipe("minecraft:black_concrete_powder", cauldronResult(black concrete))
+    addWashingRecipe("minecraft:brown_concrete_powder", cauldronResult(brown concrete))
+    addWashingRecipe("minecraft:red_concrete_powder", cauldronResult(red concrete))
+    addWashingRecipe("minecraft:orange_concrete_powder", cauldronResult(orange concrete))
+    addWashingRecipe("minecraft:yellow_concrete_powder", cauldronResult(yellow concrete))
+    addWashingRecipe("minecraft:lime_concrete_powder", cauldronResult(lime concrete))
+    addWashingRecipe("minecraft:green_concrete_powder", cauldronResult(green concrete))
+    addWashingRecipe("minecraft:cyan_concrete_powder", cauldronResult(cyan concrete))
+    addWashingRecipe("minecraft:light_blue_concrete_powder", cauldronResult(light blue concrete))
+    addWashingRecipe("minecraft:blue_concrete_powder", cauldronResult(blue concrete))
+    addWashingRecipe("minecraft:purple_concrete_powder", cauldronResult(purple concrete))
+    addWashingRecipe("minecraft:magenta_concrete_powder", cauldronResult(magenta concrete))
+    addWashingRecipe("minecraft:pink_concrete_powder", cauldronResult(pink concrete))
+    # wool
+    addWashingRecipe("minecraft:light_gray_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:gray_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:black_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:brown_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:red_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:orange_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:yellow_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:lime_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:green_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:cyan_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:light_blue_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:blue_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:purple_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:magenta_wool", cauldronResult(white wool))
+    addWashingRecipe("minecraft:pink_wool", cauldronResult(white wool))
+    # stained glass
+    addWashingRecipe("minecraft:white_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:light_gray_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:gray_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:black_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:brown_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:red_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:orange_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:yellow_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:lime_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:green_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:cyan_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:light_blue_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:blue_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:purple_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:magenta_stained_glass", cauldronResult(glass))
+    addWashingRecipe("minecraft:pink_stained_glass", cauldronResult(glass))
+    # stained glass pane
+    addWashingRecipe("minecraft:white_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:light_gray_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:gray_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:black_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:brown_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:red_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:orange_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:yellow_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:lime_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:green_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:cyan_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:light_blue_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:blue_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:purple_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:magenta_stained_glass_pane", cauldronResult(glass pane))
+    addWashingRecipe("minecraft:pink_stained_glass_pane", cauldronResult(glass pane))
+    # other washing
+    addWashingRecipe("turtle:crushed_raw_iron", (cauldronResult(iron nugget,9),cauldronResult(redstone,1,0.12)))
+    addWashingRecipe("turtle:crushed_raw_gold", (cauldronResult(gold nugget,9),cauldronResult(quartz,1,0.5)))
+    addWashingRecipe("turtle:crushed_raw_copper", (cauldronResult((custom item "turtle:copper_nugget"),9),cauldronResult(clay_ball,1,0.5)))
+    addWashingRecipe("minecraft:gravel", (cauldronResult(flint,1,0.25),cauldronResult(iron nugget,1,0.12)))
+    addWashingRecipe("minecraft:ice", cauldronResult(packed ice))
+    addWashingRecipe("minecraft:magma_block", cauldronResult(obsidian))
+    addWashingRecipe("minecraft:sand", cauldronResult(clay ball,1,0.25))
+    addWashingRecipe("minecraft:red_sand", (cauldronResult(gold nugget,3,0.12),cauldronResult(dead bush,1,0.05)))
+    addWashingRecipe("minecraft:soul_sand", (cauldronResult(quartz,4,0.12),cauldronResult(gold nugget,1,0.02)))
+    # smoking
+    addSmokingRecipe("minecraft:rotten_flesh", cauldronResult(leather))
+    # haunting
+    addHauntingRecipe("minecraft:lapis_lazuli", (cauldronResult(prismarine shard,1,0.75),cauldronResult(prismarine crystals,1,0.12)))
+    addHauntingRecipe("minecraft:red_mushroom", cauldronResult(crimson fungus))
+    addHauntingRecipe("minecraft:brown_mushroom", cauldronResult(warped fungus))
+    addHauntingRecipe("minecraft:potato", cauldronResult(poisonous potato))
+    addHauntingRecipe("minecraft:brick", cauldronResult(nether brick))
+    addHauntingRecipe("minecraft:torch", cauldronResult(soul torch))
+    addHauntingRecipe("minecraft:lantern", cauldronResult(soul lantern))
+    addHauntingRecipe("minecraft:campfire", cauldronResult(soul campfire))
+    addHauntingRecipe("minecraft:dirt", cauldronResult(soul soil))
+    addHauntingRecipe("minecraft:sand", cauldronResult(soul sand))
+    addHauntingRecipe("minecraft:red_sand", cauldronResult(soul sand))
+    addHauntingRecipe("minecraft:sweet_berries", cauldronResult(glow berries))
+    addHauntingRecipe("minecraft:cobblestone", cauldronResult(blackstone))
+    addHauntingRecipe("minecraft:mossy_cobblestone", cauldronResult(blackstone))
+    addHauntingRecipe("minecraft:infested_cobblestone", cauldronResult(blackstone))
+    addHauntingRecipe("minecraft:ink_sac", cauldronResult(glow ink sac))
+    addHauntingRecipe("minecraft:stone", cauldronResult(infested stone))
+    addHauntingRecipe("minecraft:stone_bricks", cauldronResult(infested stone bricks))
+    addHauntingRecipe("minecraft:mossy_stone_bricks", cauldronResult(infested mossy stone bricks))
+    addHauntingRecipe("minecraft:cracked_stone_bricks", cauldronResult(infested cracked stone bricks))
+    addHauntingRecipe("minecraft:chiseled_stone_bricks", cauldronResult(infested chiseled stone bricks))
+    addHauntingRecipe("minecraft:deepslate", cauldronResult(deepslate))
+    # blasting
+    addBlastingRecipe("minecraft:slime_ball", cauldronResult(magma cream))
+    # freezing
+    addFreezingRecipe("minecraft:water_bucket", cauldronResult(ice))
+    addFreezingRecipe("minecraft:ice", cauldronResult(packed ice))
+    addFreezingRecipe("minecraft:magma_cream", cauldronResult(slime ball))
+    addFreezingRecipe("minecraft:slime_ball", cauldronResult(snow ball))
+    addFreezingRecipe("minecraft:blaze_rod", cauldronResult(breeze rod))

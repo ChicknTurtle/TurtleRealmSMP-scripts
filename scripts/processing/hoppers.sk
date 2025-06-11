@@ -1,26 +1,26 @@
 
+# returns true if item should be blocked
+function checkHopperFilter(item:item, hopper:block) :: boolean:
+    if (string list tag "filter;ids" of (custom nbt of {_hopper})) isn't set:
+        return false
+    if (boolean tag "filter;blacklist" of (custom nbt of {_hopper})) is true:
+        (string list tag "filter;ids" of (custom nbt of {_hopper})) contains (item id of {_item})
+        return true
+    else:
+        if (string list tag "filter;ids" of (custom nbt of {_hopper})) doesn't contain (item id of {_item}):
+            return true
+    return false
+
 # dropped item > hopper
 on inventory pickup:
     set {_b} to (holder of event-inventory)
-    (string list tag "filter;ids" of (custom nbt of {_b})) is set
-    if (boolean tag "filter;blacklist" of (custom nbt of {_b})) is true:
-        (string list tag "filter;ids" of (custom nbt of {_b})) doesn't contain (item id of event-item)
-        exit trigger
-    else:
-        if (string list tag "filter;ids" of (custom nbt of {_b})) contains (item id of event-item):
-            exit trigger
+    checkHopperFilter(event-item, {_b}) is true
     cancel event
     chance of 0.0625
     make 1 of dust using dustOption(rgb(255,0,0),4) at {_b}
 # hopper/dropper > whatever
 on inventory item move:
-    (string list tag "filter;ids" of (custom nbt of future event-block)) is set
-    if (boolean tag "filter;blacklist" of (custom nbt of future event-block)) is true:
-        (string list tag "filter;ids" of (custom nbt of future event-block)) doesn't contain (item id of event-item)
-        exit trigger
-    else:
-        if (string list tag "filter;ids" of (custom nbt of future event-block)) contains (item id of event-item):
-            exit trigger
+    checkHopperFilter(event-item, event-block) is true
     cancel event
     chance of 0.5
     make 1 of dust using dustOption(rgb(255,0,0),4) at (future event-block)
