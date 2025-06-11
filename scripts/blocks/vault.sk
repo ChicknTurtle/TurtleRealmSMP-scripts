@@ -1,0 +1,15 @@
+
+import:
+    io.papermc.paper.event.block.VaultChangeStateEvent
+
+on VaultChangeStateEvent:
+    clearRewardedPlayers(blockstate of event.getBlock())
+
+local function clearRewardedPlayers(b:blockstate):
+    loop ...{_b}.getRewardedPlayers():
+        {_b}.removeRewardedPlayer(loop-value)
+    update {_b}
+
+on player interact:
+    event-block is vault
+    clearRewardedPlayers(blockstate of event-block)
