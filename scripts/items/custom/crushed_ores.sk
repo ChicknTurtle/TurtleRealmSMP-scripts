@@ -3,6 +3,7 @@ when ready to register custom items:
     set (custom item "turtle:crushed_raw_iron") to (firework star with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_iron"",""minecraft:item_name"":""Crushed Iron Ore""}")
     set (custom item "turtle:crushed_raw_gold") to (clock with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_gold"",""minecraft:item_name"":""Crushed Gold Ore""}")
     set (custom item "turtle:crushed_raw_copper") to (firework star with nbt from "{""minecraft:item_model"":""turtle:crushed_raw_copper"",""minecraft:item_name"":""Crushed Copper Ore""}")
+    set (custom item "turtle:copper_nugget") to (firework star with nbt from "{""minecraft:item_model"":""turtle:copper_nugget"",""minecraft:item_name"":""Copper Nugget""}")
 
 when ready to load recipes:
     register furnace recipe:
@@ -41,3 +42,18 @@ when ready to load recipes:
         input: (custom item "turtle:crushed_raw_copper")
         group: "copper_ingot"
         category: "misc"
+    
+    register shaped recipe:
+        id: "turtle:copper_ingot_from_nuggets"
+        result: copper ingot
+        group: "copper_ingot"
+        category: "misc"
+        shape: "aaa", "aaa", "aaa"
+        ingredients:
+            set ingredient of "a" to (custom item "turtle:copper_nugget")
+    register shapeless recipe:
+        id: "turtle:copper_nugget"
+        result: 9 of (custom item "turtle:copper_nugget")
+        category: "misc"
+        ingredients:
+            add copper ingot to ingredients

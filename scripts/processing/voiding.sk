@@ -1,0 +1,19 @@
+
+function voidProcess(e:entity):
+    set {_id} to (item id of (item of {_e}))
+    {-voidingRecipes::%{_id}%} is set
+    set (item of {_e}) to ((item amount of (item of {_e})) of {-voidingRecipes::%{_id}%})
+
+local function addVoidingRecipe(input:string, result:item):
+    set {-voidingRecipes::%{_input}%} to {_result}
+
+when ready to load recipes:
+    clear {-voidingRecipes::*}
+    addVoidingRecipe("minecraft:apple", (custom item "minecraft:chorus_fruit"))
+    addVoidingRecipe("minecraft:cobblestone", (custom item "minecraft:end_stone"))
+    addVoidingRecipe("minecraft:stone_bricks", (custom item "minecraft:end_stone_bricks"))
+    addVoidingRecipe("minecraft:mossy_stone_bricks", (custom item "minecraft:end_stone_bricks"))
+    addVoidingRecipe("minecraft:egg", (custom item "minecraft:ender_pearl"))
+    addVoidingRecipe("minecraft:brown_egg", (custom item "minecraft:ender_pearl"))
+    addVoidingRecipe("minecraft:blue_egg", (custom item "minecraft:ender_pearl"))
+    addVoidingRecipe("minecraft:honey_bottle", (custom item "minecraft:dragon_breath"))

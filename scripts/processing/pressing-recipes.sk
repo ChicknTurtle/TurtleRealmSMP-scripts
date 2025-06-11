@@ -1,330 +1,100 @@
 
+struct pressing_recipe_result:
+    item: string
+    count: integer=1
+    chance: number=1
+struct pressing_recipe:
+    input: string
+    results: structs
+
 local function pressResult(item:string, count:integer=1, chance:number=1) :: struct:
     return pressing_recipe_result struct:
         item: {_item}
         count: {_count}
         chance: {_chance}
+local function addPressingRecipe(input:string, results:structs):
+    set {-pressingRecipes::%{_input}%} to pressing_recipe struct:
+        results: {_results::*}
 
 when ready to load recipes:
     clear {-pressingRecipes::*}
-    # pressing recipes
-    # sugar cane -> paper
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:sugar_cane"
-        results: pressResult("minecraft:paper")
-    # any dirt -> dirt path
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "#minecraft:dirt"
-        results: pressResult("minecraft:dirt_path")
-    # allium -> magenta dye x2, purple dye x2 (10%), pink dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:allium"
-        results: pressResult("minecraft:magenta_dye",2),pressResult("minecraft:purple_dye",2,0.1),pressResult("minecraft:pink_dye",1,0.1)
-    # azure bluet -> light gray dye x2, white dye x2 (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:azure_bluet"
-        results: pressResult("minecraft:light_gray_dye",2),pressResult("minecraft:white_dye",2,0.1)
-    # blue orchid -> light blue dye x2, light gray dye (5%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:blue_orchid"
-        results: pressResult("minecraft:light_blue_dye",2),pressResult("minecraft:light_gray_dye",1,0.05)
-    # cornflower -> blue dye x2
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:cornflower"
-        results: pressResult("minecraft:blue_dye",2)
-    # dandelion -> yellow dye x2, yellow dye (5%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:dandelion"
-        results: pressResult("minecraft:yellow_dye",2),pressResult("minecraft:yellow_dye",1,0.05)
-    # lilac -> magenta dye x3, magenta dye (25%), purple dye (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:lilac"
-        results: pressResult("minecraft:magenta_dye",3),pressResult("minecraft:magenta_dye",1,0.25),pressResult("minecraft:purple_dye",1,0.25)
-    # lily of the valley -> white dye x2, lime dye (10%), white dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:lily_of_the_valley"
-        results: pressResult("minecraft:white_dye",2),pressResult("minecraft:lime_dye",1,0.1),pressResult("minecraft:white_dye",1,0.1)
-    # orange tulip -> orange dye x2, lime dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:orange_tulip"
-        results: pressResult("minecraft:orange_dye",2),pressResult("minecraft:lime_dye",1,0.1)
-    # oxeye daisy -> light gray dye x2, white dye (20%), yellow dye (5%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:oxeye_daisy"
-        results: pressResult("minecraft:light_gray_dye",2),pressResult("minecraft:white_dye",1,0.2),pressResult("minecraft:yellow_dye",1,0.05)
-    # peony -> pink dye x3, magenta dye (25%), pink dye (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:peony"
-        results: pressResult("minecraft:pink_dye",3),pressResult("minecraft:magenta_dye",1,0.25),pressResult("minecraft:pink_dye",1,0.25)
-    # pink tulip -> pink dye x2, lime dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:pink_tulip"
-        results: pressResult("minecraft:pink_dye",2),pressResult("minecraft:lime_dye",1,0.1)
-    # poppy -> red dye x2, green dye (5%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:poppy"
-        results: pressResult("minecraft:red_dye",2),pressResult("minecraft:green_dye",1,0.05)
-    # red tulip -> red dye x2, lime dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:red_tulip"
-        results: pressResult("minecraft:red_dye",2),pressResult("minecraft:lime_dye",1,0.1)
-    # rose bush -> red dye x3, green dye (5%), red dye (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:rose_bush"
-        results: pressResult("minecraft:red_dye",3),pressResult("minecraft:green_dye",1,0.05),pressResult("minecraft:red_dye",1,0.25)
-    # sunflower -> yellow dye x3, orange dye (25%), yellow dye (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:sunflower"
-        results: pressResult("minecraft:yellow_dye",3),pressResult("minecraft:orange_dye",1,0.25),pressResult("minecraft:yellow_dye",1,0.25)
-    # white tulip -> white dye x2, lime dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:white_tulip"
-        results: pressResult("minecraft:white_dye",2),pressResult("minecraft:lime_dye",1,0.1)
-    # wither rose -> black dye x2, black dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:wither_rose"
-        results: pressResult("minecraft:black_dye",2),pressResult("minecraft:black_dye",1,0.1)
-    # beetroot -> red dye x2, beetroot seeds (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:beetroot"
-        results: pressResult("minecraft:red_dye",2),pressResult("minecraft:beetroot_seeds",1,0.1)
-    # bone -> bone meal x3, white dye (25%), bone meal x3 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:bone"
-        results: pressResult("minecraft:bone_meal",3),pressResult("minecraft:white_dye",1,0.25),pressResult("minecraft:bone_meal",3,0.25)
-    # bone meal -> white dye x2, light gray dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:bone_meal"
-        results: pressResult("minecraft:white_dye",2),pressResult("minecraft:light_gray_dye",1,0.1)
-    # cactus -> green dye x2, green dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:cactus"
-        results: pressResult("minecraft:green_dye",2),pressResult("minecraft:green_dye",1,0.1)
-    # calcite -> bonemeal (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:calcite"
-        results: pressResult("minecraft:bone_meal",1,0.12)
-    # charcoal -> black dye, gray dye x2 (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:charcoal"
-        results: pressResult("minecraft:black_dye",1),pressResult("minecraft:gray_dye",2),pressResult("minecraft:gray_dye",2,0.1)
-    # coal -> black dye, gray dye x2 (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:coal"
-        results: pressResult("minecraft:black_dye",1),pressResult("minecraft:gray_dye",2),pressResult("minecraft:gray_dye",2,0.1)
-    # cocoa beans -> brown dye x2, brown dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:cocoa_beans"
-        results: pressResult("minecraft:brown_dye",2),pressResult("minecraft:brown_dye",1,0.1)
-    # ink sac -> black dye x2, gray dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:ink_sac"
-        results: pressResult("minecraft:black_dye",2),pressResult("minecraft:gray_dye",1,0.1)
-    # lapis lazuli -> blue dye x2, blue dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:lapis_lazuli"
-        results: pressResult("minecraft:blue_dye",2),pressResult("minecraft:blue_dye",1,0.1)
-    # sea pickle -> lime dye x2, green dye (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:sea_pickle"
-        results: pressResult("minecraft:lime_dye",2),pressResult("minecraft:green_dye",1,0.1)
-    # fern -> green dye, wheat seeds (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:fern"
-        results: pressResult("minecraft:green_dye",1),pressResult("minecraft:wheat_seeds",1,0.1)
-    # large fern -> green dye x2, green dye (50%), wheat seeds (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:large_fern"
-        results: pressResult("minecraft:green_dye",2),pressResult("minecraft:green_dye",1,0.5),pressResult("minecraft:wheat_seeds",1,0.1)
-    # grass -> wheat seeds (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:grass"
-        results: pressResult("minecraft:wheat_seeds",1,0.25)
-    # tall grass -> wheat seeds (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:tall_grass"
-        results: pressResult("minecraft:wheat_seeds",1,0.5)
-    # cobblestone -> gravel
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:cobblestone"
-        results: pressResult("minecraft:gravel")
-    # gravel -> sand, flint (10%), clay ball (5%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:gravel"
-        results: pressResult("minecraft:sand"),pressResult("minecraft:flint",1,0.1),pressResult("minecraft:clay_ball",1,0.05)
-    # sandstone -> sand
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:sandstone"
-        results: pressResult("minecraft:sand")
-    # terracotta -> red sand
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:terracotta"
-        results: pressResult("minecraft:red_sand")
-    # andesite -> cobblestone
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:andesite"
-        results: pressResult("minecraft:cobblestone")
-    # granite -> red sand
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:granite"
-        results: pressResult("minecraft:red_sand")
-    # diorite -> nether quartz (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:diorite"
-        results: pressResult("minecraft:quartz",1,0.25)
-    # tuff -> flint (25%), gold nugget (10%), copper nugget (10%), iron nugget (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:tuff"
-        results: pressResult("minecraft:flint",1,0.25),pressResult("minecraft:gold_nugget",1,0.1),pressResult("minecraft:copper_nugget",1,0.1),pressResult("minecraft:iron_nugget",1,0.1)
-    # clay -> clay ball x3, clay ball (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:clay"
-        results: pressResult("minecraft:clay_ball",3),pressResult("minecraft:clay_ball",1,0.5)
-    # dripstone block -> clay ball
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:dripstone_block"
-        results: pressResult("minecraft:clay_ball")
-    # glowstone -> glowstone dust x3, glowstone dust (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:glowstone"
-        results: pressResult("minecraft:glowstone_dust",3),pressResult("minecraft:glowstone_dust",1,0.5)
-    # any wool -> string
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "#minecraft:wool"
-        results: pressResult("minecraft:string")
-    # blaze rod -> blaze powder x3, blaze powder x3 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:blaze_rod"
-        results: pressResult("minecraft:blaze_powder",3),pressResult("minecraft:blaze_powder",3,0.25)
-    # amethyst cluster -> amethyst shard x7, amethyst shard (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:amethyst_cluster"
-        results: pressResult("minecraft:amethyst_shard",7),pressResult("minecraft:amethyst_shard",1,0.5)
-    # block of amethyst -> amethyst shard x3, amethyst shard (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:block_of_amethyst"
-        results: pressResult("minecraft:amethyst_shard",3),pressResult("minecraft:amethyst_shard",1,0.5)
-    # prismarine crystals -> nether quartz, nether quartz x2 (50%), glowstone dust x2 (10%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:prismarine_crystals"
-        results: pressResult("minecraft:quartz",1),pressResult("minecraft:quartz",2,0.5),pressResult("minecraft:glowstone_dust",2,0.1)
-    # nether wart block -> nether wart (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:nether_wart_block"
-        results: pressResult("minecraft:nether_wart",1,0.25)
-    # diamond horse armor -> diamond, leather x2 (50%), diamond x3 (10%), string x2 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:diamond_horse_armor"
-        results: pressResult("minecraft:diamond",1),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:diamond",3,0.1),pressResult("minecraft:string",2,0.25)
-    # golden horse armor -> gold ingot x2, leather x2 (50%), gold ingot x2 (50%), string x2 (25%), gold nugget x8 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:golden_horse_armor"
-        results: pressResult("minecraft:gold_ingot",2),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:gold_ingot",2,0.5),pressResult("minecraft:string",2,0.25),pressResult("minecraft:gold_nugget",8,0.25)
-    # iron horse armor -> iron ingot x2, leather x2 (50%), iron ingot x2 (50%), string x2 (25%), iron nugget x8 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:iron_horse_armor"
-        results: pressResult("minecraft:iron_ingot",2),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:iron_ingot",2,0.5),pressResult("minecraft:string",2,0.25),pressResult("minecraft:iron_nugget",8,0.25)
-    # leather horse armor -> leather x4, leather x2 (50%), string x2 (25%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:leather_horse_armor"
-        results: pressResult("minecraft:leather",4),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:string",2,0.25)
-    # saddle -> leather x2, leather x2 (50%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:saddle"
-        results: pressResult("minecraft:leather",2),pressResult("minecraft:leather",2,0.5)
-    # block of raw copper -> crushed copper ore x9, nugget of experience x9 (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_copper_block"
-        results: pressResult("turtle:crushed_raw_copper",9),pressResult("turtle:experience_nugget",9,0.75)
-    # block of raw gold -> crushed gold ore x9, nugget of experience x9 (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_gold_block"
-        results: pressResult("turtle:crushed_raw_gold",9),pressResult("turtle:experience_nugget",9,0.75)
-    # block of raw iron -> crushed iron ore x9, nugget of experience x9 (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_iron_block"
-        results: pressResult("turtle:crushed_raw_iron",9),pressResult("turtle:experience_nugget",9,0.75)
-    # raw copper -> crushed copper ore, nugget of experience (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_copper"
-        results: pressResult("turtle:crushed_raw_copper",1),pressResult("turtle:experience_nugget",1,0.75)
-    # raw gold -> crushed gold ore, nugget of experience (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_gold"
-        results: pressResult("turtle:crushed_raw_gold",1),pressResult("turtle:experience_nugget",1,0.75)
-    # raw iron -> crushed iron ore, nugget of experience (75%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:raw_iron"
-        results: pressResult("turtle:crushed_raw_iron",1),pressResult("turtle:experience_nugget",1,0.75)
-    # coal ore -> coal, coal (75%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:coal_ore"
-        results: pressResult("minecraft:coal",1),pressResult("minecraft:coal",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate coal ore -> coal, coal (75%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_coal_ore"
-        results: pressResult("minecraft:coal",1),pressResult("minecraft:coal",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # copper ore -> crushed copper ore x5, crushed copper ore (25%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:copper_ore"
-        results: pressResult("turtle:crushed_raw_copper",5),pressResult("turtle:crushed_raw_copper",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate copper ore -> crushed copper ore x7, crushed copper ore (25%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_copper_ore"
-        results: pressResult("turtle:crushed_raw_copper",7),pressResult("turtle:crushed_raw_copper",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # iron ore -> crushed iron ore, crushed iron ore (75%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:iron_ore"
-        results: pressResult("turtle:crushed_raw_iron",1),pressResult("turtle:crushed_raw_iron",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate iron ore -> crushed iron ore x2, crushed iron ore (75%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_iron_ore"
-        results: pressResult("turtle:crushed_raw_iron",2),pressResult("turtle:crushed_raw_iron",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # gold ore -> crushed gold ore, crushed gold ore (75%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:gold_ore"
-        results: pressResult("turtle:crushed_raw_gold",1),pressResult("turtle:crushed_raw_gold",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate gold ore -> crushed gold ore x2, crushed gold ore (25%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_gold_ore"
-        results: pressResult("turtle:crushed_raw_gold",2),pressResult("turtle:crushed_raw_gold",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # diamond ore -> diamond x2, diamond (75%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:diamond_ore"
-        results: pressResult("minecraft:diamond",2),pressResult("minecraft:diamond",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate diamond ore -> diamond x2, diamond (25%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_diamond_ore"
-        results: pressResult("minecraft:diamond",2),pressResult("minecraft:diamond",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # emerald ore -> emerald, emerald (75%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:emerald_ore"
-        results: pressResult("minecraft:emerald",1),pressResult("minecraft:emerald",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate emerald ore -> emerald x2, emerald (25%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_emerald_ore"
-        results: pressResult("minecraft:emerald",2),pressResult("minecraft:emerald",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # lapis lazuli ore -> lapis lazuli x10, lapis lazuli (50%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:lapis_lazuli_ore"
-        results: pressResult("minecraft:lapis_lazuli",10),pressResult("minecraft:lapis_lazuli",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate lapis lazuli ore -> lapis lazuli x12, lapis lazuli (50%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_lapis_lazuli_ore"
-        results: pressResult("minecraft:lapis_lazuli",12),pressResult("minecraft:lapis_lazuli",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # redstone ore -> redstone dust x6, redstone dust (50%), nugget of experience (75%), cobblestone (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:redstone_ore"
-        results: pressResult("minecraft:redstone_dust",6),pressResult("minecraft:redstone_dust",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)
-    # deepslate redstone ore -> redstone dust x7, redstone dust (50%), nugget of experience (75%), cobbled deepslate (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:deepslate_redstone_ore"
-        results: pressResult("minecraft:redstone_dust",7),pressResult("minecraft:redstone_dust",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)
-    # nether gold ore -> gold nugget x18, nugget of experience (75%), netherrack (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:nether_gold_ore"
-        results: pressResult("minecraft:gold_nugget",18),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:netherrack",1,0.12)
-    # nether quartz ore -> nether quartz x2, nugget of experience (75%), netherrack (12%)
-    add pressing_recipe struct to {-pressingRecipes::*}:
-        input: "minecraft:nether_quartz_ore"
-        results: pressResult("minecraft:quartz",2),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:netherrack",1,0.12)
+    addPressingRecipe("minecraft:sugar_cane", pressResult("minecraft:paper"))
+    addPressingRecipe("minecraft:dirt", pressResult("minecraft:dirt_path"))
+    addPressingRecipe("minecraft:allium", (pressResult("minecraft:magenta_dye",2),pressResult("minecraft:purple_dye",2,0.1),pressResult("minecraft:pink_dye",1,0.1)))
+    addPressingRecipe("minecraft:azure_bluet", (pressResult("minecraft:light_gray_dye",2),pressResult("minecraft:white_dye",2,0.1)))
+    addPressingRecipe("minecraft:blue_orchid", (pressResult("minecraft:light_blue_dye",2),pressResult("minecraft:light_gray_dye",1,0.05)))
+    addPressingRecipe("minecraft:cornflower", pressResult("minecraft:blue_dye",2))
+    addPressingRecipe("minecraft:dandelion", (pressResult("minecraft:yellow_dye",2),pressResult("minecraft:yellow_dye",1,0.05)))
+    addPressingRecipe("minecraft:lilac", (pressResult("minecraft:magenta_dye",3),pressResult("minecraft:magenta_dye",1,0.25),pressResult("minecraft:purple_dye",1,0.25)))
+    addPressingRecipe("minecraft:lily_of_the_valley", (pressResult("minecraft:white_dye",2),pressResult("minecraft:lime_dye",1,0.1),pressResult("minecraft:white_dye",1,0.1)))
+    addPressingRecipe("minecraft:orange_tulip", (pressResult("minecraft:orange_dye",2),pressResult("minecraft:lime_dye",1,0.1)))
+    addPressingRecipe("minecraft:oxeye_daisy", (pressResult("minecraft:light_gray_dye",2),pressResult("minecraft:white_dye",1,0.2),pressResult("minecraft:yellow_dye",1,0.05)))
+    addPressingRecipe("minecraft:peony", (pressResult("minecraft:pink_dye",3),pressResult("minecraft:magenta_dye",1,0.25),pressResult("minecraft:pink_dye",1,0.25)))
+    addPressingRecipe("minecraft:pink_tulip", (pressResult("minecraft:pink_dye",2),pressResult("minecraft:lime_dye",1,0.1)))
+    addPressingRecipe("minecraft:poppy", (pressResult("minecraft:red_dye",2),pressResult("minecraft:green_dye",1,0.05)))
+    addPressingRecipe("minecraft:red_tulip", (pressResult("minecraft:red_dye",2),pressResult("minecraft:lime_dye",1,0.1)))
+    addPressingRecipe("minecraft:rose_bush", (pressResult("minecraft:red_dye",3),pressResult("minecraft:green_dye",1,0.05),pressResult("minecraft:red_dye",1,0.25)))
+    addPressingRecipe("minecraft:sunflower", (pressResult("minecraft:yellow_dye",3),pressResult("minecraft:orange_dye",1,0.25),pressResult("minecraft:yellow_dye",1,0.25)))
+    addPressingRecipe("minecraft:white_tulip", (pressResult("minecraft:white_dye",2),pressResult("minecraft:lime_dye",1,0.1)))
+    addPressingRecipe("minecraft:wither_rose", (pressResult("minecraft:black_dye",2),pressResult("minecraft:black_dye",1,0.1)))
+    addPressingRecipe("minecraft:beetroot", (pressResult("minecraft:red_dye",2),pressResult("minecraft:beetroot_seeds",1,0.1)))
+    addPressingRecipe("minecraft:bone", (pressResult("minecraft:bone_meal",3),pressResult("minecraft:white_dye",1,0.25),pressResult("minecraft:bone_meal",3,0.25)))
+    addPressingRecipe("minecraft:bone_meal", (pressResult("minecraft:white_dye",2),pressResult("minecraft:light_gray_dye",1,0.1)))
+    addPressingRecipe("minecraft:cactus", (pressResult("minecraft:green_dye",2),pressResult("minecraft:green_dye",1,0.1)))
+    addPressingRecipe("minecraft:calcite", pressResult("minecraft:bone_meal",1,0.12))
+    addPressingRecipe("minecraft:charcoal", (pressResult("minecraft:black_dye",1),pressResult("minecraft:gray_dye",2),pressResult("minecraft:gray_dye",2,0.1)))
+    addPressingRecipe("minecraft:coal", (pressResult("minecraft:black_dye",1),pressResult("minecraft:gray_dye",2),pressResult("minecraft:gray_dye",2,0.1)))
+    addPressingRecipe("minecraft:cocoa_beans", (pressResult("minecraft:brown_dye",2),pressResult("minecraft:brown_dye",1,0.1)))
+    addPressingRecipe("minecraft:ink_sac", (pressResult("minecraft:black_dye",2),pressResult("minecraft:gray_dye",1,0.1)))
+    addPressingRecipe("minecraft:lapis_lazuli", (pressResult("minecraft:blue_dye",2),pressResult("minecraft:blue_dye",1,0.1)))
+    addPressingRecipe("minecraft:sea_pickle", (pressResult("minecraft:lime_dye",2),pressResult("minecraft:green_dye",1,0.1)))
+    addPressingRecipe("minecraft:fern", (pressResult("minecraft:green_dye",1),pressResult("minecraft:wheat_seeds",1,0.1)))
+    addPressingRecipe("minecraft:large_fern", (pressResult("minecraft:green_dye",2),pressResult("minecraft:green_dye",1,0.5),pressResult("minecraft:wheat_seeds",1,0.1)))
+    addPressingRecipe("minecraft:grass", pressResult("minecraft:wheat_seeds",1,0.25))
+    addPressingRecipe("minecraft:tall_grass", pressResult("minecraft:wheat_seeds",1,0.5))
+    addPressingRecipe("minecraft:cobblestone", pressResult("minecraft:gravel"))
+    addPressingRecipe("minecraft:gravel", (pressResult("minecraft:sand"),pressResult("minecraft:flint",1,0.1),pressResult("minecraft:clay_ball",1,0.05)))
+    addPressingRecipe("minecraft:sandstone", pressResult("minecraft:sand"))
+    addPressingRecipe("minecraft:terracotta", pressResult("minecraft:red_sand"))
+    addPressingRecipe("minecraft:andesite", pressResult("minecraft:cobblestone"))
+    addPressingRecipe("minecraft:granite", pressResult("minecraft:red_sand"))
+    addPressingRecipe("minecraft:diorite", pressResult("minecraft:quartz",1,0.25))
+    addPressingRecipe("minecraft:tuff", (pressResult("minecraft:flint",1,0.25),pressResult("minecraft:gold_nugget",1,0.1),pressResult("minecraft:copper_nugget",1,0.1),pressResult("minecraft:iron_nugget",1,0.1)))
+    addPressingRecipe("minecraft:clay", (pressResult("minecraft:clay_ball",3),pressResult("minecraft:clay_ball",1,0.5)))
+    addPressingRecipe("minecraft:dripstone_block", pressResult("minecraft:clay_ball"))
+    addPressingRecipe("minecraft:glowstone", (pressResult("minecraft:glowstone_dust",3),pressResult("minecraft:glowstone_dust",1,0.5)))
+    addPressingRecipe("minecraft:white_wool", pressResult("minecraft:string"))
+    addPressingRecipe("minecraft:blaze_rod", (pressResult("minecraft:blaze_powder",3),pressResult("minecraft:blaze_powder",3,0.25)))
+    addPressingRecipe("minecraft:amethyst_cluster", (pressResult("minecraft:amethyst_shard",7),pressResult("minecraft:amethyst_shard",1,0.5)))
+    addPressingRecipe("minecraft:block_of_amethyst", (pressResult("minecraft:amethyst_shard",3),pressResult("minecraft:amethyst_shard",1,0.5)))
+    addPressingRecipe("minecraft:prismarine_crystals", (pressResult("minecraft:quartz",1),pressResult("minecraft:quartz",2,0.5),pressResult("minecraft:glowstone_dust",2,0.1)))
+    addPressingRecipe("minecraft:nether_wart_block", pressResult("minecraft:nether_wart",1,0.25))
+    addPressingRecipe("minecraft:diamond_horse_armor", (pressResult("minecraft:diamond",1),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:diamond",3,0.1),pressResult("minecraft:string",2,0.25)))
+    addPressingRecipe("minecraft:golden_horse_armor", (pressResult("minecraft:gold_ingot",2),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:gold_ingot",2,0.5),pressResult("minecraft:string",2,0.25),pressResult("minecraft:gold_nugget",8,0.25)))
+    addPressingRecipe("minecraft:iron_horse_armor", (pressResult("minecraft:iron_ingot",2),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:iron_ingot",2,0.5),pressResult("minecraft:string",2,0.25),pressResult("minecraft:iron_nugget",8,0.25)))
+    addPressingRecipe("minecraft:leather_horse_armor", (pressResult("minecraft:leather",4),pressResult("minecraft:leather",2,0.5),pressResult("minecraft:string",2,0.25)))
+    addPressingRecipe("minecraft:saddle", (pressResult("minecraft:leather",2),pressResult("minecraft:leather",2,0.5)))
+    addPressingRecipe("minecraft:raw_copper_block", (pressResult("turtle:crushed_raw_copper",9),pressResult("turtle:experience_nugget",9,0.75)))
+    addPressingRecipe("minecraft:raw_gold_block", (pressResult("turtle:crushed_raw_gold",9),pressResult("turtle:experience_nugget",9,0.75)))
+    addPressingRecipe("minecraft:raw_iron_block", (pressResult("turtle:crushed_raw_iron",9),pressResult("turtle:experience_nugget",9,0.75)))
+    addPressingRecipe("minecraft:raw_copper", (pressResult("turtle:crushed_raw_copper",1),pressResult("turtle:experience_nugget",1,0.75)))
+    addPressingRecipe("minecraft:raw_gold", (pressResult("turtle:crushed_raw_gold",1),pressResult("turtle:experience_nugget",1,0.75)))
+    addPressingRecipe("minecraft:raw_iron", (pressResult("turtle:crushed_raw_iron",1),pressResult("turtle:experience_nugget",1,0.75)))
+    addPressingRecipe("minecraft:coal_ore", (pressResult("minecraft:coal",1),pressResult("minecraft:coal",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_coal_ore", (pressResult("minecraft:coal",1),pressResult("minecraft:coal",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:copper_ore", (pressResult("turtle:crushed_raw_copper",5),pressResult("turtle:crushed_raw_copper",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_copper_ore", (pressResult("turtle:crushed_raw_copper",7),pressResult("turtle:crushed_raw_copper",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:iron_ore", (pressResult("turtle:crushed_raw_iron",1),pressResult("turtle:crushed_raw_iron",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_iron_ore", (pressResult("turtle:crushed_raw_iron",2),pressResult("turtle:crushed_raw_iron",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:gold_ore", (pressResult("turtle:crushed_raw_gold",1),pressResult("turtle:crushed_raw_gold",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_gold_ore", (pressResult("turtle:crushed_raw_gold",2),pressResult("turtle:crushed_raw_gold",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:diamond_ore", (pressResult("minecraft:diamond",2),pressResult("minecraft:diamond",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_diamond_ore", (pressResult("minecraft:diamond",2),pressResult("minecraft:diamond",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:emerald_ore", (pressResult("minecraft:emerald",1),pressResult("minecraft:emerald",1,0.75),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_emerald_ore", (pressResult("minecraft:emerald",2),pressResult("minecraft:emerald",1,0.25),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:lapis_lazuli_ore", (pressResult("minecraft:lapis_lazuli",10),pressResult("minecraft:lapis_lazuli",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_lapis_lazuli_ore", (pressResult("minecraft:lapis_lazuli",12),pressResult("minecraft:lapis_lazuli",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:redstone_ore", (pressResult("minecraft:redstone_dust",6),pressResult("minecraft:redstone_dust",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobblestone",1,0.12)))
+    addPressingRecipe("minecraft:deepslate_redstone_ore", (pressResult("minecraft:redstone_dust",7),pressResult("minecraft:redstone_dust",1,0.5),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:cobbled_deepslate",1,0.12)))
+    addPressingRecipe("minecraft:nether_gold_ore", (pressResult("minecraft:gold_nugget",18),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:netherrack",1,0.12)))
+    addPressingRecipe("minecraft:nether_quartz_ore", (pressResult("minecraft:quartz",2),pressResult("turtle:experience_nugget",1,0.75),pressResult("minecraft:netherrack",1,0.12)))
