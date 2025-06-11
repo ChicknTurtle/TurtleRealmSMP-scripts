@@ -27,7 +27,7 @@ function cloudJumpBoost(p:player):
         set {_z} to 0
         set {_y} to 0.575
         add 0.1 * (level of jump boost of {_p}) to {_y}
-        if (player's gamemode) isn't creative:
+        if ({_p}'s gamemode) isn't creative:
             add 0.1 to exhaustion of {_p}
         if {_p} is sprinting:
             add 0-sin(yaw of {_p})*0.55*(1+0.15*(level of speed of {_p})) to {_x}

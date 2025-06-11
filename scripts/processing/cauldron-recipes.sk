@@ -144,5 +144,5 @@ when ready to load recipes:
     addFreezingRecipe("minecraft:water_bucket", cauldronResult(ice))
     addFreezingRecipe("minecraft:ice", cauldronResult(packed ice))
     addFreezingRecipe("minecraft:magma_cream", cauldronResult(slime ball))
-    addFreezingRecipe("minecraft:slime_ball", cauldronResult(snow ball))
+    addFreezingRecipe("minecraft:slime_ball", cauldronResult(snowball))
     addFreezingRecipe("minecraft:blaze_rod", cauldronResult(breeze rod))
