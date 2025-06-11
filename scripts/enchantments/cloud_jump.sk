@@ -27,12 +27,12 @@ function cloudJumpBoost(p:player):
         set {_z} to 0
         set {_y} to 0.575
         add 0.1 * (level of jump boost of {_p}) to {_y}
-        add 0.05 to exhaustion of {_p}
+        if (player's gamemode) isn't creative:
+            add 0.1 to exhaustion of {_p}
         if {_p} is sprinting:
             add 0-sin(yaw of {_p})*0.55*(1+0.15*(level of speed of {_p})) to {_x}
             add cos(yaw of {_p})*0.55*(1+0.15*(level of speed of {_p})) to {_z}
             add 0.115 to {_y}
-            add 0.2-0.05 to exhaustion of {_p}
         set {_y} to max({_y}, y of {_p}'s velocity)
         add vector({_x},0,{_z}) to ({_p}'s velocity)
         set y of ({_p}'s velocity) to {_y}
