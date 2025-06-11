@@ -137,7 +137,7 @@ when ready to load recipes:
     addHauntingRecipe("minecraft:mossy_stone_bricks", cauldronResult(infested mossy stone bricks))
     addHauntingRecipe("minecraft:cracked_stone_bricks", cauldronResult(infested cracked stone bricks))
     addHauntingRecipe("minecraft:chiseled_stone_bricks", cauldronResult(infested chiseled stone bricks))
-    addHauntingRecipe("minecraft:deepslate", cauldronResult(deepslate))
+    addHauntingRecipe("minecraft:deepslate", cauldronResult(infested deepslate))
     # blasting
     addBlastingRecipe("minecraft:slime_ball", cauldronResult(magma cream))
     # freezing
