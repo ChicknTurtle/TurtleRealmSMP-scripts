@@ -17,6 +17,19 @@ function getFormattedTps() :: string:
         set {_tps} to "%{_tps}%.0"
     return "%{_c}%%{_prefix}%%{_tps}%"
 
+function getFormattedMspt() :: string:
+    set {_mspt} to SparkProvider.get().mspt().poll(StatisticWindow.MillisPerTick.SECONDS_10).mean()
+    if ({_mspt} > 50):
+        set {_c} to "§c"
+    else if ({_mspt} > 40):
+        set {_c} to "§e"
+    else:
+        set {_c} to "§a"
+    set {_mspt} to round({_mspt}*10)/10
+    if "%{_mspt}%" doesn't contain ".":
+        set {_mspt} to "%{_mspt}%.0"
+    return "%{_c}%%{_mspt}%"
+
 function getFormattedCpu() :: string:
     set {_usage} to SparkProvider.get().cpuSystem().poll(StatisticWindow.CpuUsage.SECONDS_10)
     if ({_usage} > 0.9):
