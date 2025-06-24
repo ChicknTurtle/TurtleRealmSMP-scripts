@@ -53,8 +53,10 @@ on custom item interact with "turtle:chorium_case_filled":
     set {_portalhit} to ({_portalhit} ~ vector(-0,-0.5,-0))
     set {_hit} to ({_portalhit} ? {_hit})
     set {_startLoc} to (player's location)
-    relative tp player to {_hit}
-    set fall distance of player to 0
+    set (yaw of {_hit}) to (yaw of player)
+    set (pitch of {_hit}) to (pitch of player)
+    teleport player to {_hit} while retaining (vehicle,passengers,xyz velocity)
+    set (fall distance of player) to 0
     set {-playerdata::%player%::canCloudJump} to true
     set (boolean tag "ignore_fall_damage_from_current_explosion" of (full nbt of player)) to false
     set {_v} to normalized (vector from {_startLoc} to {_hit})
