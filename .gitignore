@@ -1,5 +1,6 @@
-# System files
+# System/IDE files
 .DS_Store
+/.vscode
 
 # Skript files
 /variables.csv
@@ -9,5 +10,4 @@
 # Custom hidden files
 /scripts/test/
 /scripts/env.sk
-/scripts/customItems/yamls/example-items.yml
 /scripts/uploads/
