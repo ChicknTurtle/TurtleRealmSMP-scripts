@@ -1,0 +1,23 @@
+
+function getSlabMaterial(slab:item) :: item:
+    set {_r::*} to (recipes for {_slab})
+    loop {_r::*}:
+        set {_i::*} to (ingredients of recipe loop-value)
+        (1st element of {_i::*}) is (2nd element of {_i::*})
+        (2nd element of {_i::*}) is (3rd element of {_i::*})
+        return (1st element of {_i::*})
+
+when ready to load recipes:
+    loop (tag contents of block tag "minecraft:slabs"):
+        set {_slab} to loop-value
+        set {_block} to (getSlabMaterial({_slab}))
+        {_block} is set
+        set {_blockid} to (namespaced key from (raw name of {_block})).getKey()
+        register shapeless recipe:
+            id: "turtle:%{_blockid}%_from_slabs"
+            result: {_block}
+            category: "building"
+            group: {_blockid}
+            ingredients:
+                add {_slab} to ingredients
+                add {_slab} to ingredients
