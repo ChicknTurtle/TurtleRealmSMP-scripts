@@ -5,15 +5,21 @@ options:
     maxDistanceSneaking: 15
 
 when ready to register custom items:
-    set (custom item "turtle:chorium_case") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_case"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}") with lore "§50/{@maxAmount}"
+    # chorium case
+    set (custom item "turtle:chorium_case") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_case"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
+    set (remove nbt of (custom item "turtle:chorium_case")) to ("minecraft:food","minecraft:consumable")
     apply use cooldown component to (custom item "turtle:chorium_case"):
         seconds: 1 second
         group: "minecraft:ender_pearl"
+    set component lore of (custom item "turtle:chorium_case") to getLore()
+    # chorium case filled
     set (custom item "turtle:chorium_case_filled") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_case_filled"",""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
     apply use cooldown component to (custom item "turtle:chorium_case_filled"):
         seconds: 1 second
         group: "minecraft:ender_pearl"
     add custom interact to (custom item "turtle:chorium_case_filled")
+    set component lore of (custom item "turtle:chorium_case_filled") to getLore()
+    set (kept lore amount of (custom item "turtle:chorium_case_filled")) to 1
 
 when ready to load recipes:
     register smithing transform recipe:
@@ -23,16 +29,37 @@ when ready to load recipes:
         base: heart of the sea
         addition: custom item "turtle:chorium_ingot"
 
-local function updateCase(case:item) :: item:
-    set {_amount} to (int tag "storedPearls" of (custom nbt of {_case}))
-    set lore of {_case} to ("§5%{_amount}%/{@maxAmount}")
-    if {_amount} <= 0:
-        set item id of {_case} to "turtle:chorium_case"
-        update {_case}
-    else:
-        set item id of {_case} to "turtle:chorium_case_filled"
-        update {_case}
-    return {_case}
+local function getLore() :: objects:
+    set {_c1} to (text component from "§d0§5/{@maxAmount}")
+    set (italic format of {_c1}) to false
+
+    # description
+    set {_c2} to (text component from "§7Capable of storing a large amount of ender pearls")
+    set (italic format of {_c2}) to false
+
+    set {_c3::1} to (text component from "§7Use ")
+    set {_c3::2} to (keybind component from "key.use")
+    set (color format of {_c3::2}) to rgb(102,217,217)
+    set {_c3::3} to (text component from "§7 to teleport at the cost of a pearl")
+    set (italic format of {_c3::*}) to false
+
+    set {_c4::1} to (text component from "§7Hold ")
+    set {_c4::2} to (keybind component from "key.sneak")
+    set (color format of {_c4::2}) to rgb(102,217,217)
+    set {_c4::3} to (text component from "§7 to shorten the maximum distance")
+    set (italic format of {_c4::*}) to false
+
+    return ({_c1}, {_c2}, (merge components {_c3::*}), (merge components {_c4::*}))
+
+local function updateItem(item:item) :: item:
+    set {_amount} to (int tag "storedPearls" of (custom nbt of {_item}))
+    # lore
+    set {_c} to (text component from "§d%{_amount}%§5/{@maxAmount}")
+    set (italic format of {_c}) to false
+    set (line 1 of component lore of {_item}) to {_c}
+    # update item
+    set (item id of {_item}) to ("turtle:chorium_case" if ({_amount} <= 0) else "turtle:chorium_case_filled")
+    return updated {_item}
 
 # show tp indicator
 on player tick:
@@ -46,6 +73,7 @@ on player tick:
 
 # teleport
 on custom item interact with "turtle:chorium_case_filled":
+    set {_case} to (player's offhand tool) if (event-equipmentslot is off hand slot) else (player's tool)
     set {_dist} to (({@maxDistanceSneaking} if (player is pressing sneak key) else {@maxDistance}))
     set {_ray} to (raytrace from player with max distance {_dist} while ignoring passable blocks)
     set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
@@ -68,18 +96,21 @@ on custom item interact with "turtle:chorium_case_filled":
         make 5 of witch at {_loc}
         set {_loc} to ({_loc} ~ {_v})
     play sound "minecraft:entity.player.teleport" in player category at player
-    # cooldown / swing
-    player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
+    # swing hand
     if event-equipmentslot is off hand:
         make player swing their offhand
     else:
         make player swing their hand
     # lower count
     player's gamemode isn't creative
-    set {_amount} to ((int tag "storedPearls" of custom nbt of player's tool) ? 1)
+    set {_amount} to ((int tag "storedPearls" of custom nbt of {_case}) ? 1)
     set {_newamount} to {_amount} - 1
-    set (int tag "storedPearls" of (custom nbt of player's tool)) to {_newamount}
-    set player's tool to updateCase(player's tool)
+    set (int tag "storedPearls" of (custom nbt of {_case})) to {_newamount}
+    set {_case} to updateItem({_case})
+    if (event-equipmentslot is off hand slot):
+        set player's offhand tool to {_case}
+    else:
+        set player's tool to {_case}
 
 # insert/extract pearls
 on inventory click:
@@ -100,7 +131,7 @@ on inventory click:
                 set {_remaining} to 0
             # update item
             set (int tag "storedPearls" of (custom nbt of event-slot)) to {_newamount}
-            set event-slot to updateCase(event-slot)
+            set event-slot to updateItem(event-slot)
             set (player's cursor slot) to ({_remaining} of ender pearl)
             # effects
             play sound "minecraft:item.bundle.insert" in players category at player to player
@@ -118,7 +149,7 @@ on inventory click:
                 set {_take} to 16
             # update item
             set (int tag "storedPearls" of (custom nbt of event-slot)) to {_newamount}
-            set event-slot to updateCase(event-slot)
+            set event-slot to updateItem(event-slot)
             set (player's cursor slot) to ({_take} of ender pearl)
             # effects
             play sound "minecraft:item.bundle.remove_one" in players category at player to player
@@ -139,7 +170,7 @@ on inventory click:
                 set {_remaining} to 0
             # update item
             set (int tag "storedPearls" of (custom nbt of (player's cursor slot))) to {_newamount}
-            set (player's cursor slot) to updateCase(player's cursor slot)
+            set (player's cursor slot) to updateItem(player's cursor slot)
             set event-slot to ({_remaining} of ender pearl)
             # effects
             play sound "minecraft:item.bundle.insert" in players category at player to player
@@ -157,7 +188,7 @@ on inventory click:
                 set {_take} to 16
             # update item
             set (int tag "storedPearls" of (custom nbt of (player's cursor slot))) to {_newamount}
-            set (player's cursor slot) to updateCase(player's cursor slot)
+            set (player's cursor slot) to updateItem(player's cursor slot)
             set event-slot to ({_take} of ender pearl)
             # effects
             play sound "minecraft:item.bundle.remove_one" in players category at player to player
@@ -178,6 +209,6 @@ on entity added to world:
             ({_amount} + {_size}) <= {@maxAmount}
             delete (entity within loop-value)
             set (int tag "storedPearls" of (custom nbt of (item of event-entity))) to ({_amount} + {_size})
-            set (item of event-entity) to updateCase(item of event-entity)
+            set (item of event-entity) to updateItem(item of event-entity)
             play sound "minecraft:item.bundle.insert" in players category at event-entity
             exit loop

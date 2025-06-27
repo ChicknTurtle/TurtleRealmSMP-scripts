@@ -9,15 +9,6 @@ when ready to register custom items:
         damage_on_hurt: false
 
 when ready to load recipes:
-    register shaped recipe:
-        id: "turtle:chorium_upgrade_smithing_template"
-        result: 2 of custom item "turtle:chorium_upgrade_smithing_template"
-        category: "misc"
-        shape: "#S#", "#C#", "###"
-        ingredients:
-            set ingredient of "#" to diamond
-            set ingredient of "C" to end stone
-            set ingredient of "S" to custom item "turtle:chorium_upgrade_smithing_template"
     register smithing transform recipe:
         id: "turtle:chorium_elytra_smithing"
         result: custom item "turtle:chorium_elytra"
