@@ -26,7 +26,7 @@ function discordChat(msg:string, p:player):
             loop-value is "xaero-waypoint"
             set {_name} to {_parts::%loop-iteration+1%}
             stop loop
-        set {_name} to "Shared Waypoint" if {_name} is ""
+        set {_name} to "Shared Waypoint" if ({_name} ? "") is ""
         discordSend(":round_pushpin: %{_p}'s name% shared a waypoint called **%{_name}%**")
         stop
     # chat

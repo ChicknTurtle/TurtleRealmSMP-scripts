@@ -8,50 +8,72 @@ import:
 
 on skript start:
     loadCustomItems()
-local function loadCustomItems():
-    clear {-customItems::*}
-    # Load items
-    log info "‍🔥 Loading custom items..."
-    wait 1 tick
-    call custom event "customItemsReady"
-    set {_s} to "" if (size of {-customItems::*} is 1) else "s"
-    log info "Loaded &b%size of {-customItems::*}% &rcustom item%{_s}%."
-    # Load recipes
+    loadAllRecipes()
+local function loadAllRecipes():
     log info "‍🔥 Loading custom recipes..."
     Bukkit.resetRecipes()
     call custom event "recipesReady"
     unlock recipes all recipes for all players
     update server recipes
+    log info "Loaded &b%size of all recipes% &rrecipes."
+local function loadCustomItems():
+    clear {-customItems::*}
+    log info "‍🔥 Loading custom items..."
+    call custom event "customItemsReady"
+    set {_s} to "" if (size of {-customItems::*} is 1) else "s"
+    log info "Loaded &b%size of {-customItems::*}% &rcustom item%{_s}%."
 
-brig command /turtle:reloaditems:
+# Custom items command
+brig command tree /turtle:customitems:
     permission: op
-    trigger:
-        send "Reloading all custom items..." to command sender
-        loadCustomItems()
-
-# Custom give command for custom items
-brig command /turtle:givecustom <players:players>:
-    permission: op
-    arguments:
-        register namespacedkey arg "item" using indexes of {-customItems::*}
-        register optional int arg "count" with min 1 and max 6400
-    trigger:
-        set {_item} to {_item} ? ""
-        set {_count} to {_count} ? 1
-        if {-customItems::%{_item}%} isn't set:
-            send "§cUnknown custom item '%{_item}%'" to command sender
-            stop
-        set {_customItem} to {-customItems::%{_item}%}
-        give or drop {_count} of {_customItem} to {_players::*}
-        set {_c::1} to (text component from "Gave %{_count}% ")
-        set {_c::2} to (item chat component of {_customItem})
-        set {_c::3} to (text component from " to ")
-        set {_c::3} to (text component from " to ")
-        if (size of {_players::*}) > 1:
-            set {_c::4} to (text component from "%size of {_players::*}% players")
-        else:
-            set {_c::4} to playerComponent(first element of {_players::*})
-        send components (merge components {_c::*}) to command sender
+    aliases: ci
+    literal arg "give":
+        players arg "players":
+            namespacedkey arg "item":
+                suggestions:
+                    apply suggestion (indexes of {-customItems::*})
+                optional int arg "count" with min 1 and max 6400:
+                    trigger:
+                        set {_item} to {_item} ? ""
+                        set {_count} to {_count} ? 1
+                        if {-customItems::%{_item}%} isn't set:
+                            send "§cUnknown custom item '%{_item}%'" to command sender
+                            stop
+                        set {_customItem} to {-customItems::%{_item}%}
+                        give or drop {_count} of {_customItem} to {_players::*}
+                        set {_c::1} to (text component from "Gave %{_count}% ")
+                        set {_c::2} to (item chat component of {_customItem})
+                        set {_c::3} to (text component from " to ")
+                        set {_c::3} to (text component from " to ")
+                        if (size of {_players::*}) > 1:
+                            set {_c::4} to (text component from "%size of {_players::*}% players")
+                        else:
+                            set {_c::4} to playerComponent(first element of {_players::*})
+                        send components (merge components {_c::*}) to command sender
+    literal arg "reload":
+        literal arg "items":
+            trigger:
+                send "§fReloading all custom items..." to command sender
+                loadCustomItems()
+                send "§aFinished reloading custom items!" to command sender
+        literal arg "recipes":
+            trigger:
+                send "§fReloading all recipes..." to command sender
+                loadAllRecipes()
+                send "§aFinished reloading recipes!" to command sender
+        literal arg "all":
+            trigger:
+                send "§fReloading all custom items and recipes..." to command sender
+                loadCustomItems()
+                send "§bFinished reloading custom items..." to command sender
+                loadAllRecipes()
+                send "§aFinished reloading recipes!" to command sender
+        trigger:
+            send "§fReloading all custom items and recipes..." to command sender
+            loadCustomItems()
+            send "§bFinished reloading custom items..." to command sender
+            loadAllRecipes()
+            send "§aFinished reloading recipes!" to command sender
 
 # Effects and expressions for handling custom items
 
@@ -68,8 +90,37 @@ effect:
             nutrition: 0
             saturation: 0
             can_always_eat: true
-        set (boolean tag "hasCustomInteract" of (custom nbt of {_item})) to true
+        set (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) to true
         set raw expression expr-1 to {_item}
+
+# Set 'remove nbt tags' of an item
+# These tags will be forcefully removed from the item when it is updated
+plural expression:
+    return type: strings
+    loop of: tag
+    patterns:
+        remove nbt [strings|tags] of %item%
+        %item%'s remove nbt [strings|tags]
+    get:
+        return (string list tag "customItems;removeNbt" of (custom nbt of (expr-1)))
+    set:
+        set {_item} to expr-1
+        set (string list tag "customItems;removeNbt" of (custom nbt of {_item})) to (change values)
+        set (raw expression expr-1) to {_item}
+
+# Set 'kept lore amount' of an item
+# This number of lore lines will be retained when the item is updated
+expression:
+    return type: integer
+    patterns:
+        kept (lore|tooltip) (lines|amount) of %item%
+        %item%'s kept (lore|tooltip) (lines|amount)
+    get:
+        return (int tag "customItems;keepLore" of (custom nbt of (expr-1)))
+    set:
+        set {_item} to expr-1
+        set (int tag "customItems;keepLore" of (custom nbt of {_item})) to (change value)
+        set (raw expression expr-1) to {_item}
 
 # Get all custom items
 plural expression:
@@ -124,15 +175,15 @@ expression:
 item property item id:
     return type: string
     get:
-        set {_id} to (string tag "customId" of (custom nbt of expr-1))
+        set {_id} to (string tag "customItems;id" of (custom nbt of expr-1))
         return {_id} if {_id} is set else (raw name of expr-1)
     set:
         set {_item} to expr-1
-        set (string tag "customId" of (custom nbt of {_item})) to change value
+        set (string tag "customItems;id" of (custom nbt of {_item})) to change value
         set (raw expression expr-1) to {_item}
     delete:
         set {_item} to expr-1
-        delete (string tag "customId" of (custom nbt of {_item}))
+        delete (string tag "customItems;id" of (custom nbt of {_item}))
         set (raw expression expr-1) to {_item}
 
 # Update an item based on its custom id
@@ -143,28 +194,44 @@ expression:
         set {_item} to expr-1
         if {_item} ? air is air:
             return {_item}
-        set {_rawitem} to (custom item ({_item}'s item id)) ? {_item}
+        # update legacy items
+        if (string tag "customId" of (custom nbt of {_item})) is set:
+            set (string tag "customItems;id" of (custom nbt of {_item})) to (string tag "customId" of (custom nbt of {_item}))
+            delete (string tag "customId" of (custom nbt of {_item}))
+        # kept lore
+        set {_keepLore} to (int tag "customItems;keepLore" of (custom nbt of {_item}))
+        if {_keepLore} is set:
+            set {_keptLore::*} to (first {_keepLore} elements of (component lore of {_item}))
+        # update nbt
+        set {_rawitem} to (custom item (item id of {_item})) ? {_item}
         if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
             (int tag "minecraft:damage" of (vanilla nbt of {_rawitem})) isn't set
             delete (int tag "minecraft:damage" of (nbt of {_item}))
         set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
         add nbt of {_item} to nbt of {_newitem}
         add nbt of {_rawitem} to nbt of {_newitem}
+        # finalize
+        loop (string list tag "customItems;removeNbt" of (custom nbt of {_rawitem})):
+            delete tag loop-value of (nbt of {_newitem})
+        if {_keepLore} is set:
+            loop {_keepLore} times:
+                set (line loop-iteration of component lore of {_newitem}) to {_keptLore::%loop-iteration%}
         return {_newitem}
 effect:
     patterns:
         update [[custom] item] %item%
     trigger:
-        set (raw expression expr-1) to updated expr-1
+        set (raw expression expr-1) to (updated expr-1)
 
 # Handle existing custom items
 
 # Custom interact behavior
 on consume with priority lowest:
     set {_item} to event-item
-    (boolean tag "hasCustomInteract" of (custom nbt of {_item})) is true
+    (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) is true
     cancel event
     set event-item to {_item}
+    try player.setCooldown(event-item, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of event-item)))
     set {_eventValues::player} to event-player
     set {_eventValues::item} to event-item
     set {_eventValues::world} to event-world
@@ -189,7 +256,8 @@ on inventory slot change:
 # chest loot generating
 on loot generate:
     loop loot:
-        update loop-value
+        add (updated loop-value) to {_newloot::*}
+    set loot to {_newloot::*}
 # crafting
 on preparing craft:
     update event-slot

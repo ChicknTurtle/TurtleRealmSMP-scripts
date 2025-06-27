@@ -35,8 +35,8 @@ on chunk generate:
                     set scale attribute of event-entity to 1.5
                     set max health of event-entity to 50
                     heal event-entity
-                    set boolean tag "custom;noTeleport" of nbt of event-entity to true
-                    set string tag "custom;special" of nbt of event-entity to "vault_minion"
+                    set boolean tag "noTeleport" of custom nbt of event-entity to true
+                    set string tag "special" of custom nbt of event-entity to "vault_minion"
             # boss
             else if ({_block} is (large amethyst bud)):
                 spawn shulker at (block under loop-block):
@@ -45,5 +45,5 @@ on chunk generate:
                     set scale attribute of event-entity to 3
                     set max health of event-entity to 100
                     heal event-entity
-                    set boolean tag "custom;noTeleport" of nbt of event-entity to true
-                    set string tag "custom;special" of nbt of event-entity to "vault_boss"
+                    set boolean tag "noTeleport" of custom nbt of event-entity to true
+                    set string tag "special" of custom nbt of event-entity to "vault_boss"

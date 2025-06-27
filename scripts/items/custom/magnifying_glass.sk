@@ -1,15 +1,16 @@
 
 when ready to register custom items:
     set (custom item "turtle:magnifying_glass") to (firework star with nbt from "{""minecraft:item_model"":""turtle:magnifying_glass"",""minecraft:item_name"":""Magnifying Glass"",""minecraft:max_stack_size"":1}")
+    apply use cooldown component to (custom item "turtle:magnifying_glass"):
+        seconds: 3 seconds
+        group: "turtle:magnifying_glass"
+    # lore
     set {_c::1} to (text component from "§7Use ")
     set {_c::2} to (keybind component from "key.use")
     set (color format of {_c::2}) to rgb(102,217,217)
     set {_c::3} to (text component from "§7 to display info about blocks and entities")
     set (italic format of {_c::*}) to false
     set component lore of (custom item "turtle:magnifying_glass") to (merge components {_c::*})
-    apply use cooldown component to (custom item "turtle:magnifying_glass"):
-        seconds: 3 seconds
-        group: "turtle:magnifying_glass"
 
 when ready to load recipes:
     register shaped recipe:
@@ -28,7 +29,7 @@ import:
 
 on right click:
     (item id of player's tool) is "turtle:magnifying_glass"
-    player.hasCooldown(1 of player's tool) is false
+    player.hasCooldown((custom item "turtle:magnifying_glass")) is false
     set {_e} to (clicked entity)
     set {_b} to (clicked block)
     if {_e} is set:
@@ -122,6 +123,6 @@ on right click:
     else:
         exit trigger
     cancel event
-    play sound "minecraft:entity.illusioner.prepare_mirror" in player category at player to player
-    player.setCooldown(1 of player's tool, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of player's tool)))
+    play sound "minecraft:ui.loom.take_result" in player category at player to player
+    player.setCooldown((custom item "turtle:magnifying_glass"), floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of (custom item "turtle:magnifying_glass"))))
     make player swing their hand

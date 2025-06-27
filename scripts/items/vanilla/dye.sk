@@ -31,13 +31,13 @@ local function dyeMob(e:entity, p:player) :: boolean:
 on right click:
     {enabledFeatures::dyeing} is true
     (tag values of item tag "dyes") contains player's tool
-    if block tag "wool" contains event-block:
+    if event-block is tagged with (block tag "wool"):
         dyeBlock("wool", event-block, player) is true
         cancel event
-    if block tag "wool_carpets" contains event-block:
+    if event-block is tagged with (block tag "wool_carpets"):
         dyeBlock("carpet", event-block, player) is true
         cancel event
-    if block tag "shulker_boxes" contains event-block:
+    if event-block is tagged with (block tag "shulker_boxes"):
         dyeBlock("shulker box", event-block, player) is true
         cancel event
     if event-entity is a shulker:

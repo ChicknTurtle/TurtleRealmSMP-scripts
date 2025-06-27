@@ -7,27 +7,27 @@ on entity add to world:
 
 # cancel special shulkers from doing stuff
 on shulker teleport:
-    boolean tag "custom;noTeleport" of nbt of event-entity is true
+    boolean tag "noTeleport" of custom nbt of event-entity is true
     cancel event
 on vehicle enter:
     event-entity is a shulker
-    boolean tag "custom;noTeleport" of nbt of event-entity is true
+    boolean tag "noTeleport" of custom nbt of event-entity is true
     cancel event
 
 # ender vault boss shulker
 on shoot:
     shooter is a shulker
     projectile is a shulker bullet
-    (boolean tag "custom;customShoot" of nbt of projectile) isn't true
-    (string tag "custom;special" of nbt of shooter) is "vault_boss" or "vault_minion"
+    (boolean tag "customShoot" of custom nbt of projectile) isn't true
+    (string tag "special" of custom nbt of shooter) is "vault_boss" or "vault_minion"
     set glowing of projectile to true
     set {_amount} to 2
-    if (string tag "custom;special" of nbt of shooter) is "vault_boss":
+    if (string tag "special" of custom nbt of shooter) is "vault_boss":
         set {_amount} to 7
     set {_projectile} to projectile
     spawn {_amount} of shulker bullet at projectile:
         set glowing of event-entity to true
-        set (boolean tag "custom;customShoot" of nbt of event-entity) to true
+        set (boolean tag "customShoot" of custom nbt of event-entity) to true
         set (uuid tag "Owner" of nbt of event-entity) to (uuid tag "Owner" of nbt of {_projectile})
         set (uuid tag "Target" of nbt of event-entity) to (uuid tag "Target" of nbt of {_projectile})
         set (int tag "Steps" of nbt of event-entity) to (int tag "Steps" of nbt of {_projectile})
@@ -45,7 +45,7 @@ on damage by shulker bullet:
         set damage to ((damage+3)*2.5)
 
 on death of shulker:
-    string tag "custom;special" of nbt of victim is "vault_boss"
+    string tag "special" of custom nbt of victim is "vault_boss"
     set {_amount} to (random integer from 1 to 2)
     set {_tool} to ((direct entity of damage source)'s tool)
     if {_tool} is enchanted with looting:

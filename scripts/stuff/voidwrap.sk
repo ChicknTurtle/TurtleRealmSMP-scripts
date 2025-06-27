@@ -16,7 +16,7 @@ local function warp(e:entity, world:text, coord:number):
     set {_dest} to location({_x}, {_coord}, {_z}, {_world}, {_yaw}, {_pitch})
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
     make 15 of witch at {_loc} with force
-    relative tp {_e} to {_dest}
+    teleport {_e} to {_dest} while retaining (vehicle,passengers,xyz velocity)
     try {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_e}),floor(y-coord of {_e}),floor(z-coord of {_e})))
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
     make 15 of witch at {_dest} with force

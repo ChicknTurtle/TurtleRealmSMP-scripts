@@ -1,7 +1,7 @@
 
 # keep components nbt when broken
 on mine:
-    block tag "shulker_boxes" contains event-block
+    event-block is tagged with (block tag "shulker_boxes")
     player's gamemode isn't creative
     (compound tag "components" of (full nbt of event-block)) is set
     set {_componentsnbt} to compound tag "components" of full nbt of event-block
@@ -17,7 +17,7 @@ on mine:
 import:
     io.papermc.paper.event.block.BlockBreakBlockEvent
 on BlockBreakBlockEvent:
-    block tag "shulker_boxes" contains event.getBlock()
+    event.getBlock() is tagged with (block tag "shulker_boxes")
     (compound tag "components" of (full nbt of event.getBlock())) is set
     set {_componentsnbt} to compound tag "components" of full nbt of event.getBlock()
     set {_drops::*} to ...event.getDrops()

@@ -32,7 +32,7 @@ on piston extend:
     (blockdata of {_b2}).isFaceSturdy({_face}, BlockSupport.FULL)
     if any:
         {@pressingRequiresObsidian} is false
-        block tag "minecraft:needs_diamond_tool" contains {_b2}
+        {_b2} is tagged with (block tag "minecraft:needs_diamond_tool")
     then:
         pressProcessBlock({_b}, {_face}.getOppositeFace().getDirection())
 
