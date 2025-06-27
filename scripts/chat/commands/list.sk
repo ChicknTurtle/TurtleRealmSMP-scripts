@@ -1,0 +1,12 @@
+
+brig command /turtle:list:
+    trigger:
+        set {_p::*} to (all players)
+        set {_size} to (size of {_p::*})
+        set {_s} to ("" if {_size} is 1 else "s")
+        set {_c::*} to "§b%{_size}% §7player%{_s}% online: §f"
+        loop {_p::*}:
+            add playerComponent(loop-value) to {_c::*}
+            loop-iteration isn't (size of {_p::*})
+            add "§7, §f" to {_c::*}
+        send components (merge components {_c::*})
