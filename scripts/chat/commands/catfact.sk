@@ -1,5 +1,5 @@
 
-command /catfact:
+brig command /turtle:catfact:
     trigger:
         async run 0 ticks later:
             set {_json} to (first element of urlfetch "https://catfact.ninja/fact")
