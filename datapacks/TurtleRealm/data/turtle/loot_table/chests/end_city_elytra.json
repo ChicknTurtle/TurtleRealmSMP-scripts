@@ -81,8 +81,27 @@
           ]
         },
         {
+          "type": "minecraft:item",
+          "name": "minecraft:elytra",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:enchantments": {
+                  "minecraft:mending": 1
+                }
+              }
+            }
+          ]
+        },
+        {
           "type": "item",
-          "weight": 9,
+          "weight": 8,
           "name": "minecraft:elytra",
           "quality": 1,
           "functions": [
