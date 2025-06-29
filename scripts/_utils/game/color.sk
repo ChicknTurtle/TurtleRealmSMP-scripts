@@ -87,7 +87,7 @@ expression:
 
 local function computeOffset(start:integer, end:integer, value:integer) :: number:
     set {_offset} to ({_value}-{_start}) / ({_end}-{_start})
-    return max(0, min(1, {_offset}))
+    return clamp({_offset}, 0, 1)
 
 local function interpolate(color1:color, color2:color, offset:number) :: color:
     set {_r} to ({_color1}.getRed() + ({_color2}.getRed() - {_color1}.getRed()) * {_offset})
