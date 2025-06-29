@@ -6,34 +6,22 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:netherite_scrap",
-          "weight": 85,
+          "name": "minecraft:firework_star",
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:chorium_cluster\"}"
+              "tag": "{customId:\"turtle:shulker_soul\"}"
             },
             {
               "function": "minecraft:set_count",
-              "count": 1
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 0,
+                "max": 2
+              }
             }
           ],
           "conditions": []
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:netherite_scrap",
-          "weight": 15,
-          "functions": [
-            {
-              "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:chorium_cluster\"}"
-            },
-            {
-              "function": "minecraft:set_count",
-              "count": 2
-            }
-          ]
         }
       ]
     },

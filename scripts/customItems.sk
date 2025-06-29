@@ -13,7 +13,7 @@ local function loadAllRecipes():
     log info "‍🔥 Loading custom recipes..."
     Bukkit.resetRecipes()
     call custom event "recipesReady"
-    unlock recipes all recipes for all players
+    unlock recipes (all recipes) for (all players)
     update server recipes
     log info "Loaded &b%size of all recipes% &rrecipes."
 local function loadCustomItems():
