@@ -9,7 +9,8 @@ options:
     # All entities can be picked up while in creative
 
 when ready to register custom items:
-    set (custom item "turtle:mob_bundle") to (black bundle with nbt from "{""minecraft:item_model"":""turtle:mob_bundle"",""minecraft:item_name"":""Mob Bundle"",""minecraft:rarity"":""uncommon"",""minecraft:damage_resistant"":{types:""#minecraft:is_fire""}}")
+    set (custom item "turtle:mob_bundle") to (black bundle with nbt from "{""minecraft:item_model"":""turtle:mob_bundle"",""minecraft:item_name"":""Mob Bundle"",""minecraft:rarity"":""uncommon""}")
+    make (custom item "turtle:mob_bundle") fire resistant
 
 when ready to load recipes:
     register shaped recipe:

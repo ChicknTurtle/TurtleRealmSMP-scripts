@@ -1,0 +1,13 @@
+
+on entity remove from world:
+    event-entity is a dropped item
+    event-entityremovecause is death (entityremovecause)
+    set {_loc} to (event-entity ~ vector(0.5,0.5,0.5))
+    set {_id} to (item id of (item of event-entity))
+    set {_amount} to (item amount of (item of event-entity))
+    # strong handle
+    if {_id} is "turtle:strong_handle":
+        drop {_amount} of (custom item "turtle:ravager_hide") at {_loc}
+    # diamond paxel
+    else if {_id} is "turtle:diamond_paxel":
+        drop 2*{_amount} of (custom item "turtle:ravager_hide") at {_loc}

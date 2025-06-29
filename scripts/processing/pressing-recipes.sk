@@ -18,6 +18,9 @@ local function addPressingRecipe(input:string, results:structs):
 
 when ready to load recipes:
     clear {-pressingRecipes::*}
+    # custom
+    addPressingRecipe("minecraft:obsidian", (pressResult("turtle:powdered_obsidian"), pressResult("minecraft:obsidian", 1, 0.85)))
+    # standard
     addPressingRecipe("minecraft:sugar_cane", pressResult("minecraft:paper"))
     addPressingRecipe("minecraft:dirt", pressResult("minecraft:dirt_path"))
     addPressingRecipe("minecraft:allium", (pressResult("minecraft:magenta_dye",2),pressResult("minecraft:purple_dye",2,0.1),pressResult("minecraft:pink_dye",1,0.1)))

@@ -1,0 +1,48 @@
+
+when ready to register custom items:
+    set (custom item "turtle:blazing_ingot") to (firework star with nbt from "{""minecraft:item_model"":""turtle:blazing_ingot"",""minecraft:item_name"":""Blazing Ingot"",""minecraft:rarity"":""uncommon""}")
+    make (custom item "turtle:blazing_ingot") fire resistant
+
+    set (custom item "turtle:blazing_nugget") to (firework star with nbt from "{""minecraft:item_model"":""turtle:blazing_nugget"",""minecraft:item_name"":""Blazing Nugget"",""minecraft:rarity"":""uncommon""}")
+    make (custom item "turtle:blazing_nugget") fire resistant
+
+    #set (custom item "turtle:blazing_upgrade_smithing_template") to (firework star with nbt from "{""minecraft:item_model"":""turtle:blazing_upgrade_smithing_template"",""minecraft:item_name"":""Blazing Upgrade"",""minecraft:rarity"":""uncommon""}") with lore ("§fSmithing Template","","§fApplies to:","§9 Diamond Pickaxe & Diamond Paxel","§fIngredients:","§9 Blazing Ingot")
+
+when ready to load recipes:
+    ###
+    register shaped recipe:
+        id: "turtle:blazing_upgrade_smithing_template"
+        result: 2 of custom item "turtle:blazing_upgrade_smithing_template"
+        category: "misc"
+        shape: "#S#", "#C#", "###"
+        ingredients:
+            set ingredient of "#" to diamond
+            set ingredient of "C" to nether bricks
+            set ingredient of "S" to custom item "turtle:blazing_upgrade_smithing_template"
+    ###
+    register shapeless recipe:
+        id: "turtle:blazing_nugget"
+        result: custom item "turtle:blazing_nugget"
+        group: "blazing_nugget"
+        category: "misc"
+        ingredients:
+            add iron nugget to ingredients
+            add (custom item "turtle:powdered_obsidian") to ingredients
+            add magma cream to ingredients
+            add blaze powder to ingredients
+            add blaze powder to ingredients
+    register shaped recipe:
+        id: "turtle:blazing_ingot_from_nuggets"
+        result: custom item "turtle:blazing_ingot"
+        group: "blazing_ingot"
+        category: "misc"
+        shape: "aaa", "aaa", "aaa"
+        ingredients:
+            set ingredient of "a" to (custom item "turtle:blazing_nugget")
+    register shapeless recipe:
+        id: "turtle:blazing_nugget_from_ingot"
+        result: 9 of (custom item "turtle:blazing_nugget")
+        group: "blazing_nugget"
+        category: "misc"
+        ingredients:
+            add (custom item "turtle:blazing_ingot") to ingredients

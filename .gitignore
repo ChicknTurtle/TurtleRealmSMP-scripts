@@ -4,6 +4,7 @@
 
 # Skript files
 /variables.csv
+/variables.csv.temp
 /backups
 /lang
 

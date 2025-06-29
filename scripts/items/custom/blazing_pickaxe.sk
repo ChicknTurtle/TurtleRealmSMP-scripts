@@ -1,27 +1,54 @@
 
 when ready to register custom items:
-    set (custom item "turtle:blazing_pickaxe") to (diamond pickaxe with nbt from "{""minecraft:item_model"":""turtle:blazing_pickaxe"",""minecraft:item_name"":""Blazing Pickaxe"",""minecraft:rarity"":""uncommon"",""minecraft:damage_resistant"":{types:""#minecraft:is_fire""}}") with lore "§r§7Automatically smelts block drops"
+    set (custom item "turtle:blazing_pickaxe") to (diamond pickaxe with nbt from "{""minecraft:item_model"":""turtle:blazing_pickaxe"",""minecraft:item_name"":""Blazing Pickaxe"",""minecraft:rarity"":""uncommon""}")
+    set (max durability of (custom item "turtle:blazing_pickaxe")) to 1000
+    make (custom item "turtle:blazing_pickaxe") fire resistant
+    # paxel
+    set (custom item "turtle:blazing_paxel") to (diamond axe with nbt from "{""minecraft:item_model"":""turtle:blazing_paxel"",""minecraft:item_name"":""Blazing Paxel"",""minecraft:rarity"":""uncommon""}")
+    apply tool component to (custom item "turtle:blazing_paxel"):
+        rules:
+            apply tool rule:
+                blocks: minecraft block tag "incorrect_for_diamond_tool"
+                correct_for_drops: false
+            apply tool rule:
+                blocks: minecraft block tag "mineable/axe"
+                speed: 8
+                correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/shovel"
+                speed: 8
+                correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/pickaxe"
+                speed: 8
+                correct_for_drops: true
+    set (max durability of (custom item "turtle:blazing_paxel")) to 1000
+    make (custom item "turtle:blazing_paxel") fire resistant
 
 when ready to load recipes:
     register shaped recipe:
         id: "turtle:blazing_pickaxe"
         result: custom item "turtle:blazing_pickaxe"
-        shape: "bgb", " s ", " s "
+        shape: "rir", " h ", " h "
         category: "equipment"
         ingredients:
-            set ingredient of "b" to blaze rod
-            set ingredient of "g" to golden pickaxe
-            set ingredient of "s" to netherite scrap
+            set ingredient of "i" to (custom item "turtle:blazing_ingot")
+            set ingredient of "r" to blaze rod
+            set ingredient of "h" to (custom item "turtle:reinforced_handle")
+    register shaped recipe:
+        id: "turtle:blazing_paxel"
+        result: custom item "turtle:blazing_paxel"
+        shape: "iii", "ihi", " h "
+        category: "equipment"
+        ingredients:
+            set ingredient of "i" to (custom item "turtle:blazing_ingot")
+            set ingredient of "h" to (custom item "turtle:reinforced_handle")
 
 on break:
-    # ignore if sneaking
-    player isn't sneaking
-    # doesn't change creative functionality
     gamemode of player isn't creative
-    # check if player is using blazing pickaxe
-    (item id of player's tool) is "turtle:blazing_pickaxe"
-    # doesn't work on containers
+    ("turtle:blazing_pickaxe", "turtle:blazing_paxel") contains (item id of player's tool)
     inventory of event-block isn't set
+    # smelt drops
     clear drops
     loop drops of event-block using player's tool as player:
         drop smelted loop-value at event-block's location ~ vector(0.5,0.5,0.5)

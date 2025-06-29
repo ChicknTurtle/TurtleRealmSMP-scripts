@@ -1,15 +1,15 @@
 
 import:
-    java.io.File
+    java.io.File as javaFile
 
 local function getFiles(dir:string) :: strings:
-    set {_dir} to new File({_dir})
+    set {_dir} to new javaFile({_dir})
     loop ...{_dir}.listFiles() where [input.isFile()]:
         add loop-value.getPath() to {_return::*}
     return {_return::*}
 
 local function getFilesRecursive(dir:string) :: strings:
-    set {_dir} to new File({_dir})
+    set {_dir} to new javaFile({_dir})
     loop ...{_dir}.listFiles():
         if loop-value.isDirectory():
             add getFilesRecursive(loop-value.getPath()) to {_return::*}
