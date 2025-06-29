@@ -1,0 +1,32 @@
+
+when ready to register custom items:
+    set (custom item "turtle:diamond_paxel") to (diamond axe with nbt from "{""minecraft:item_model"":""turtle:diamond_paxel"",""minecraft:item_name"":""Diamond Paxel"",""minecraft:rarity"":""uncommon""}")
+    apply tool component to (custom item "turtle:diamond_paxel"):
+        rules:
+            apply tool rule:
+                blocks: minecraft block tag "incorrect_for_diamond_tool"
+                correct_for_drops: false
+            apply tool rule:
+                blocks: minecraft block tag "mineable/axe"
+                speed: 8
+                correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/shovel"
+                speed: 8
+                correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/pickaxe"
+                speed: 8
+                correct_for_drops: true
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:diamond_paxel"
+        result: custom item "turtle:diamond_paxel"
+        shape: "asp", " h ", " h "
+        category: "equipment"
+        ingredients:
+            set ingredient of "a" to diamond axe
+            set ingredient of "s" to diamond shovel
+            set ingredient of "p" to diamond pickaxe
+            set ingredient of "h" to (custom item "turtle:strong_handle")

@@ -1,0 +1,33 @@
+
+when ready to register custom items:
+    # strong handle
+    set (custom item "turtle:strong_handle") to (firework star with nbt from "{""minecraft:item_model"":""turtle:strong_handle"",""minecraft:item_name"":""Strong Handle"",""minecraft:rarity"":""uncommon""}")
+    # reinforced handle
+    set (custom item "turtle:reinforced_handle") to (firework star with nbt from "{""minecraft:item_model"":""turtle:reinforced_handle"",""minecraft:item_name"":""Reinforced Handle"",""minecraft:rarity"":""uncommon""}")
+    make (custom item "turtle:reinforced_handle") fire resistant
+
+when ready to load recipes:
+    register shapeless recipe:
+        id: "turtle:strong_handle"
+        result: custom item "turtle:strong_handle"
+        category: "equipment"
+        ingredients:
+            add stick to ingredients
+            add (custom item "turtle:ravager_hide") to ingredients
+    register shapeless recipe:
+        id: "turtle:reinforced_handle"
+        result: custom item "turtle:reinforced_handle"
+        category: "equipment"
+        group: "turtle:reinforced_handle"
+        ingredients:
+            add (custom item "turtle:strong_handle") to ingredients
+            add netherite scrap to ingredients
+    register shapeless recipe:
+        id: "turtle:reinforced_handle2"
+        result: custom item "turtle:reinforced_handle"
+        category: "equipment"
+        group: "turtle:reinforced_handle"
+        ingredients:
+            add stick to ingredients
+            add (custom item "turtle:ravager_hide") to ingredients
+            add netherite scrap to ingredients
