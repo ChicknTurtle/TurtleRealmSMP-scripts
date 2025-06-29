@@ -1,7 +1,6 @@
 
 options:
-    resourcePackUrl: "https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip"
-    resourcePackHash: "a8db06d548c061c6407251139fab41b4ebdd7256"
+    resourcePackUrl: https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip
     resourcePackPrompt: "§bRequired for custom textures, sounds and other features"
     resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
@@ -10,6 +9,13 @@ on load:
     loop all worlds:
         set gamerule playersSleepingPercentage of loop-world to 0
         set gamerule doInsomnia of loop-world to false
+    log info "Fetching resource pack hash from {@resourcePackUrl}§r..."
+    async run 0 ticks later:
+        set {-resourcePackHash} to hashFromUrl("{@resourcePackUrl}")
+        if {-resourcePackHash} isn't set:
+            log error "Failed to fetch resource pack hash from {@resourcePackUrl}§r. Resource pack will not be sent to players."
+        else:
+            log info "Found resource pack hash: %{-resourcePackHash}%"
 
 # unlock recipes
 # send resource pack
@@ -20,7 +26,8 @@ on join:
 import:
     java.util.UUID
 local function sendResourcePack(p:player):
-    send resource pack {@resourcePackUrl} with id str(UUID.nameUUIDFromBytes("TurtleRealmSMP-main".getBytes())) with hash {@resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
+    if {-resourcePackHash} is set:
+        send resource pack "{@resourcePackUrl}" with id str(UUID.nameUUIDFromBytes("TurtleRealmSMP-main".getBytes())) with hash {-resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
 
 on resource pack decline:
     send {@resourcePackDeclineMsg} to player

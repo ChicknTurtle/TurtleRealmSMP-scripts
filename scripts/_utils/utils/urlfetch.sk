@@ -1,10 +1,36 @@
 
 import:
-    java.lang.StringBuffer
-    java.io.InputStreamReader
     java.io.BufferedReader
-    java.net.URL
+    java.io.InputStreamReader
+    java.math.BigInteger
     java.net.HttpURLConnection
+    java.net.URL
+    java.nio.file.Files
+    java.nio.file.Paths
+    java.nio.file.StandardCopyOption
+    java.security.DigestInputStream
+    java.security.MessageDigest
+    java.lang.String as javaString
+
+function asyncDownloadFile(url:string, path:string):
+    async run 0 ticks later:
+        downloadFile({_url}, {_path})
+
+function hashFromUrl(url:string) :: string:
+    set {_sha1} to MessageDigest.getInstance("SHA-1")
+    set {_input} to new URL({_url}).openStream()
+    set {_digestStream} to new DigestInputStream({_input}, {_sha1})
+    set {_tempFile} to Files.createTempFile("tempHashFile-", ".tmp")
+    Files.copy({_digestStream}, {_tempFile}, StandardCopyOption.REPLACE_EXISTING)
+    {_digestStream}.close()
+    {_input}.close()
+    Files.deleteIfExists({_tempFile})
+    set {_digest} to {_sha1}.digest()
+    return javaString.format("%%040x", new BigInteger(1, {_digest}))
+
+function downloadFile(url:string, path:string):
+    set {_stream} to new URL({_url}).openStream()
+    Files.copy({_stream}, Paths.get("%{_path}%"), StandardCopyOption.REPLACE_EXISTING)
 
 # Get content of an url
 # Will block main thread of server if not used in an async section
@@ -40,7 +66,7 @@ plural expression:
             {_buffer}.close()
             {_reader}.close()
         else:
-            log warn "Failed to fetch url %{_url}%%nl%%last java error%"
+            log warn "Failed to fetch url %{_url}%%nl%ERROR?: %last java error%"
         {_con}.disconnect()
 
         return {_response::*} ? {_}
