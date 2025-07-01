@@ -1,0 +1,9 @@
+
+on explode:
+    event-entity is creeper
+    chance of 0.1
+    clear exploded blocks
+    loop shuffled (rgb(240,0,50), rgb(240,150,0), rgb(240,220,0), rgb(50,240,0), rgb(0,160,240), rgb(240,0,240)):
+        launch small colored loop-value at (event-entity's eyes)
+        detonate last launched firework
+    play sound "minecraft:entity.firework_rocket.twinkle" in hostile category at (location of event-entity)
