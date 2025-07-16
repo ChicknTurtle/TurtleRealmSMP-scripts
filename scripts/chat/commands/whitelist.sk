@@ -2,12 +2,12 @@
 on load:
     set {-features::whitelist::name} to "Whitelist"
     set {-features::whitelist::desc} to "Enable a whitelist that players can add to"
-    set {-features::whitelist::warn} to "If disabled, anybody will be able to join"
     set {-features::whitelist::icon} to paper
 
+    {enabledFeatures::whitelist} is true
     server is whitelisted
     set the whitelist to false
-    log info "Vanilla whitelist has been disabled in place of custom whitelist feature."
+    log warn "Vanilla whitelist has been disabled in place of custom whitelist feature."
 
 brig command tree /turtle:whitelist:
     literal arg "add":
