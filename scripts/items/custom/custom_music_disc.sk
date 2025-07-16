@@ -1,0 +1,38 @@
+
+when ready to register custom items:
+    set (custom item "turtle:custom_music_disc") to (music disc creator with nbt from "{""minecraft:item_model"":""turtle:custom_music_disc"",""minecraft:item_name"":""Custom Music Disc"",""minecraft:jukebox_playable"":""turtle:custom_song"",""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}")
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:custom_music_disc"
+        result: custom item "turtle:custom_music_disc"
+        shape: "fgf", "gdg", "fgf"
+        category: "misc"
+        ingredients:
+            set ingredient of "f" to disc fragment 5
+            set ingredient of "g" to gold ingot
+            set ingredient of "d" to diamond
+
+function updateCustomMusicDisc(disc:item) :: item:
+    set {_name} to name of {_disc}
+    set {_song} to getNbsSong({_name})
+    if any:
+        {_name} isn't set
+        {_song} isn't set
+    then:
+        clear lore of {_disc}
+        return {_disc}
+    if {_song}.author ? "" isn't "":
+        add "§7%{_song}.author%" to {_c::*}
+    if {_song}.originalAuthor ? "" isn't "":
+        add "§7Originally by %{_song}.originalAuthor%" to {_c::*}
+    set {_c::*} to {_c::*} ? "§7No song info"
+    set lore of {_disc} to {_c::*}
+    return {_disc}
+
+on anvil prepare:
+    item id of event-slot is "turtle:custom_music_disc"
+    set event-slot to updateCustomMusicDisc(event-slot)
+    name of event-slot is set
+    lore of event-slot isn't set
+    set event-slot to air

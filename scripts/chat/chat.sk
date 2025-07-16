@@ -13,18 +13,6 @@ on load:
     set {-features::customchat::desc} to "Better looking and colorable chat messages\n[item] is replaced with your held item"
     set {-features::customchat::icon} to oak sign
 
-    set {-features::chatfilter::name} to "Chat filter"
-    set {-features::chatfilter::desc} to "Filter out bad words from chat"
-    set {-features::chatfilter::icon} to barrier
-
-    # Create badwords list
-    if {-env::dev} is true:
-        set {_url} to "https://gist.githubusercontent.com/lasagnaphil/7667eaeddb6ed0c565f0cb653d756942/raw/e05dbc73062aa1679b733e8f9f9b32e003c59d0e/fruits.txt"
-    else:
-        set {_url} to "https://raw.githubusercontent.com/adam-dziedzic/list-of-banned-words/refs/heads/master/en"
-    async run 0 ticks later:
-        set {-badwords::*} to urlfetch {_url}
-
 on join:
     {enabledFeatures::joinleavemsgs} is true
     set {_c::1} to "§a+ §7| "
@@ -44,11 +32,14 @@ on leave:
     discordSend("**-** %player%")
 
 on death of player:
+    event.getShowDeathMessages() is true
     {enabledFeatures::deathmsgs} is true
-    set {_msg} to death message
-    set death message to "§c☠ §7%{_msg}%"
-    gamerule showDeathMessages of world of victim is true
-    discordSend(":skull: %uncolored {_msg}%")
+    discordSend(":skull: %uncolored death message%")
+    set {_c} to (text component from "§c☠ ")
+    set {_c1} to component death message
+    set color format of {_c1} to light gray
+    add {_c1} to {_c}
+    set component death message to {_c}
 
 on async chat:
     {enabledFeatures::customchat} is true
@@ -69,12 +60,6 @@ on async chat:
         set {_name} to (effective name of (player's tool))
         component replace "\[item]" with (item chat component of (player's tool)) in {_format}
         replace "[item]" with "**[%{_name}%]**" in {_msg}
-
-    # replace bad words
-    if {enabledFeatures::chatfilter} is true:
-        loop {-badwords::*}:
-            replace regex "(?i)%loop-value%" with "\\****" in {_msg}
-            component replace "(?i)%loop-value%" with "§c****" in {_format}
 
     # send message
     set async chat format to {_format}

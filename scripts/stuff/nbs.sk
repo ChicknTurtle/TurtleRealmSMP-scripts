@@ -1,0 +1,144 @@
+
+import:
+    java.io.File
+    com.xxmicloxx.NoteBlockAPI.NoteBlockAPI
+    com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder
+    com.xxmicloxx.NoteBlockAPI.songplayer.PositionSongPlayer
+    com.xxmicloxx.NoteBlockAPI.event.SongEndEvent
+    com.xxmicloxx.NoteBlockAPI.model.SoundCategory
+
+function getBlockKey(block:block) :: string:
+    return "block:%floor(x-coord of {_block})%,%floor(y-coord of {_block})%,%floor(z-coord of {_block})%,%world of {_block}%"
+
+function getAllNbsFiles() :: objects:
+    set {_file} to new File("nbsSongs")
+    {_file}.exists() is true
+    loop ...{_file}.listFiles() where [input.getName() ends with ".nbs"]:
+        add getFileName(loop-value.getName()) to {_names::*}
+    return {_names::*}
+
+function getNbsSong(songName:string) :: object:
+    if {_songName} isn't set:
+        return {_}
+    set {_file} to new File("nbsSongs/%{_songName}%.nbs")
+    if {_file}.exists() is true:
+        return NBSDecoder.parse({_file})
+
+function playNbsSongAtBlock(songName:string, block:block) :: boolean:
+    set {_song} to getNbsSong({_songName})
+    if {_song} is set:
+        set {_songPlayer} to new PositionSongPlayer({_song}, SoundCategory.RECORDS)
+        {_songPlayer}.setTargetLocation(location of {_block})
+        {_songPlayer}.setDistance(64)
+        loop all players in world of {_block}:
+            {_songPlayer}.addPlayer(loop-player)
+        {_songPlayer}.setPlaying(true)
+        stopNbsSongOfBlock({_block})
+        set {-playingNbsSongs::%getBlockKey({_block})%} to {_songPlayer}
+        return true
+    return false
+
+function stopNbsSongOfBlock(block:block):
+    set {_songPlayer} to {-playingNbsSongs::%getBlockKey({_block})%}
+    {_songPlayer} is set
+    {_songPlayer}.destroy()
+    delete {-playingNbsSongs::%getBlockKey({_block})%}
+
+function stopAllNbsSongs():
+    loop {-playingNbsSongs::*}:
+        loop-value.destroy()
+    clear {-playingNbsSongs::*}
+
+on game event jukebox_play:
+    set {_block} to (block at event-location)
+    long tag "ticks_since_song_started" of nbt of {_block} is 0
+    set {_disc} to (blockstate of {_block}).getRecord()
+    (item id of {_disc}) is "turtle:custom_music_disc"
+    set {_songName} to (name of {_disc})
+    if {_songName} is set:
+        playNbsSongAtBlock({_songName}, {_block}) is true
+        exit trigger
+    (blockstate of {_block}).stopPlaying()
+
+on game event jukebox_stop_play:
+    set {_block} to (block at event-location)
+    stopNbsSongOfBlock({_block})
+
+on SongEndEvent:
+    remove event.getSongPlayer() from {-playingNbsSongs::*}
+    set {_loc} to try event.getSongPlayer().getTargetLocation()
+    {_loc} is set
+    block at {_loc} is jukebox
+    (blockstate of block at {_loc}).stopPlaying()
+
+on join:
+    loop {-playingNbsSongs::*}:
+        world of (try loop-value.getTargetLocation()) is event-world
+        loop-value.addPlayer(player)
+on player world change:
+    loop {-playingNbsSongs::*}:
+        world of (try loop-value.getTargetLocation()) is event-world
+        loop-value.addPlayer(player)
+
+brig command tree /turtle:nbs:
+    literal arg "list":
+        optional int arg "page":
+            trigger:
+                set {_songs::*} to sorted getAllNbsFiles()
+                if size of {_songs::*} is 0:
+                    send "§cNo songs are available."
+                else:
+                    set {_pageAmount} to 8
+                    set {_maxPages} to ceil(size of {_songs::*} / {_pageAmount})
+                    set {_page} to clamp({_page} ? 1, 1, {_maxPages})
+                    set {_start} to {_pageAmount}*{_page}-{_pageAmount}+1
+                    set {_end} to min(size of {_songs::*}, {_pageAmount}*{_page})
+                    send "§6Page §e%{_page}%/%{_maxPages}% §7(showing §3#%{_start}%-%{_end}%§7 out of %size of {_songs::*}%)"
+                    set {_shown::*} to (elements from {_start} to {_end} of {_songs::*})
+                    loop {_shown::*}:
+                        set {_c} to (text component from " §b%loop-value%")
+                        set (hover event of {_c}) to (hover event showing "§bClick to copy to clipboard")
+                        set (click event of {_c}) to (click event to copy loop-value to clipboard)
+                        add {_c} to {_shownC::*}
+                        loop-iteration isn't (size of {_shown::*})
+                        add nl to {_shownC::*}
+                    send components (merge components {_shownC::*})
+    literal arg "stopall":
+        permission: op
+        trigger:
+            send "Stopped %size of {-playingNbsSongs::*}% song player(s)"
+            stopAllNbsSongs()
+
+slash command uploadnbs <attachment="file">:
+    description: Upload a song file to use with a Custom Music Disc
+    bot: ChatLink
+    arguments:
+        file: File to upload, must be a .nbs file
+    trigger:
+        # linked user
+        loop indexes of {discordLinks::*}:
+            {discordLinks::%loop-value%} is (discord id of event-user)
+            set {_linkeduuid} to loop-value
+            exit loop
+        if {_linkeduuid} isn't set:
+            reply with hidden "You must have your account linked to upload a song!"
+            exit trigger
+        # check .nbs file
+        set {_file} to argument "file" as attachment
+        if file extension of {_file} isn't "nbs":
+            reply with hidden "**Not a song file.** File must end with .nbs"
+            exit trigger
+        # download file
+        set {_filenameNoExt} to getFileName(file name of {_file})
+        set {_filename} to first 30 characters of {_filenameNoExt}
+        replace "_" with " " in {_filename}
+        download {_file} to path "nbsSongs/%{_filename}%.nbs"
+        log info "%event-user% uploaded '%{_filename}%.nbs'"
+        # check if corrupted
+        wait 1 second
+        if getNbsSong({_filename}) is set:
+            reply with hidden "Successfully uploaded `%{_filename}%.nbs`%nl%Rename a Custom Music Disc to ""%{_filename}%"" to hear your song.%nl%Your file could be deleted or overwritten by another user, so don't lose your original file!"
+            discordSend(":cd: <@%discord id of event-user%> uploaded `%{_filename}%`")
+        else:
+            reply with hidden "Your file `%file name of {_file}%` isn't a valid song file! Try again with a valid file."
+            new File("nbsSongs/%{_filename}%.nbs").delete()

@@ -1,17 +1,6 @@
 
 import:
-    net.minecraft.nbt.ListTag
-    net.minecraft.nbt.DoubleTag
     io.papermc.paper.event.entity.EntityAttemptSmashAttackEvent
-
-local function setExplosionImpactPos(p:player, x:number, y:number, z:number):
-    set {_explosionPos} to new ListTag()
-    {_explosionPos}.add(DoubleTag.valueOf({_x}))
-    {_explosionPos}.add(DoubleTag.valueOf({_y}))
-    {_explosionPos}.add(DoubleTag.valueOf({_z}))
-    set {_nbt} to (full nbt of {_p}).getCompound()
-    {_nbt}.put("current_explosion_impact_pos", {_explosionPos})
-    {_p}.getHandle().load({_nbt})
 
 function cloudJumpBoost(p:player):
     # boost
@@ -38,8 +27,7 @@ function cloudJumpBoost(p:player):
         set y of ({_p}'s velocity) to {_y}
     # fall damage
     set boolean tag "ignore_fall_damage_from_current_explosion" of full nbt of {_p} to true
-    setExplosionImpactPos({_p},(x-coord of {_p}),(y-coord of {_p}),(z-coord of {_p}))
-    #set (double list tag "current_explosion_impact_pos" of nbt of {_p}) to (x-coord of {_p}),(y-coord of {_p}),(z-coord of {_p})
+    set (double list tag "current_explosion_impact_pos" of nbt of {_p}) to (x-coord of {_p}),(y-coord of {_p}),(z-coord of {_p})
     # effects
     play sound "minecraft:entity.wind_charge.wind_burst" in players category with pitch 0.75 at {_p}
     make 1 of gust emitter small at {_p}

@@ -89,3 +89,17 @@ when ready to register custom items:
         id: "turtle:luck.boots"
         amount: 0.25
         operation: add_number
+    # netherite rarity
+    set (custom item "minecraft:ancient_debris") to ancient debris with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_scrap") to netherite scrap with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_ingot") to netherite ingot with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_block") to netherite block with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_helmet") to netherite helmet with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_chestplate") to netherite chestplate with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_leggings") to netherite leggings with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_boots") to netherite boots with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_sword") to netherite sword with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_axe") to netherite axe with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_pickaxe") to netherite pickaxe with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_shovel") to netherite shovel with nbt from "{""minecraft:rarity"":""uncommon""}"
+    set (custom item "minecraft:netherite_hoe") to netherite hoe with nbt from "{""minecraft:rarity"":""uncommon""}"

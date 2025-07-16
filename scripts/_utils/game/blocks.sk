@@ -14,7 +14,7 @@ expression:
         [the] block only of %block%
         %block%'s block only
     get:
-        return "%expr-1%" parsed as blockdata
+        return expr-1
     set:
         loop blockdata tags of expr-1:
             set {_blockdata::%loop-value%} to blockdata tag loop-value of expr-1

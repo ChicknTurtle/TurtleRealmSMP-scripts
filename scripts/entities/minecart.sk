@@ -153,7 +153,7 @@ on vehicle move:
                 set vector length of {_v} to 1
                 set {_switch} to block at loop-block ~ {_v}
                 set {_dir1} to facing of vector ({_v} * -1)
-                set {_dir2} to facing of first element of {_cart}'s passengers
+                set {_dir2} to facing of (first element of ({_cart}'s passengers))
                 {_dir2} is north, south, east, or west
                 block at ({_switch}'s location ~ vector of direction {_dir2}) is rail, activator rail, powered rail, or detector rail
                 # super long rail logic D:

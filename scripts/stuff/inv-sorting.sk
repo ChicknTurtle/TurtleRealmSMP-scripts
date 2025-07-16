@@ -1,0 +1,42 @@
+
+on inventory click:
+    (event-item ? air) is air
+    if all:
+        event-clicktype isn't middle mouse button
+        event-clicktype isn't double click using mouse
+    then:
+        exit
+    if all:
+        (player inventory, chest, trapped chest, barrel, (tag contents of block tag "shulker_boxes"), minecart with chest, chest boat) doesn't contain (holder of event-inventory)
+        event-inventory isn't (ender chest of player)
+    then:
+        exit
+
+    if event-inventory is player inventory:
+        set {_items::*} to slots (integers from 9 and 35) of event-inventory
+    else:
+        set {_items::*} to (items of event-inventory)
+    {_items::*} is set
+    loop {_items::*}:
+        set {_id} to (item id of loop-value)
+        add loop-value to {_groups::%{_id}%::items::*}
+        add (65 - max stack size of loop-value)*(item amount of loop-value) to {_groups::%{_id}%::total}
+    
+    set {_indexes::*} to indexes of {_groups::*}
+    sort {_indexes::*} in descending order by {_groups::%input%::total}
+    loop {_indexes::*}:
+        set {_stacks::*} to {_groups::%loop-value%::items::*}
+        sort {_stacks::*} by "%nbt of input%"
+        add {_stacks::*} to {_finalStacks::*}
+
+    {_finalStacks::*} is set
+    if event-inventory is player inventory:
+        set {_inv} to chest inventory with 3 rows
+        add {_finalStacks::*} to {_inv}
+        clear slots (integers from 9 and 35) of event-inventory
+        loop items of {_inv}:
+            set (slot 8+loop-iteration of event-inventory) to loop-value
+    else:
+        clear event-inventory
+        add {_finalStacks::*} to event-inventory
+    play sound "minecraft:ui.button.click" in ui with volume 0.5 with pitch 2 for player

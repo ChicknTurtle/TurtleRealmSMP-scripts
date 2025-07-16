@@ -20,8 +20,8 @@ plural expression:
 # Get the item used to spawn an entity
 expression:
     patterns:
-        [the] [effective|real] spawn[ ](item|egg) of %entity%
-        %entity%'s [effective|real] spawn[ ](item|egg)
+        [the] [effective|real] spawn[ ]item of %entity%
+        %entity%'s [effective|real] spawn[ ]item
     get:
         if spawn egg of expr-1 is set:
             return spawn egg of expr-1

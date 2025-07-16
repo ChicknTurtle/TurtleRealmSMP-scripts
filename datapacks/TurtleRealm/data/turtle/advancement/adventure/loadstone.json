@@ -5,8 +5,7 @@
     },
     "title": "Loadstone",
     "description": "Turn a lodestone into a chunk-loader with an echo shard",
-    "frame": "goal",
-    "hidden": false
+    "frame": "goal"
   },
   "parent": "minecraft:adventure/use_lodestone",
   "criteria": {

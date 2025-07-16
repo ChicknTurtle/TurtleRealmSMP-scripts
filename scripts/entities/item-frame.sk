@@ -1,0 +1,18 @@
+
+import:
+    io.papermc.paper.event.player.PlayerItemFrameChangeEvent
+    org.bukkit.Rotation
+
+on PlayerItemFrameChangeEvent:
+    if "%event.getAction()%" is "PLACE":
+        set visibility of event.getItemFrame() to false
+    else if "%event.getAction()%" is "REMOVE":
+        set visibility of event.getItemFrame() to true
+        event.getItemFrame().setRotation(Rotation.NONE)
+    else:
+        event.getPlayer() isn't sneaking
+        event.setCancelled(true)
+
+on damage of item frame or glow item frame:
+    set visibility of victim to true
+    victim.setRotation(Rotation.NONE)

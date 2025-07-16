@@ -117,6 +117,23 @@ on right click:
                     add "   §3🔻 §7Whitelist Filter: §f%{_joinNames}%" to {_info::*}
             else:
                 add "   §3🔻 §7No Filter" to {_info::*}
+        # jukebox
+        if {_b} is a jukebox:
+            set {_record} to (blockstate of {_b}).getRecord()
+            if ({_record} ? air) isn't air:
+                if (item id of {_record}) is "turtle:custom_music_disc":
+                    if (name of {_record}) is set:
+                        add "   §6🎵 §7Playing Custom Song: §b%(name of {_record})%" to {_record::*}
+                    else:
+                        add "   §6🎵 §7Playing Custom Song: §cinvalid" to {_record::*}
+                else:
+                    set {_song} to (namespaced key from (string tag "minecraft:jukebox_playable" of vanilla nbt of {_record})).value()
+                    replace "_" with " " in {_song}
+                    set {_song} to proper case {_song}
+                    add "   §6🎵 §7Playing §a%{_song}%" to {_record::*}
+            else:
+                add "   §6🎵 §7Empty" to {_record::*}
+            add (merge components {_record::*}) to {_info::*}
         if (size of {_info::*}) <= 1:
             exit trigger
         send components {_info::*} to player

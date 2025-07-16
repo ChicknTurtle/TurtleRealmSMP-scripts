@@ -9,6 +9,8 @@ on load:
     loop all worlds:
         set gamerule playersSleepingPercentage of loop-world to 0
         set gamerule doInsomnia of loop-world to false
+
+function findResourcePackHash():
     log info "Fetching resource pack hash from {@resourcePackUrl}§r..."
     async run 0 ticks later:
         set {-resourcePackHash} to hashFromUrl("{@resourcePackUrl}")
@@ -16,6 +18,8 @@ on load:
             log error "Failed to fetch resource pack hash from {@resourcePackUrl}§r. Resource pack will not be sent to players."
         else:
             log info "Found resource pack hash: %{-resourcePackHash}%"
+on skript load:
+    findResourcePackHash()
 
 # unlock recipes
 # send resource pack

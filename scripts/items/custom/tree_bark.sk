@@ -1,0 +1,9 @@
+
+when ready to register custom items:
+    set (custom item "turtle:tree_bark") to (stick with nbt from "{""minecraft:item_model"":""turtle:tree_bark"",""minecraft:item_name"":""Tree Bark""}")
+
+on player interact:
+    event-blockaction is right_click_block
+    event-block is tagged with block tag "turtle:strippable_logs"
+    event-item is tagged with item tag "minecraft:axes"
+    drop 1 of (custom item "turtle:tree_bark") at ((exact location of event-block) ~ event-vector) without velocity

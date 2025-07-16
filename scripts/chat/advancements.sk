@@ -84,9 +84,6 @@ on spawn of warden:
 on death of warden:
     grantAdvancement("turtle:adventure/kill_warden", attacker)
 
-# Kidnapping
-# customItems/items/mob_bundle.sk
-
 # Wandering Ripoff
 on death of wandering trader:
     grantAdvancement("turtle:adventure/kill_wandering_trader", attacker)
@@ -103,9 +100,6 @@ every 5 seconds:
             {_blocks::*} contains horn coral block
         then:
             grantAdvancement("turtle:adventure/under_the_sea", loop-player)
-
-# Bullet Train
-# tweaks/entities/minecart.sk
 
 # On a Rail
 import:
@@ -143,9 +137,3 @@ on consume of nether wart:
     set {_nauseas::*} to {_nauseas::*} where [seconds of (potion duration of input) is 15]
     (size of {_nauseas::*}) > 0
     grantAdvancement("turtle:nether/feeling_blue", player)
-
-# Loadstone
-# tweaks/blocks/loadstone.sk
-
-# Overpowered
-# datapacks/TurtleSMP/data/turtle/advancement/combat/overpowered.json

@@ -5,13 +5,15 @@
     },
     "title": "Beast Slayer",
     "description": "Kill the warden",
-    "frame": "challenge",
-    "hidden": true
+    "frame": "challenge"
   },
   "parent": "turtle:adventure/encounter_warden",
   "criteria": {
     "requirement": {
       "trigger": "minecraft:impossible"
     }
+  },
+  "rewards": {
+    "experience": 100
   }
 }

@@ -5,8 +5,7 @@
     },
     "title": "Feeling Blue",
     "description": "Eat one too many nether warts",
-    "frame": "task",
-    "hidden": false
+    "frame": "task"
   },
   "parent": "minecraft:nether/find_fortress",
   "criteria": {
