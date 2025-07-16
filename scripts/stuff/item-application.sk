@@ -1,0 +1,52 @@
+
+on player interact:
+    event-blockaction is right_click_block
+    if event-item is wheat seeds:
+        event-block is dirt
+        event-blockface is up_face
+        cancel event
+        set {_success} to true
+        set event-block to grass block
+        play sound "minecraft:item.crop.plant" in blocks category at event-block
+    else if (item id of event-item) is "turtle:tree_bark":
+        set {_bark::minecraft;stripped_oak_log} to oak log
+        set {_bark::minecraft;stripped_oak_wood} to oak wood
+        set {_bark::minecraft;stripped_spruce_log} to spruce log
+        set {_bark::minecraft;stripped_spruce_wood} to spruce wood
+        set {_bark::minecraft;stripped_birch_log} to birch log
+        set {_bark::minecraft;stripped_birch_wood} to birch wood
+        set {_bark::minecraft;stripped_jungle_log} to jungle log
+        set {_bark::minecraft;stripped_jungle_wood} to jungle wood
+        set {_bark::minecraft;stripped_acacia_log} to acacia log
+        set {_bark::minecraft;stripped_acacia_wood} to acacia wood
+        set {_bark::minecraft;stripped_dark_oak_log} to dark oak log
+        set {_bark::minecraft;stripped_dark_oak_wood} to dark oak wood
+        set {_bark::minecraft;stripped_mangrove_log} to mangrove log
+        set {_bark::minecraft;stripped_mangrove_wood} to mangrove wood
+        set {_bark::minecraft;stripped_cherry_log} to cherry log
+        set {_bark::minecraft;stripped_cherry_wood} to cherry wood
+        set {_bark::minecraft;stripped_pale_oak_log} to pale oak log
+        set {_bark::minecraft;stripped_pale_oak_wood} to pale oak wood
+        set {_bark::minecraft;stripped_bamboo_block} to bamboo block
+        set {_bark::minecraft;stripped_crimson_stem} to crimson stem
+        set {_bark::minecraft;stripped_crimson_hyphae} to crimson hyphae
+        set {_bark::minecraft;stripped_warped_stem} to warped stem
+        set {_bark::minecraft;stripped_warped_hyphae} to warped hyphae
+        loop (indexes of {_bark::*}):
+            set {_id} to (raw name of event-block)
+            replace ":" with ";" in {_id}
+            {_id} is loop-value
+            cancel event
+            set {_success} to true
+            set (block only of event-block) to {_bark::%loop-value%}
+            make 10 of block using (type of event-block) at ((exact location of event-block) ~ event-vector)
+            play sound "minecraft:block.bamboo_wood.break" in blocks category at event-block
+    {_success} is true
+    if event-equipmentslot is hand slot:
+        make player swing their hand
+        player's gamemode isn't creative
+        remove 1 of event-item from player's tool
+    else:
+        make player swing their offhand
+        player's gamemode isn't creative
+        remove 1 of event-item from player's offhand tool

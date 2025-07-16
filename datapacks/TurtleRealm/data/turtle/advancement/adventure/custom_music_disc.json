@@ -1,0 +1,36 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:music_disc_creator",
+      "components": {
+        "minecraft:custom_name": "Personal Playlist",
+        "minecraft:item_model": "turtle:custom_music_disc"
+      }
+    },
+    "title": "Personal Playlist",
+    "description": "Use a Custom Music Disc to listen to an uploaded track",
+    "frame": "task"
+  },
+  "parent": "minecraft:adventure/play_jukebox_in_meadows",
+  "criteria": {
+    "requirement": {
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "predicates": {
+                "minecraft:custom_data": {
+                  "customItems": {
+                    "id": "turtle:custom_music_disc"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:item_used_on_block"
+    }
+  }
+}

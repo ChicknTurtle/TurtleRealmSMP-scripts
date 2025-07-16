@@ -2,7 +2,8 @@
 import:
     org.bukkit.Bukkit
     org.bukkit.event.inventory.BrewEvent
-    org.bukkit.event.inventory.PrepareInventoryResultEvent
+    com.destroystokyo.paper.event.inventory.PrepareResultEvent
+    org.bukkit.event.inventory.PrepareAnvilEvent
 
 # Initializing custom items
 
@@ -92,6 +93,24 @@ effect:
             can_always_eat: true
         set (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) to true
         set raw expression expr-1 to {_item}
+
+# Set repairable item of an item
+# Supports custom items
+plural expression:
+    return type: items
+    loop of: item
+    patterns:
+        custom repair[able] (item|material)s of %item%
+        %item%'s custom repair[able] (item|material)s
+    get:
+        loop (string list tag "customItems;repairItems" of (custom nbt of (expr-1))):
+            add (custom item loop-value) to {_return::*}
+        return {_return::*}
+    set:
+        set {_item} to expr-1
+        set (repairable items of {_item}) to (change values)
+        set (string list tag "customItems;repairItems" of (custom nbt of {_item})) to (item id of change values)
+        set (raw expression expr-1) to {_item}
 
 # Set 'remove nbt tags' of an item
 # These tags will be forcefully removed from the item when it is updated
@@ -243,31 +262,61 @@ on entity add to world:
     event-entity is a dropped item
     update item (item of event-entity)
 
+# anvil logic
+# and update anvil/grindstone/smithing results
+on PrepareResultEvent:
+    event.getResult() is set
+    event.setResult(updated event.getResult())
+    event is instance of PrepareAnvilEvent
+    set {_inv} to event.getInventory()
+    set {_first} to {_inv}.getFirstItem()
+    set {_second} to {_inv}.getSecondItem()
+    # trying to merge
+    if (raw name of {_first}) is (raw name of {_second}):
+        (item id of {_first}) isn't (item id of {_second}) # tried to merge with two different items
+        # cancel if not a custom repair
+        (string list tag "customItems;repairItems" of custom nbt of {_first}) doesn't contain (item id of {_second})
+        event.setResult(null)
+    # trying to repair
+    else if (repairable items of {_first}) contains {_second}:
+        set {_repairItems::*} to (string list tag "customItems;repairItems" of custom nbt of {_first}) ? (item id of (repairable items of {_first}))
+        {_repairItems::*} is set
+        {_repairItems::*} doesn't contain (item id of {_second})
+        event.setResult(null)
+    # trying to apply book
+    else if {_second} is enchanted book:
+        # temporary solution for custom enchants
+        {_first} is firework star
+        (item id of {_first}) isn't "turtle:chorium_mirror"
+        event.setResult(null)
+
 # player joining
 on join:
-    loop (amount of slots of player) times:
+    loop 41 times:
         update (slot (loop-value)-1 of player)
+
 # /give etc
 # doesn't work well when in creative
 on inventory slot change:
     player's gamemode isn't creative
     event-slot isn't air
     update event-slot
+
 # chest loot generating
 on loot generate:
     loop loot:
         add (updated loop-value) to {_newloot::*}
     set loot to {_newloot::*}
+
 # crafting
 on preparing craft:
     update event-slot
+
 # smelting
 # updating result blocks more items from being smelted
 #on smelt:
 #    update smelted item
-# anvil, grindstone, smithing
-on PrepareInventoryResultEvent:
-    event.setResult(updated event.getResult())
+
 # brewing
 on BrewEvent:
     set {_block} to event.getBlock()

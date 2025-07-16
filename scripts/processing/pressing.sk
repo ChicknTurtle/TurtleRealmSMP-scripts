@@ -46,28 +46,27 @@ function pressProcessBlock(b:block, dir:vector):
     loop {_e::*}:
         if true is true:
             # check recipes
-            set {_recipe} to {-pressingRecipes::%item id of (item of loop-value)%}
-            if {_recipe} is set:
-                loop ({_recipe}'s results field):
-                    chance of (loop-value-2's chance field)
-                    loop (loop-value-2's count field) times:
-                        add custom item (loop-value-2's item field) to {_spawnitems::*}
-                add updated (use remainder of (item of loop-value-1)) to {_spawnitems::*}
-                add (break sound of (item of loop-value-1)) to {_playsounds::*}
+            set {_item} to (item of loop-value)
+            if indexes of {-pressingRecipes::%item id of {_item}%::*} is set:
+                loop indexes of {-pressingRecipes::%item id of {_item}%::*}:
+                    chance of {-pressingRecipes::%item id of {_item}%::%loop-value-2%::chance}
+                    add {-pressingRecipes::%item id of {_item}%::%loop-value-2%::amount} of {-pressingRecipes::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
+                add (updated (use remainder of {_item})) to {_spawnitems::*}
+                add (break sound of {_item}) to {_playsounds::*}
                 make 10 of item particle using (type of item of loop-value-1) at loop-value-1 with extra 0.2
                 (loop-value-1).setItemStack((loop-value-1).getItemStack().subtract())
                 set (short tag "Age" of nbt of loop-value-1) to 0
                 exit 2 sections
             # check packing
-            set {_compacted::*} to getCompactedItem((item of loop-value-1), (item amount of (item of loop-value-1)))
+            set {_compacted::*} to getCompactedItem({_item}, (item amount of {_item}))
             {_compacted::*} is set
             set {_compacted} to {_compacted::1}
             set {_compactedAmount} to {_compacted::2}
             add updated {_compacted} to {_spawnitems::*}
             loop {_compactedAmount} times:
-                add use remainder of (item of loop-value-1) to {_spawnitems::*}
-                add (break sound of (item of loop-value-1)) to {_playsounds::*}
-            make 10 of item particle using (type of item of loop-value-1) at loop-value-1 with extra 0.2
+                add use remainder of {_item} to {_spawnitems::*}
+                add (break sound of {_item}) to {_playsounds::*}
+            make 10 of item particle using (type of {_item}) at loop-value-1 with extra 0.2
             loop-value.setItemStack(loop-value.getItemStack().subtract({_compactedAmount}))
             set (short tag "Age" of nbt of loop-value-1) to 0
         {_spawnitems::*} is set

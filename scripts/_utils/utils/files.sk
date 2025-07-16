@@ -2,6 +2,15 @@
 import:
     java.io.File as javaFile
 
+function getFileName(filename:string) :: string:
+    set {_name::*} to {_filename} split at "."
+    return (join (first (size of {_name::*} - 1) elements of {_name::*}) with ".")
+
+function getFileExt(filename:string) :: string:
+    if {_filename} doesn't contain ".":
+        return ""
+    return last element of ({_filename} split at ".")
+
 local function getFiles(dir:string) :: strings:
     set {_dir} to new javaFile({_dir})
     loop ...{_dir}.listFiles() where [input.isFile()]:

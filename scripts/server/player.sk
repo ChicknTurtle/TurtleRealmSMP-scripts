@@ -52,20 +52,23 @@ on player tick:
 # handle player death
 on death of player:
     set {_e} to enchantment from key "turtle:soulbound"
-    if event.getKeepInventory() is false:
-        set {_drops::*} to ...event.getDrops()
-        event.getDrops().clear()
-        # drop skull
-        if {enabledFeatures::dropskull} is true:
-            attacker is a player
-            add (nbt skull of "%victim%").getRandom() to {_drops::*}
-        loop {_drops::*}:
-            # soulbound
-            if loop-value is enchanted with {_e}:
-                event.getItemsToKeep().add(loop-value)
-            # protected items
+    event.getKeepInventory() is false
+    set {_drops::*} to ...event.getDrops()
+    event.getDrops().clear()
+    # drop skull
+    if {enabledFeatures::dropskull} is true:
+        attacker is a player
+        add (nbt skull of "%victim%").getRandom() to {_drops::*}
+    # cookie
+    if (lowercase name of victim) contains "cookie":
+        add cookie to {_drops::*}
+    loop {_drops::*}:
+        # soulbound
+        if loop-value is enchanted with {_e}:
+            event.getItemsToKeep().add(loop-value)
+        # protected items
+        else:
+            if {enabledFeatures::protectdeathloot} is true:
+                event.getDrops().add(protectItemStack(loop-value))
             else:
-                if {enabledFeatures::protectdeathloot} is true:
-                    event.getDrops().add(protectItemStack(loop-value))
-                else:
-                    event.getDrops().add(loop-value)
+                event.getDrops().add(loop-value)

@@ -35,12 +35,6 @@ local function dropOrHopper(items:items, hoppers:blocks, loc:location):
                 remove loop-value-2 from {_items::*}
     drop {_items::*} at {_loc} without velocity
 
-local function getRecipeResults(recipe:struct) :: items:
-    loop ({_recipe}'s results field):
-        chance of (loop-value's chance field)
-        add (loop-value's count field) of (updated (loop-value's item field)) to {_items::*}
-    return {_items::*}
-
 on entity inside block:
     event-block is tagged with (block tag "cauldrons")
     event-entity is a dropped item
@@ -53,15 +47,16 @@ on entity inside block:
     # freezing recipes
     if all:
         event-block is powder snow cauldron
-        {-freezingRecipes::%item id of {_item}%} is set
+        indexes of {-cauldronRecipes::freezing::%item id of {_item}%::*} is set
     then:
-        set {_recipe} to {-freezingRecipes::%item id of {_item}%}
         make 1 of poof at event-entity with extra 0.1
         if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
-            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            loop indexes of {-cauldronRecipes::freezing::%item id of {_item}%::*}:
+                chance of {-cauldronRecipes::freezing::%item id of {_item}%::%loop-value-2%::chance}
+                add {-cauldronRecipes::freezing::%item id of {_item}%::%loop-value-2%::amount} of {-cauldronRecipes::freezing::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
             add (updated (use remainder of {_item})) to {_spawnitems::*}
         dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
         delete event-entity
@@ -69,15 +64,16 @@ on entity inside block:
     # blasting recipes
     else if all:
         event-block is lava cauldron
-        {-bulkBlastingRecipes::%item id of {_item}%} is set
+        indexes of {-cauldronRecipes::blasting::%item id of {_item}%::*} is set
     then:
-        set {_recipe} to {-bulkBlastingRecipes::%item id of {_item}%}
         make 1 of lava at event-entity
         if (short tag "blastingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "blastingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "blastingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
-            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            loop indexes of {-cauldronRecipes::blasting::%item id of {_item}%::*}:
+                chance of {-cauldronRecipes::blasting::%item id of {_item}%::%loop-value-2%::chance}
+                add {-cauldronRecipes::blasting::%item id of {_item}%::%loop-value-2%::amount} of {-cauldronRecipes::blasting::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
             add (updated (use remainder of {_item})) to {_spawnitems::*}
         dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
         delete event-entity
@@ -97,33 +93,35 @@ on entity inside block:
     else if all:
         event-block is water cauldron
         block under event-block is soul campfire[lit=true]
-        {-hauntingRecipes::%item id of {_item}%} is set
+        indexes of {-cauldronRecipes::haunting::%item id of {_item}%::*} is set
     then:
-        set {_recipe} to {-hauntingRecipes::%item id of {_item}%}
         make 1 of splash at event-entity
         make 1 of soul at event-entity with extra 0.05
         if (short tag "hauntingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "hauntingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "hauntingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
-            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            loop indexes of {-cauldronRecipes::haunting::%item id of {_item}%::*}:
+                chance of {-cauldronRecipes::haunting::%item id of {_item}%::%loop-value-2%::chance}
+                add {-cauldronRecipes::haunting::%item id of {_item}%::%loop-value-2%::amount} of {-cauldronRecipes::haunting::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
             add (updated (use remainder of {_item})) to {_spawnitems::*}
         dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
         delete event-entity
-    
+        
     # smoking recipes
     else if all:
         event-block is water cauldron
         block under event-block is campfire[lit=true]
-        {-bulkSmokingRecipes::%item id of {_item}%} is set
+        indexes of {-cauldronRecipes::smoking::%item id of {_item}%::*} is set
     then:
-        set {_recipe} to {-bulkSmokingRecipes::%item id of {_item}%}
         make 1 of splash at event-entity
         if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
-            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            loop indexes of {-cauldronRecipes::smoking::%item id of {_item}%::*}:
+                chance of {-cauldronRecipes::smoking::%item id of {_item}%::%loop-value-2%::chance}
+                add {-cauldronRecipes::smoking::%item id of {_item}%::%loop-value-2%::amount} of {-cauldronRecipes::smoking::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
             add (updated (use remainder of {_item})) to {_spawnitems::*}
         dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
         delete event-entity
@@ -144,15 +142,16 @@ on entity inside block:
     # washing
     else if all:
         event-block is water cauldron
-        {-washingRecipes::%item id of {_item}%} is set
+        indexes of {-cauldronRecipes::washing::%item id of {_item}%::*} is set
     then:
-        set {_recipe} to {-washingRecipes::%item id of {_item}%}
         make 1 of splash at event-entity
         if (short tag "washingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "washingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "washingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
-            add getRecipeResults({_recipe}) to {_spawnitems::*}
+            loop indexes of {-cauldronRecipes::washing::%item id of {_item}%::*}:
+                chance of {-cauldronRecipes::washing::%item id of {_item}%::%loop-value-2%::chance}
+                add {-cauldronRecipes::washing::%item id of {_item}%::%loop-value-2%::amount} of {-cauldronRecipes::washing::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
             add (updated (use remainder of {_item})) to {_spawnitems::*}
         dropOrHopper({_spawnitems::*}, {_hoppers::*}, event-entity's location)
         delete event-entity

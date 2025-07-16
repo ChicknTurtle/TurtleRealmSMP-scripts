@@ -63,6 +63,7 @@ local function updateItem(item:item) :: item:
 
 # show tp indicator
 on player tick:
+    (player's tool) is firework star
     (item id of player's tool) is "turtle:chorium_case_filled"
     set {_dist} to ({@maxDistanceSneaking} if player is pressing sneak key else {@maxDistance})
     set {_ray} to raytrace from player with max distance {_dist} while ignoring passable blocks

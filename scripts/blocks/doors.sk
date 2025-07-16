@@ -1,0 +1,33 @@
+
+function doubleDoor(door:block):
+    set {_dirMap::*} to west, north, east, south, west, north
+    set {_facing} to (blockdata tag "facing" of {_door})
+    if {_facing} is "north":
+        set {_i} to 2
+    else if {_facing} is "east":
+        set {_i} to 3
+    else if {_facing} is "south":
+        set {_i} to 4
+    else:
+        set {_i} to 5
+    if (blockdata tag "hinge" of {_door}) is "left":
+        add 1 to {_i}
+    else:
+        subtract 1 from {_i}
+    set {_dir} to ({_i}th element of {_dirMap::*})
+    set {_otherdoor} to block at ({_door} ~ (vector of direction {_dir}))
+    (blockdata tag "facing" of {_otherdoor}) is {_facing}
+    (blockdata tag "hinge" of {_otherdoor}) isn't (blockdata tag "hinge" of {_door})
+    wait 1 tick
+    {_otherdoor} is tagged with block tag "minecraft:doors"
+    (blockdata tag "open" of {_otherdoor}) isn't (blockdata tag "open" of {_door})
+    toggle {_otherdoor}
+
+on right click:
+    player isn't sneaking
+    event-block is tagged with block tag "minecraft:doors"
+    doubleDoor(event-block)
+
+on redstone change:
+    event-block is tagged with block tag "minecraft:doors"
+    doubleDoor(event-block)
