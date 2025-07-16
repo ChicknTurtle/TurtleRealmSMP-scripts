@@ -4,4 +4,4 @@ brig command /turtle:lookat <blockpos>:
         {enabledFeatures::commands} is true
         set {_eyeHeight} to (y-coord of player's eye location) - (y-coord of player's location)
         make player look at ({_blockpos} ~ vector(0.5,0.5-{_eyeHeight},0.5))
-        play sound "minecraft:block.note_block.hat" in player category with volume 0.5 and pitch 1.5 at player to player
+        play sound "minecraft:block.note_block.hat" in (player category) with volume 0.5 and pitch 1.5 at player to player
