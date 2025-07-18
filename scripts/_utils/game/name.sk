@@ -26,7 +26,7 @@ expression:
             return translate component from (translation key of {_item})
         if name of {_item} is set:
             return (name of {_item}) + "§r"
-        else if (component item name of {_item}) isn't "":
+        else if (try {_item}.getItemMeta().hasItemName()):
             return (component item name of {_item}) + "§r"
         else:
             return translate component from (translation key of {_item})
@@ -60,7 +60,7 @@ expression:
     get:
         set {_col} to rarity color of expr-1
         set {_name} to (effective item name of expr-1)
-        set {_c} to text component from "[%{_name}%]"
+        set {_c} to (merge components (text component from "["), {_name}, (text component from "]"))
         set color format of {_c} to {_col}
         set hover event of {_c} to hover event showing expr-1
         return {_c}

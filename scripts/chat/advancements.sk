@@ -42,7 +42,7 @@ on advancement done:
     else:
         set {_c::3} to (text component from " §7(%{_completed}%/%{_total}%)")
     set (hover event of {_c::2}) to (hover event showing "%{_c}%%{_title}%%nl%%{_desc}%")
-    broadcast component (merge components {_c::*})
+    send component (merge components {_c::*}) to (all players and console)
 
     discordSend(":trophy: %player% has completed **[%{_title}%]** *(%{_completed}%/%{_total}%)*")
 

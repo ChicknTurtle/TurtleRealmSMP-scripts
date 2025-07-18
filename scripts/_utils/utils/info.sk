@@ -14,7 +14,7 @@ local function playerInfo(p:player) :: string:
         add "§8%uuid of {_p}%" to {_lines::*}
     return (join {_lines::*} with "§r%nl%")
 
-function playerComponent(p:offline player) :: object:
+function playerComponent(p:player) :: object:
     set {_c} to text component from ({_p}'s display name)
     set hover event of {_c} to (hover event showing (playerInfo({_p})))
     set click event of {_c} to (click event to suggest command "/msg %{_p}%")

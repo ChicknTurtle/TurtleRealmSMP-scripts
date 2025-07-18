@@ -2,8 +2,19 @@
 when ready to register custom items:
     set (custom item "turtle:tree_bark") to (stick with nbt from "{""minecraft:item_model"":""turtle:tree_bark"",""minecraft:item_name"":""Tree Bark""}")
 
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:paper_from_bark"
+        category: "misc"
+        shape: "###"
+        result: paper
+        ingredients:
+            set ingredient of "#" to (custom item "turtle:tree_bark")
+
 on player interact:
     event-blockaction is right_click_block
     event-block is tagged with block tag "turtle:strippable_logs"
     event-item is tagged with item tag "minecraft:axes"
+    wait 1 tick
+    event-block isn't tagged with block tag "turtle:strippable_logs"
     drop 1 of (custom item "turtle:tree_bark") at ((exact location of event-block) ~ event-vector) without velocity

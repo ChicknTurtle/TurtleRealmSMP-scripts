@@ -1,0 +1,6 @@
+
+import:
+    java.lang.Thread as javaThread
+
+function threadSleep(ms:integer):
+    javaThread.sleep({_ms})

@@ -1,6 +1,7 @@
 
 import:
     java.io.File
+    java.lang.System
     com.xxmicloxx.NoteBlockAPI.NoteBlockAPI
     com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder
     com.xxmicloxx.NoteBlockAPI.songplayer.PositionSongPlayer
@@ -13,52 +14,96 @@ function getBlockKey(block:block) :: string:
 function getAllNbsFiles() :: objects:
     set {_file} to new File("nbsSongs")
     {_file}.exists() is true
-    loop ...{_file}.listFiles() where [input.getName() ends with ".nbs"]:
+    set {_files::*} to (...{_file}.listFiles() where [input.getName() ends with ".nbs"])
+    sort {_files::*} by input.lastModified()
+    loop {_files::*}:
         add getFileName(loop-value.getName()) to {_names::*}
     return {_names::*}
 
-function getNbsSong(songName:string) :: object:
-    if {_songName} isn't set:
-        return {_}
-    set {_file} to new File("nbsSongs/%{_songName}%.nbs")
-    if {_file}.exists() is true:
-        return NBSDecoder.parse({_file})
+on load:
+    create new section with {_songName} stored in {-sections::getNbsSong}:
+        # return from cache
+        if {-nbsSongCache::%{_songName}%} is set:
+            return {-nbsSongCache::%{_songName}%}
+        # wait until song is loaded, give up after 10s
+        else if {-loadingNbsSongs::%{_songName}%} is set:
+            while {-loadingNbsSongs::%{_songName}%} is set:
+                threadSleep(100)
+                loop-iteration > 100
+                exit loop
+        # load song from file
+        else:
+            set {-loadingNbsSongs::%{_songName}%} to true
+            set {_file} to new File("nbsSongs/%{_songName}%.nbs")
+            {_file}.exists() is true
+            log debug "Loading and caching song '%{_songName}%'"
+            {_file}.setLastModified(System.currentTimeMillis())
+            set {-nbsSongCache::%{_songName}%} to NBSDecoder.parse({_file})
+        delete {-loadingNbsSongs::%{_songName}%}
+        return {-nbsSongCache::%{_songName}%}
+    create new section stored in {-sections::clearOldNbsFiles}:
+        set {_dir} to new File("nbsSongs")
+        # 30 days ago
+        set {_cutoff} to System.currentTimeMillis() - 30*24*60*60*1000
+        loop ...{_dir}.listFiles():
+            getFileExt(loop-value.getName()) is "nbs"
+            loop-value.lastModified() < {_cutoff}
+            log debug "Deleting file: %loop-value.getName()%"
+            loop-value.delete()
+            add 1 to {_deleted}
+        if {_deleted} is set:
+            log info "Cleared %{_deleted}% old nbs file(s)"
+        return {_deleted} ? 0
+    
+    run section {-sections::clearOldNbsFiles} async
 
-function playNbsSongAtBlock(songName:string, block:block) :: boolean:
-    set {_song} to getNbsSong({_songName})
-    if {_song} is set:
-        set {_songPlayer} to new PositionSongPlayer({_song}, SoundCategory.RECORDS)
-        {_songPlayer}.setTargetLocation(location of {_block})
-        {_songPlayer}.setDistance(64)
-        loop all players in world of {_block}:
-            {_songPlayer}.addPlayer(loop-player)
-        {_songPlayer}.setPlaying(true)
-        stopNbsSongOfBlock({_block})
-        set {-playingNbsSongs::%getBlockKey({_block})%} to {_songPlayer}
-        return true
-    return false
+every 5 minutes:
+    size of {-nbsSongCache::*} > 0
+    log debug "Automatically clearing %size of {-nbsSongCache::*}% song(s) from cache"
+    clear {-nbsSongCache::*}
+
+function playNbsSongAtBlock(song:object, block:block) :: boolean:
+    set {_songPlayer} to new PositionSongPlayer({_song}, SoundCategory.RECORDS)
+    {_songPlayer}.setTargetLocation(location of {_block})
+    {_songPlayer}.setDistance(64)
+    loop all players in world of {_block}:
+        {_songPlayer}.addPlayer(loop-player)
+    {_songPlayer}.setPlaying(true)
+    stopNbsSongOfBlock({_block})
+    set {-playingNbsSongs::%getBlockKey({_block})%} to {_songPlayer}
+
+# Temporary fix until .destroy() is fixed to remove from playingSongs map
+function destroySongPlayer(songPlayer:object):
+    loop ...NoteBlockAPI.getAPI().playingSongs.keySet():
+        {_songPlayer}.removePlayer(loop-value)
+    {_songPlayer}.destroy()
 
 function stopNbsSongOfBlock(block:block):
     set {_songPlayer} to {-playingNbsSongs::%getBlockKey({_block})%}
     {_songPlayer} is set
-    {_songPlayer}.destroy()
+    destroySongPlayer({_songPlayer})
     delete {-playingNbsSongs::%getBlockKey({_block})%}
 
 function stopAllNbsSongs():
     loop {-playingNbsSongs::*}:
-        loop-value.destroy()
+        destroySongPlayer(loop-value)
     clear {-playingNbsSongs::*}
 
 on game event jukebox_play:
     set {_block} to (block at event-location)
-    long tag "ticks_since_song_started" of nbt of {_block} is 0
+    long tag "ticks_since_song_started" of (nbt of {_block}) is 0
     set {_disc} to (blockstate of {_block}).getRecord()
     (item id of {_disc}) is "turtle:custom_music_disc"
     set {_songName} to (name of {_disc})
-    if {_songName} is set:
-        playNbsSongAtBlock({_songName}, {_block}) is true
-        exit trigger
-    (blockstate of {_block}).stopPlaying()
+    {_songName} is set
+    run section {-sections::getNbsSong} async with {_songName} and store result in {_song} and wait
+    {_song} is set
+    {_block} is a jukebox
+    (blockstate of {_block}).isPlaying() is true
+    set {_updated} to updateCustomMusicDisc((slot 0 of inventory of {_block}), {_song})
+    if (slot 0 of inventory of {_block}) isn't {_updated}:
+        set (slot 0 of inventory of {_block}) to {_updated}
+    playNbsSongAtBlock({_song}, {_block})
 
 on game event jukebox_stop_play:
     set {_block} to (block at event-location)
@@ -84,30 +129,75 @@ brig command tree /turtle:nbs:
     literal arg "list":
         optional int arg "page":
             trigger:
-                set {_songs::*} to sorted getAllNbsFiles()
+                set {_songs::*} to reversed getAllNbsFiles()
                 if size of {_songs::*} is 0:
-                    send "§cNo songs are available."
+                    send "§6No songs are available. Try uploading one on discord with §e/uploadnbs <file>§6."
                 else:
-                    set {_pageAmount} to 8
-                    set {_maxPages} to ceil(size of {_songs::*} / {_pageAmount})
+                    set {_perPage} to 16
+                    set {_maxPages} to ceil(size of {_songs::*} / {_perPage})
                     set {_page} to clamp({_page} ? 1, 1, {_maxPages})
-                    set {_start} to {_pageAmount}*{_page}-{_pageAmount}+1
-                    set {_end} to min(size of {_songs::*}, {_pageAmount}*{_page})
-                    send "§6Page §e%{_page}%/%{_maxPages}% §7(showing §3#%{_start}%-%{_end}%§7 out of %size of {_songs::*}%)"
+                    set {_start} to {_perPage}*{_page}-{_perPage}+1
+                    set {_end} to min((size of {_songs::*}), {_perPage}*{_page})
+                    send "§6Listing songs §e#%{_start}%-%{_end}%§6 out of %size of {_songs::*}%:"
                     set {_shown::*} to (elements from {_start} to {_end} of {_songs::*})
                     loop {_shown::*}:
-                        set {_c} to (text component from " §b%loop-value%")
-                        set (hover event of {_c}) to (hover event showing "§bClick to copy to clipboard")
-                        set (click event of {_c}) to (click event to copy loop-value to clipboard)
-                        add {_c} to {_shownC::*}
+                        set {_c} to (text component from " §3%{_start}-1+loop-iteration%. §b%loop-value%")
+                        set (hover event of {_c}) to (hover event showing "§b%loop-value%%nl%§3Click to apply to held disc")
+                        set (click event of {_c}) to (click event to run command "/nbs apply %loop-value%")
+                        add {_c} to {_c::*}
                         loop-iteration isn't (size of {_shown::*})
-                        add nl to {_shownC::*}
-                    send components (merge components {_shownC::*})
+                        add nl to {_c::*}
+                    add nl to {_c::*}
+                    set {_c} to "§8⏪⏪⏪⏪⏪"
+                    if {_page} > 1:
+                        set {_c} to text component from "§2⏪⏪⏪⏪⏪"
+                        set (click event of {_c}) to (click event to run command "/nbs list %{_page}-1%")
+                    add {_c} to {_c::*}
+                    add " §a%{_page}%/%{_maxPages}% " to {_c::*}
+                    set {_c} to "§8⏩⏩⏩⏩⏩"
+                    if {_page} < {_maxPages}:
+                        set {_c} to text component from "§2⏩⏩⏩⏩⏩"
+                        set (click event of {_c}) to (click event to run command "/nbs list %{_page}+1%")
+                    add {_c} to {_c::*}
+                    send components (merge components {_c::*})
+    literal arg "apply":
+        greedy string arg "name":
+            suggestions:
+                apply suggestion getAllNbsFiles()
+            trigger:
+                if (item id of player's tool) isn't "turtle:custom_music_disc":
+                    send "§6Hold a Custom Music Disc to apply a song."
+                else:
+                    if getAllNbsFiles() contains {_name}:
+                        run section {-sections::getNbsSong} async with {_name} and store result in {_song} and wait
+                        if (item id of player's tool) is "turtle:custom_music_disc":
+                            set (name of player's tool) to {_name}
+                            set (player's tool) to updateCustomMusicDisc(player's tool, {_song})
+                            play sound "minecraft:ui.cartography_table.take_result" in ui to player
+                        else:
+                            set {_c} to (text component from "§bTry again?")
+                            set (hover event of {_c}) to (hover event showing "§b%{_name}%%nl%§3Click to apply to held disc")
+                            set (click event of {_c}) to (click event to run command "/nbs apply %{_name}%")
+                            send component (merge components "§cYou switched off the disc too fast. ", {_c})
+                    else:
+                        send "§cThe song '%{_name}%§r§c' doesn't exist. §6Use /nbs list to list all songs."
     literal arg "stopall":
         permission: op
         trigger:
             send "Stopped %size of {-playingNbsSongs::*}% song player(s)"
             stopAllNbsSongs()
+    literal arg "clearcache":
+        permission: op
+        trigger:
+            send "Cleared %size of {-nbsSongCache::*}% song(s) from cache"
+            size of {-nbsSongCache::*} > 0
+            log info "Cleared %size of {-nbsSongCache::*}% song(s) from cache"
+            clear {-nbsSongCache::*}
+    literal arg "deleteoldsongs":
+        permission: op
+        trigger:
+            run section {-sections::clearOldNbsFiles} async and store result in {_cleared} and wait
+            send "Cleared %{_cleared}% old nbs file(s)"
 
 slash command uploadnbs <attachment="file">:
     description: Upload a song file to use with a Custom Music Disc
@@ -115,30 +205,47 @@ slash command uploadnbs <attachment="file">:
     arguments:
         file: File to upload, must be a .nbs file
     trigger:
-        # linked user
-        loop indexes of {discordLinks::*}:
-            {discordLinks::%loop-value%} is (discord id of event-user)
-            set {_linkeduuid} to loop-value
-            exit loop
-        if {_linkeduuid} isn't set:
-            reply with hidden "You must have your account linked to upload a song!"
-            exit trigger
-        # check .nbs file
-        set {_file} to argument "file" as attachment
-        if file extension of {_file} isn't "nbs":
-            reply with hidden "**Not a song file.** File must end with .nbs"
-            exit trigger
-        # download file
-        set {_filenameNoExt} to getFileName(file name of {_file})
-        set {_filename} to first 30 characters of {_filenameNoExt}
-        replace "_" with " " in {_filename}
-        download {_file} to path "nbsSongs/%{_filename}%.nbs"
-        log info "%event-user% uploaded '%{_filename}%.nbs'"
-        # check if corrupted
-        wait 1 second
-        if getNbsSong({_filename}) is set:
-            reply with hidden "Successfully uploaded `%{_filename}%.nbs`%nl%Rename a Custom Music Disc to ""%{_filename}%"" to hear your song.%nl%Your file could be deleted or overwritten by another user, so don't lose your original file!"
-            discordSend(":cd: <@%discord id of event-user%> uploaded `%{_filename}%`")
-        else:
-            reply with hidden "Your file `%file name of {_file}%` isn't a valid song file! Try again with a valid file."
-            new File("nbsSongs/%{_filename}%.nbs").delete()
+        async run 0 ticks later:
+            # linked user
+            loop indexes of {discordLinks::*}:
+                {discordLinks::%loop-value%} is (discord id of event-user)
+                set {_linkeduuid} to loop-value
+                exit loop
+            if {_linkeduuid} isn't set:
+                reply with hidden "You must have your account linked to upload a song!"
+                exit trigger
+            # check .nbs file
+            set {_fileAttachment} to argument "file" as attachment
+            if file extension of {_fileAttachment} isn't "nbs":
+                reply with hidden "The file you tried to upload isn't a song file. Valid song files end with .nbs%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>)."
+                exit trigger
+            # get filename
+            set {_filenameNoExt} to getFileName(file name of {_fileAttachment})
+            set {_filename} to (first 30 characters of {_filenameNoExt})
+            replace "_" with " " in {_filename}
+            set {_filename} to (try {_filename}.trim()) ? {_filename}
+            # msgs
+            log info "%event-user% is uploading '%{_filename}%.nbs'"
+            reply with hidden "Uploading `%{_filename}%.nbs`%nl%Your file could be deleted or overwritten by another user, so don't lose your original file!%nl%See [Custom Music Disc](<https://github.com/ChicknTurtle/TurtleRealmSMP-scripts/wiki/Custom-Music-Disc>) to learn how to listen to your song in-game."
+            # check if song file is valid
+            set {_inputStream} to {_fileAttachment}.getProxy().download().get()
+            set {_song} to try NBSDecoder.parse({_inputStream})
+            {_inputStream}.close()
+            if {_song} is set:
+                download {_fileAttachment} to path "nbsSongs/%{_filename}%.nbs"
+                log debug "Caching uploaded song '%{_filename}%'"
+                set {-nbsSongCache::%{_filename}%} to {_song}
+                set {_c::1} to "§b◎ "
+                set {_c::2} to (text component from (effective name of event-member))
+                set (color format of {_c::2}) to rgb(88, 101, 242)
+                set (hover event of {_c::2}) to (hover event showing "§f%event-user%%nl%§7@%discord name of event-user%")
+                set {_c::3} to " uploaded "
+                set {_c::4} to (text component from "§b%{_filename}%")
+                set (hover event of {_c::4}) to (hover event showing "§b%{_filename}%%nl%§3Click to apply to held disc")
+                set (click event of {_c::4}) to (click event to run command "/nbs apply %{_filename}%")
+                send component (merge components {_c::*}) to (all players and console)
+                discordSend(":cd: <@%discord id of event-member%> uploaded `%{_filename}%`")
+            else:
+                open private channel of event-user and store it in {_channel}
+                {_channel} is set
+                post "Your file `%file name of {_fileAttachment}%` was not uploaded because it was found to be an invalid song file.%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>)." to {_channel}
