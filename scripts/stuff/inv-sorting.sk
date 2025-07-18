@@ -1,11 +1,9 @@
 
 on inventory click:
     (event-item ? air) is air
-    if all:
-        event-clicktype isn't middle mouse button
-        event-clicktype isn't double click using mouse
-    then:
-        exit
+    set {_cursor} to (player's cursor slot)
+    ({_cursor} ? air) is air
+    event-clicktype is (middle mouse button) or (double click using mouse)
     if all:
         (player inventory, chest, trapped chest, barrel, (tag contents of block tag "shulker_boxes"), minecart with chest, chest boat) doesn't contain (holder of event-inventory)
         event-inventory isn't (ender chest of player)
@@ -39,4 +37,4 @@ on inventory click:
     else:
         clear event-inventory
         add {_finalStacks::*} to event-inventory
-    play sound "minecraft:ui.button.click" in ui with volume 0.5 with pitch 2 for player
+    play sound "minecraft:ui.button.click" in ui with volume 0.5 with pitch 2 for (viewers of event-inventory)

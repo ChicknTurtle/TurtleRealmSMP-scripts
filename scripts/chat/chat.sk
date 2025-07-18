@@ -19,7 +19,7 @@ on join:
     set {_c::2} to playerComponent(player)
     set {_c::3} to " joined the game"
     clear join message
-    broadcast components (merge components {_c::*})
+    send components (merge components {_c::*}) to (all players and console)
     discordSend("**+** %player%")
 
 on leave:
@@ -28,7 +28,7 @@ on leave:
     set {_c::2} to playerComponent(player)
     set {_c::3} to " left the game"
     clear leave message
-    broadcast components (merge components {_c::*})
+    send components (merge components {_c::*}) to (all players and console)
     discordSend("**-** %player%")
 
 on death of player:

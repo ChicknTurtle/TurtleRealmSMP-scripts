@@ -13,17 +13,14 @@ when ready to load recipes:
             set ingredient of "g" to gold ingot
             set ingredient of "d" to diamond
 
-function updateCustomMusicDisc(disc:item) :: item:
-    set {_name} to name of {_disc}
-    set {_song} to getNbsSong({_name})
-    if any:
-        {_name} isn't set
-        {_song} isn't set
-    then:
+function updateCustomMusicDisc(disc:item, song:object={_}) :: item:
+    if {_song} isn't set:
         clear lore of {_disc}
         return {_disc}
+    if {_song}.title ? "" isn't "":
+        add "§7%{_song}.title%" to {_c::*}
     if {_song}.author ? "" isn't "":
-        add "§7%{_song}.author%" to {_c::*}
+        add "§7by %{_song}.author%" to {_c::*}
     if {_song}.originalAuthor ? "" isn't "":
         add "§7Originally by %{_song}.originalAuthor%" to {_c::*}
     set {_c::*} to {_c::*} ? "§7No song info"
@@ -32,7 +29,12 @@ function updateCustomMusicDisc(disc:item) :: item:
 
 on anvil prepare:
     item id of event-slot is "turtle:custom_music_disc"
-    set event-slot to updateCustomMusicDisc(event-slot)
-    name of event-slot is set
-    lore of event-slot isn't set
+    if (name of event-slot) isn't set:
+        set event-slot to updateCustomMusicDisc(event-slot)
+        exit
+    set {_disc} to (item in event-slot)
     set event-slot to air
+    run section {-sections::getNbsSong} async with (name of {_disc}) and store result in {_song} and wait
+    item id of (slot 0 of event-inventory) is "turtle:custom_music_disc"
+    {_song} is set
+    set (slot 2 of event-inventory) to updateCustomMusicDisc({_disc}, {_song})

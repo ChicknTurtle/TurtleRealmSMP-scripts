@@ -3,23 +3,8 @@
 # Makes a small particle and sound at a location.
 effect:
     patterns:
-        [make|play] [a] (debug|pop|debug pop) [effect] [at] %location%
+        [make|play] [a] (debug|pop|debug pop) [effect] [at] %locations%
     trigger:
-        make 1 of flame at expr-1 with extra 0
-        play sound "minecraft:block.note_block.xylophone" at expr-1
-
-function broadcast(val:object, name:string={_}):
-    if {_name} is set:
-        broadcast "%{_name}%: %{_val}%"
-    else:
-        broadcast "%{_val}%"
-
-function broadcasts(val:objects, name:string={_}):
-    set {_val} to "%{_val::*}%"
-    if {_name} is set:
-        broadcast "%{_name}%: %{_val}%"
-    else:
-        broadcast "%{_val}%"
-
-function actionbar(val:object):
-    send actionbar "%{_val}%" to (all players where [input is op])
+        loop exprs-1:
+            make 1 of flame at loop-value with extra 0
+            play sound "minecraft:block.note_block.xylophone" at loop-value

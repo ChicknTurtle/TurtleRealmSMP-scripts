@@ -37,8 +37,8 @@ on message received:
     {enabledFeatures::discordlink} is true
     event-user isn't a discord bot
     discord id of event-channel is {-env::discordLinkChannel}
-    set {_c::1} to text component from "%effective name of event-member%:"
-    set {_c::2} to text component from " &f%event-message%"
-    set color format of {_c::1} to rgb(88, 101, 242)
-    set hover event of {_c::1} to hover event showing "§f%event-user%%nl%§7@%discord name of event-user%"
-    broadcast component (merge components {_c::*})
+    set {_c::1} to (text component from "%effective name of event-member%:")
+    set (color format of {_c::1}) to (rgb(88, 101, 242))
+    set (hover event of {_c::1}) to (hover event showing "§f%event-user%%nl%§7@%discord name of event-user%")
+    set {_c::2} to " &f%event-message%"
+    send component (merge components {_c::*}) to (all players and console)

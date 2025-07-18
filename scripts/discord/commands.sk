@@ -24,19 +24,13 @@ slash command exec <string="command">:
         code: Command to execute
     trigger:
         # permission
-        set {_linked::*} to (indexes of {discordLinks::*} where [{discordLinks::%input%} is (discord id of event-user)])
-        set {_linked} to (first element of {_linked::*})
-        if any:
-            {_linked} isn't set
-            {-env::opPlayers::*} doesn't contain {_linked}
-        then:
-            reply with hidden "You don't have permission to do this."
-            exit trigger
-        else:
-            # execute
+        if {-env::discordExecIds::*} contains (discord id of event-user):
             set {_command} to argument "command" as string
             log info "Executing command from discord: §3%{_command}%"
             if parse effect {_command} = true:
                 reply with hidden ":white_check_mark: Successfully executed `%{_command}%`"
             else:
                 reply with hidden ":warning: Failed to execute `%{_command}%`"
+        else:
+            reply with hidden "You don't have permission to do this."
+            exit trigger

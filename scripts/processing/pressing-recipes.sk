@@ -1,5 +1,5 @@
 
-local function getSimpleResult(item:item,amount:integer=1,chance:number=1) :: objects:
+local function getSimpleResult(item:itemtype,amount:integer=1,chance:number=1) :: objects:
     return {_item}, {_amount}, {_chance}
 
 function addPressingRecipe(input:string, results:objects):
@@ -58,16 +58,17 @@ when ready to load recipes:
     addPressingRecipe("minecraft:clay", (getSimpleResult(clay_ball, 3), getSimpleResult(clay_ball, 1, 0.5)))
     addPressingRecipe("minecraft:dripstone_block", getSimpleResult(clay_ball))
     addPressingRecipe("minecraft:glowstone", (getSimpleResult(glowstone_dust, 3), getSimpleResult(glowstone_dust, 1, 0.5)))
-    addPressingRecipe("minecraft:white_wool", getSimpleResult(string))
+    loop "white", "light_gray", "gray", "black", "brown", "red", "orange", "yellow", "lime", "green", "cyan", "light_blue", "blue", "purple", "magenta", "pink":
+        addPressingRecipe("minecraft:%loop-value%_wool", (getSimpleResult(string item,2),getSimpleResult(string item,1,0.5)))
     addPressingRecipe("minecraft:blaze_rod", (getSimpleResult(blaze_powder, 3), getSimpleResult(blaze_powder, 3, 0.25)))
     addPressingRecipe("minecraft:amethyst_cluster", (getSimpleResult(amethyst_shard, 7), getSimpleResult(amethyst_shard, 1, 0.5)))
     addPressingRecipe("minecraft:block_of_amethyst", (getSimpleResult(amethyst_shard, 3), getSimpleResult(amethyst_shard, 1, 0.5)))
     addPressingRecipe("minecraft:prismarine_crystals", (getSimpleResult(quartz, 1), getSimpleResult(quartz, 2, 0.5), getSimpleResult(glowstone_dust, 2, 0.1)))
     addPressingRecipe("minecraft:nether_wart_block", getSimpleResult(nether_wart, 1, 0.25))
-    addPressingRecipe("minecraft:diamond_horse_armor", (getSimpleResult(diamond, 1), getSimpleResult(leather, 2, 0.5), getSimpleResult(diamond, 3, 0.1), getSimpleResult(string, 2, 0.25)))
-    addPressingRecipe("minecraft:golden_horse_armor", (getSimpleResult(gold_ingot, 2), getSimpleResult(leather, 2, 0.5), getSimpleResult(gold_ingot, 2, 0.5), getSimpleResult(string, 2, 0.25), getSimpleResult(gold_nugget, 8, 0.25)))
-    addPressingRecipe("minecraft:iron_horse_armor", (getSimpleResult(iron_ingot, 2), getSimpleResult(leather, 2, 0.5), getSimpleResult(iron_ingot, 2, 0.5), getSimpleResult(string, 2, 0.25), getSimpleResult(iron_nugget, 8, 0.25)))
-    addPressingRecipe("minecraft:leather_horse_armor", (getSimpleResult(leather, 4), getSimpleResult(leather, 2, 0.5), getSimpleResult(string, 2, 0.25)))
+    addPressingRecipe("minecraft:diamond_horse_armor", (getSimpleResult(diamond, 1), getSimpleResult(leather, 2, 0.5), getSimpleResult(diamond, 3, 0.1), getSimpleResult(string item, 2, 0.25)))
+    addPressingRecipe("minecraft:golden_horse_armor", (getSimpleResult(gold_ingot, 2), getSimpleResult(leather, 2, 0.5), getSimpleResult(gold_ingot, 2, 0.5), getSimpleResult(string item, 2, 0.25), getSimpleResult(gold_nugget, 8, 0.25)))
+    addPressingRecipe("minecraft:iron_horse_armor", (getSimpleResult(iron_ingot, 2), getSimpleResult(leather, 2, 0.5), getSimpleResult(iron_ingot, 2, 0.5), getSimpleResult(string item, 2, 0.25), getSimpleResult(iron_nugget, 8, 0.25)))
+    addPressingRecipe("minecraft:leather_horse_armor", (getSimpleResult(leather, 4), getSimpleResult(leather, 2, 0.5), getSimpleResult(string item, 2, 0.25)))
     addPressingRecipe("minecraft:saddle", (getSimpleResult(leather, 2), getSimpleResult(leather, 2, 0.5)))
     addPressingRecipe("minecraft:raw_copper_block", (getSimpleResult(custom item "turtle:crushed_raw_copper", 9), getSimpleResult(custom item "turtle:experience_nugget", 9, 0.75)))
     addPressingRecipe("minecraft:raw_gold_block", (getSimpleResult(custom item "turtle:crushed_raw_gold", 9), getSimpleResult(custom item "turtle:experience_nugget", 9, 0.75)))
