@@ -32,7 +32,7 @@ on BlockPreDispenseEvent:
             dispenserBonemeal(event)
         # stem block
         else if (pumpkin stem, melon stem) contains (type of {_front_block}):
-            bonemealStemBlock({_front_block}) is true
+            bonemealStemBlock({_front_block}, 5) is true
             dispenserBonemeal(event)
         # single tick block
         else if (chorus flower) contains (type of {_front_block}):
