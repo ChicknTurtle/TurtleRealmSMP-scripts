@@ -67,7 +67,7 @@ function bonemealFlowerBlock(block:block) :: boolean:
     return false
 
 # bonemeal via right-click
-# dispenser functionality in /tweaks/blocks/dispenser.sk
+# dispenser functionality in dispenser.sk
 
 on right click:
     {enabledFeatures::bonemealing} is true

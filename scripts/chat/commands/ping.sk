@@ -1,15 +1,8 @@
 
-on load:
-    set {-features::commands::name} to "Commands"
-    set {-features::commands::desc} to "Simple but useful commands\nType '/turtle:' to show tab-completion for all commands"
-    set {-features::commands::warn} to "If disabled, commands will still be visible but not do anything"
-    set {-features::commands::icon} to command block
-
 brig command /turtle:ping:
     arguments:
-        register optional player arg "players"
+        register optional player arg "player"
     trigger:
-        {enabledFeatures::commands} is true
         set {_player} to ({_player} ? player)
         if {_player} isn't set:
             send "&cNo player was found"

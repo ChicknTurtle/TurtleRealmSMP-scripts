@@ -4,7 +4,6 @@ brig command /turtle:repair:
     arguments:
         register optional entities arg "entities"
     trigger:
-        {enabledFeatures::commands} is true
         set {_entities::*} to ({_entities::*} ? player)
         loop {_entities::*}:
             (max durability of (loop-value's tool)) isn't 0

@@ -4,7 +4,6 @@ brig command /turtle:heal:
     arguments:
         register optional entities arg "entities"
     trigger:
-        {enabledFeatures::commands} is true
         set {_entities::*} to ({_entities::*} ? player)
         loop {_entities::*}:
             heal loop-value
