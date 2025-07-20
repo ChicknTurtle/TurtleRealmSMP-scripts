@@ -1,8 +1,8 @@
 
 when ready to register custom items:
     set (custom item "turtle:chorium_mirror") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_mirror"",""minecraft:item_name"":""Chorium Mirror"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
-    set max damage of (custom item "turtle:chorium_mirror") to 16
-    set custom repair items of (custom item "turtle:chorium_mirror") to (custom item "turtle:blazing_pickaxe")
+    set max damage of (custom item "turtle:chorium_mirror") to 4
+    set custom repair items of (custom item "turtle:chorium_mirror") to (custom item "turtle:chorium_ingot")
     add custom interact to (custom item "turtle:chorium_mirror")
     set (float tag "minecraft:consumable;consume_seconds" of nbt of (custom item "turtle:chorium_mirror")) to 1.5
     set (string tag "minecraft:consumable;animation" of nbt of (custom item "turtle:chorium_mirror")) to "block"
@@ -20,6 +20,14 @@ when ready to load recipes:
         base: custom item "turtle:magnifying_glass"
         addition: custom item "turtle:chorium_ingot"
 
+on preparing craft:
+    size of (items in event-inventory) is 1
+    set {_item} to (first element of (items in event-inventory))
+    (item id of {_item}) is "turtle:chorium_mirror"
+    delete (compound tag "mirrorLoc" of custom nbt of {_item})
+    delete (boolean tag "hasMirrorLoc" of custom nbt of {_item})
+    set recipe result to updateItem({_item})
+
 local function getLore(loc:location={_}) :: objects:
     set {_c1} to (text component from "§fUnbound")
     set (italic format of {_c1}) to false
@@ -36,7 +44,7 @@ local function updateItem(item:item) :: item:
     if {_loc} isn't set:
         set {_c} to (text component from "§fUnbound")
     else:
-        set {_c} to (text component from "§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%")
+        set {_c} to (text component from "§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%§f in §d%world of {_loc}%")
     set (italic format of {_c}) to false
     set (line 1 of component lore of {_item}) to {_c}
     
@@ -48,6 +56,7 @@ local function getMirrorLoc(mirrorLoc:nbtcompound) :: location:
     set {_world} to (world from key (string tag "dimension" of {_mirrorLoc}))
     set {_loc} to location(1st element of {_pos::*},2st element of {_pos::*},3st element of {_pos::*},{_world})
     return {_loc}
+
 local function mirrorTp(p:player,loc:location):
     set {_beforeloc} to ({_p}'s location)
     set (yaw of {_loc}) to (yaw of {_p})
