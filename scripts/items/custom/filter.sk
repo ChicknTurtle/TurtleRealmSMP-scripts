@@ -29,12 +29,13 @@ when ready to load recipes:
         ingredients:
             set ingredient of "n" to iron nugget
             set ingredient of "w" to material choice of (tag contents of item tag "wool")
-    # doesn't match properly with filter nbt
-    #register shapeless recipe:
-    #    id: "turtle:filter_reset"
-    #    result: custom item "turtle:filter"
-    #    ingredients:
-    #        add (custom item "turtle:filter") to ingredients
+
+on preparing craft:
+    size of (items in event-inventory) is 1
+    set {_item} to (first element of (items in event-inventory))
+    (item id of {_item}) is "turtle:filter"
+    delete (compound tag "filter" of custom nbt of {_item})
+    set recipe result to {_item}
 
 on custom item interact with "turtle:filter":
     if event-equipmentslot is main hand:
