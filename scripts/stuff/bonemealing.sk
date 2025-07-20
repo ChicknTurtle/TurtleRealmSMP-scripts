@@ -73,7 +73,7 @@ on right click:
     {enabledFeatures::bonemealing} is true
     player's tool is bone meal
     # vertical growth block
-    if (sugar cane, cactus) contains (type of event-block):
+    if (sugar cane, cactus (itemtype)) contains (type of event-block):
         bonemealVerticalGrowthBlock(event-block) is true
         playerBonemeal(player)
     # crop block
