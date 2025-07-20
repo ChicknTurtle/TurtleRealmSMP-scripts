@@ -321,4 +321,5 @@ on preparing craft:
 on BrewEvent:
     set {_block} to event.getBlock()
     loop ...event.getResults():
-        event.getResults().set((loop-iteration)-1, (updated loop-value).getRandom())
+        set {_item} to (updated loop-value)
+        event.getResults().set((loop-iteration)-1, (try {_item}.getRandom()) ? {_item})
