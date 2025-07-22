@@ -4,21 +4,20 @@ on load:
     set {-features::bossmusic::desc} to "Plays music during bosses\nAdjusted using jukebox/noteblock sound slider"
     set {-features::bossmusic::icon} to music disc cat with nbt from "{item_model:""turtle:music_disc_milky_ways"",""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}" 
 
-on player tick:
+every second:
     {enabledFeatures::bossmusic} is true
-    # only every second
-    mod(gametick of "world", 20) is 0
-    # dragon
-    set {_dragon} to (nearest ender dragon to event-player)
-    if event-player is within 200 blocks of {_dragon}:
-        if now > (metadata value "bossmusic" of event-player):
-            delete (metadata value "bossmusic" of event-player)
-        if (metadata value "bossmusic" of event-player) isn't set:
-            set (metadata value "bossmusic" of event-player) to (now + 187 seconds)
-            play sound "turtle:music.milky_ways" in (record category) with volume 0.75 at location(0,64,0,(world of event-player)) to (event-player)
-    if (event-player isn't within 250 blocks of {_dragon}):
-        stop sound "turtle:music.milky_ways" in record category for event-player
-        delete (metadata value "bossmusic" of event-player)
+    loop all players:
+        # dragon
+        set {_dragon} to (nearest ender dragon to loop-player)
+        if loop-player is within 200 blocks of {_dragon}:
+            if now > (metadata value "bossmusic" of loop-player):
+                delete (metadata value "bossmusic" of loop-player)
+            if (metadata value "bossmusic" of loop-player) isn't set:
+                set (metadata value "bossmusic" of loop-player) to (now + 187 seconds)
+                play sound "turtle:music.milky_ways" in (record category) with volume 0.75 at location(0,64,0,(world of loop-player)) to (loop-player)
+        if (loop-player isn't within 250 blocks of {_dragon}):
+            stop sound "turtle:music.milky_ways" in record category for loop-player
+            delete (metadata value "bossmusic" of loop-player)
 
 on leave:
     delete (metadata value "bossmusic" of player)

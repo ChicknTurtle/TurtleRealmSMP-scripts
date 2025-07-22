@@ -61,16 +61,8 @@ local function mirrorTp(p:player,loc:location):
     set {_beforeloc} to ({_p}'s location)
     set (yaw of {_loc}) to (yaw of {_p})
     set (pitch of {_loc}) to (pitch of {_p})
-    set {_v} to vehicle of {_p}
-    if {_v} is set:
-        make {_p} dismount
-        wait 1 tick
-        teleport {_v} to {_loc} while retaining (vehicle,passengers,yaw and pitch velocity)
-        teleport {_p} to {_loc} while retaining (vehicle,passengers,yaw and pitch velocity)
-        wait 1 tick
-        make {_p} ride {_v}
-    else:
-        teleport {_p} to {_loc} while retaining (vehicle,passengers,yaw and pitch velocity)
+    make {_p} dismount
+    teleport {_p} to {_loc} while retaining (vehicle,passengers,yaw and pitch velocity)
     play sound "minecraft:entity.illusioner.mirror_move" in player category at {_beforeloc}
     play sound "minecraft:block.portal.travel" in player category with volume 0.25 at {_p}
     make 100 of end rod at {_beforeloc} with extra 0.25

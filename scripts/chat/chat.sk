@@ -35,23 +35,21 @@ on death of player:
     event.getShowDeathMessages() is true
     {enabledFeatures::deathmsgs} is true
     discordSend(":skull: %uncolored death message%")
-    set {_c} to (text component from "§c☠ ")
-    set {_c1} to component death message
-    set color format of {_c1} to light gray
-    add {_c1} to {_c}
-    set component death message to {_c}
+    set {_c} to (text component from "§c☠ §7")
+    add (component death message) to {_c}
+    set (component death message) to {_c}
 
 on async chat:
     {enabledFeatures::customchat} is true
-    set {_msg} to async chat message
+    set {_msg} to (async chat message)
     # create format
     # {_msg} is used for discord
     set {_p} to player
     set {_c::1} to playerComponent({_p})
-    set color format of {_c::1} to light gray
-    set {_c::2} to text component from "§7: &r"
-    set {_c::3} to colored async chat message
-    set click event of {_c::1} to click event to suggest command "/msg %name of {_p}% "
+    if (color format of {_c::1}) isn't set:
+        set (color format of {_c::1}) to (light gray)
+    set {_c::2} to "§7: &r"
+    set {_c::3} to (colored async chat message)
     set {_format} to merge components {_c::*}
 
     # replace [item]

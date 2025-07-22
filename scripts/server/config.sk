@@ -1,0 +1,299 @@
+
+import:
+    java.io.FileReader
+    com.google.gson.Gson
+    com.google.gson.JsonObject
+
+on skript start:
+    reloadServerConfig(true)
+
+local function reloadServerConfig(initial:boolean=false):
+    log info "%"L" if ({_initial} is true) else "Rel"%oading server config file..."
+    set {_gson} to new Gson()
+    set {-serverConfigJson} to {_gson}.fromJson(new FileReader("plugins/Skript/scripts/server/config.json"), JsonObject.class)
+
+brig command tree /turtle:config:
+    permission: op
+    trigger:
+        if command sender is console:
+            send "&cCannot open config gui in console."
+            exit trigger
+        openConfigPage(player)
+    literal arg "reload":
+        trigger:
+            send "Reloading server config..."
+            reloadServerConfig()
+    string arg "path":
+        suggestions:
+            apply suggestion getAllConfigValuePaths(true)
+        trigger:
+            set {_realPath} to "root.%{_path}%"
+            set {_value} to getConfigValue({_realPath})
+            if {_value} isn't set:
+                send "§cConfig element '%{_path}%' doesn't exist."
+                exit trigger
+            send "§fConfig element §b%{_path}%§f is set to: %{_value}%"
+        literal arg "set":
+            greedy string arg "value":
+                suggestions:
+                    apply suggestions getConfigValueSuggestions("root.%{_path}%")
+                trigger:
+                    set {_realPath} to "root.%{_path}%"
+                    set {_element} to getConfigElement({_realPath})
+                    if {_element} isn't set:
+                        send "§cConfig element '%{_path}%' doesn't exist."
+                        exit trigger
+                    set {_settingType} to try {_element}.get("type").getAsString()
+                    if {_settingType} is "boolean":
+                        {_value} isn't "true" or "false"
+                        send "§cInvalid boolean value for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    else if {_settingType} is "slider":
+                        set {_valueFloat} to ({_value} parsed as number)
+                        if {_valueFloat} isn't set:
+                            send "§cInvalid number value for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                        set {_settingStart} to try {_element}.get("start").getAsFloat()
+                        if {_settingStart} is set:
+                            {_valueFloat} < {_settingStart}
+                            send "§cValue is under min of %{_settingStart}% for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                        set {_settingEnd} to try {_element}.get("end").getAsFloat()
+                        if {_settingEnd} is set:
+                            {_valueFloat} > {_settingEnd}
+                            send "§cValue is over max of %{_settingEnd}% for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                    else if {_settingType} is "text":
+                        set {_settingMax} to try {_element}.get("max").getAsInt()
+                        {_settingMax} is set
+                        length of {_value} > {_settingMax}
+                        send "§cValue is over max length of %{_settingMax}% for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    else if {_settingType} is "options":
+                        set {_options::*} to ...(try {_element}.get("options").keySet())
+                        {_options::*} doesn't contain {_value}
+                        send "§cInvalid option for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    send "§fConfig element §b%{_path}%§f is set to: %{_value}%"
+        literal arg "reset":
+            trigger:
+                set {_realPath} to "root.%{_path}%"
+                set {_element} to getConfigElement({_realPath})
+                if {_element} isn't set:
+                    send "§cConfig element '%{_path}%' doesn't exist."
+                    exit trigger
+                delete {configValues::%{_path}%}
+                send "§fConfig element §b%{_path}%§f has been reset to default."
+
+function getConfigPaths(nodesJson:object, prefix:string, valuesOnly:boolean) :: strings:
+    loop ...{_nodesJson}.keySet():
+        if {_prefix} doesn't end with ".":
+            {_prefix} isn't ""
+            set {_prefix} to "%{_prefix}%."
+        set {_fullPath} to "%{_prefix}%%loop-value%"
+        set {_childJson} to {_nodesJson}.get(loop-value)
+        set {_childNodes} to {_childJson}.get("nodes")
+        set {_hasChildren} to (true if ({_childNodes} is set) else false)
+        if any:
+            {_valuesOnly} isn't true
+            {_hasChildren} isn't true
+        then:
+            add {_fullPath} to {_paths::*}
+        if {_hasChildren} is true:
+            add getConfigPaths({_childNodes}, {_fullPath}, {_valuesOnly}) to {_paths::*}
+    return {_paths::*}
+
+function getAllConfigPaths(noRoot:boolean=false) :: strings:
+    set {_prefix} to "" if {_noRoot} is true else "root"
+    return getConfigPaths({-serverConfigJson}.get("root").get("nodes"), {_noRoot}, false)
+
+function getAllConfigValuePaths(noRoot:boolean=false) :: strings:
+    set {_prefix} to "" if {_noRoot} is true else "root"
+    return getConfigPaths({-serverConfigJson}.get("root").get("nodes"), {_prefix}, true)
+
+function getConfigValueSuggestions(path:string) :: strings:
+    set {_element} to getConfigElement({_path})
+    set {_settingType} to try {_element}.get("type").getAsString()
+    if {_settingType} is "boolean":
+        return "true", "false"
+    else if {_settingType} is "slider":
+        set {_settingStart} to try {_element}.get("start").getAsFloat()
+        set {_settingDefault} to try {_element}.get("default").getAsFloat()
+        set {_settingEnd} to try {_element}.get("end").getAsFloat()
+        return {_settingStart}, {_settingDefault}, {_settingEnd}
+    else if {_settingType} is "text":
+        set {_settingDefault} to try {_element}.get("default").getAsString()
+        return {_settingDefault}
+    else if {_settingType} is "options":
+        set {_options::*} to ...(try {_element}.get("options").keySet())
+        return {_options::*}
+
+function getConfigValue(path:string) :: object:
+    if {configValues::%{_path}%} is set:
+        return {configValues::%{_path}%}
+    set {_element} to getConfigElement({_path})
+    set {_settingType} to try {_element}.get("type").getAsString()
+    set {_settingDefaultPrimitive} to try {_element}.get("default")
+    if {_settingDefaultPrimitive} is set:
+        if {_settingDefaultPrimitive}.isBoolean():
+            return {_settingDefaultPrimitive}.getAsBoolean()
+        else if {_settingDefaultPrimitive}.isNumber():
+            return {_settingDefaultPrimitive}.getAsFloat()
+        else:
+            return {_settingDefaultPrimitive}.getAsString()
+    else if {_settingType} is "slider":
+        set {_settingStart} to try {_element}.get("start").getAsFloat()
+        return {_settingStart}
+    else if {_settingType} is "options":
+        set {_options::*} to ...(try {_element}.get("options").keySet())
+        return first element of {_options::*}
+
+function getConfigElement(path:string) :: object:
+    set {_path::*} to ({_path} split at ".")
+    set {_pageJson} to {-serverConfigJson}
+    loop {_path::*}:
+        set {_pageJson} to {_pageJson}.get(loop-value)
+        loop-iteration isn't size of {_path::*}
+        set {_pageJson} to {_pageJson}.get("nodes")
+    return {_pageJson}
+
+function openConfigPage(p:player, path:string="root"):
+    set {_path::*} to ({_path} split at ".")
+    set {_pageJson} to {-serverConfigJson}
+    loop {_path::*}:
+        set {_pageJson} to {_pageJson}.get(loop-value)
+        add ({_pageJson}.get("name").getAsString() ? loop-value) to {_pathNames::*}
+        loop-iteration isn't size of {_path::*}
+        set {_pageJson} to {_pageJson}.get("nodes")
+    set {_pageName} to {_pageJson}.get("name").getAsString() ? {_path}
+    set {_pageTitle} to {_pageJson}.get("title").getAsString()
+    set {_pageDesc} to {_pageJson}.get("desc").getAsString()
+    set {_itemJson} to {_pageJson}.get("item")
+    if {_itemJson}.isJsonPrimitive():
+        set {_itemKey} to {_itemJson}.getAsString()
+    else:
+        set {_itemKey} to {_itemJson}.get("id").getAsString()
+        set {_itemNbtStr} to {_itemJson}.get("nbt").getAsString() ? "{}"
+    if {_itemKey} is set:
+        (namespaced key from {_itemKey}) is set
+        set {_item} to (itemtype from key {_itemKey})
+        hide entire tooltip of {_item}
+        add nbt from {_itemNbtStr} to nbt of {_item}
+    set {_nodes} to {_pageJson}.get("nodes")
+    open multi action dialog to {_p}:
+        title: "%join {_pathNames::*} with " > "%"
+        body:
+            if {_item} is set:
+                add item body:
+                    item: {_item}
+            add plain message body:
+                contents: "§n%{_pageTitle} ? {_pageName}%"
+                width: 600
+            if {_pageDesc} is set:
+                add plain message body:
+                    contents: {_pageDesc}
+                    width: 600
+            loop ...{_nodes}.keySet():
+                set {_settingType} to try {_nodes}.get(loop-value).get("type").getAsString()
+                {_settingType} is set
+                set {_settingDesc} to try {_nodes}.get(loop-value).get("desc").getAsString()
+                {_settingDesc} is set
+                set {_settingName} to (try {_nodes}.get(loop-value).get("name").getAsString() ? loop-value)
+                add plain message body:
+                    contents: "§b%{_settingName}%%nl%§f%{_settingDesc}%"
+                    width: 600
+        inputs:
+            loop ...{_nodes}.keySet():
+                set {_key} to loop-value
+                set {_element} to {_nodes}.get({_key})
+                set {_settingType} to try {_element}.get("type").getAsString()
+                {_settingType} is set
+                set {_settingName} to (try {_element}.get("name").getAsString() ? {_key})
+                set {_settingDesc} to try {_element}.get("desc").getAsString()
+                set {_descStr} to "%nl%%{_settingDesc}%" if {_settingDesc} is set else ""
+                set {_settingDefaultPrimitive} to try {_element}.get("default")
+                if {_settingDefaultPrimitive} is set:
+                    if {_settingDefaultPrimitive}.isBoolean():
+                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsBoolean()
+                    else if {_settingDefaultPrimitive}.isNumber():
+                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsFloat()
+                    else:
+                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsString()
+                if {_settingType} is "boolean":
+                    add boolean input:
+                        key: {_key}
+                        label: {_settingName}
+                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault}
+                else if {_settingType} is "slider":
+                    set {_settingStart} to try {_element}.get("start").getAsFloat()
+                    set {_settingEnd} to try {_element}.get("end").getAsFloat()
+                    set {_settingStep} to try {_element}.get("step").getAsFloat()
+                    add number range input:
+                        key: {_key}
+                        label: {_settingName}
+                        start: {_settingStart}
+                        end: {_settingEnd}
+                        step: {_settingStep}
+                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault} ? {_settingStart}
+                else if {_settingType} is "text":
+                    set {_settingMax} to try {_element}.get("max").getAsInt()
+                    if {_settingMax} is set:
+                        set {_maxLength} to max(1,{_settingMax},length of ({configValues::%{_path}%.%{_key}%} ? {_settingDefault}))
+                    set {_settingLines} to try {_element}.get("lines").getAsInt()
+                    if {_settingLines} is set:
+                        set {_multilineMaxLines} to max(1,{_settingLines})
+                        set {_multilineHeight} to clamp({_settingLines}*9+8,1,512)
+                    add text input:
+                        key: {_key}
+                        label: {_settingName}
+                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault}
+                        max_length: {_maxLength}
+                        multiline_max_lines: {_multilineMaxLines}
+                        multiline_height: {_multilineHeight}
+                else if {_settingType} is "options":
+                    set {_options} to try {_pageJson}.get("nodes").get({_key}).get("options")
+                    loop ...{_options}.keySet():
+                        set {_options::%loop-value-2%} to try {_options}.get(loop-value-2).getAsString()
+                    add single option input:
+                        key: {_key}
+                        label: {_settingName}
+                        options:
+                            loop indexes of {_options::*}:
+                                set {_initial} to true if {configValues::%{_path}%.%{_key}%} is loop-value else false
+                                add options entry:
+                                    id: loop-value
+                                    display: {_options::%loop-value%}
+                                    initial: {_initial}
+        actions:
+            loop ...{_nodes}.keySet():
+                set {_settingNodes::*} to try {_nodes}.get(loop-value).get("nodes")
+                {_settingNodes::*} is set
+                set {_settingName} to (try {_nodes}.get(loop-value).get("name").getAsString() ? loop-value)
+                set {_settingDesc} to try {_nodes}.get(loop-value).get("desc").getAsString()
+                add dynamic action button:
+                    label: {_settingName}
+                    tooltip: {_settingDesc}
+                    id: "config:page_button"
+                    additions: nbt from "{DATA:{page:""%{_path}%"",toPage:""%{_path}%.%loop-value%""}}"
+            if {_path} isn't "root":
+                add dynamic action button:
+                    label: "§c← Back"
+                    id: "config:back_button"
+                    additions: nbt from "{DATA:{page:""%{_path}%"",toPage:""%join (first (size of {_path::*} - 1) elements of {_path::*}) with "."%""}}"
+                add dynamic action button:
+                    label: "§b💾 Save & Exit"
+                    id: "config:save_button"
+                    additions: nbt from "{DATA:{page:""%{_path}%""}}"
+
+on dynamic button click:
+    # save input data
+    set {_page} to (string tag "DATA;page" of event-nbt)
+    if {_page} is set:
+        loop (nbt tags of event-nbt) where [input isn't "DATA"]:
+            set {_tagType} to (tag type of tag loop-value of event-nbt)
+            set {_tagType} to boolean tag if {_tagType} is byte tag else {_tagType}
+            set {configValues::%{_page}%.%loop-value%} to ({_tagType} loop-value of event-nbt)
+    # go to page
+    set {_toPage} to (string tag "DATA;toPage" of event-nbt)
+    if {_toPage} is set:
+        openConfigPage(player, {_toPage})

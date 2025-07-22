@@ -4,9 +4,15 @@ brig command /turtle:list:
         set {_p::*} to (all players)
         set {_size} to (size of {_p::*})
         set {_s} to ("" if {_size} is 1 else "s")
-        set {_c::*} to "§b%{_size}% §7player%{_s}% online: §f"
+        set {_c::*} to "§b%{_size}% §fplayer%{_s}% online: §f"
         loop {_p::*}:
             add playerComponent(loop-value) to {_c::*}
+            set {_afkTime} to (time since {-playerData::%loop-value%::afkSince})
+            if {_afkTime} > (30 seconds):
+                if {_afkTime} >= (1 minute):
+                    add " §8(AFK for %minutes of {_afkTime}%m)" to {_c::*}
+                else:
+                    add " §8(AFK for <1m)" to {_c::*}
             loop-iteration isn't (size of {_p::*})
             add "§7, §f" to {_c::*}
         send components (merge components {_c::*})
