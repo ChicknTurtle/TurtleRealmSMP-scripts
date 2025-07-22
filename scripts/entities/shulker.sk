@@ -45,11 +45,6 @@ on damage by shulker bullet:
         set damage to ((damage+3)*2.5)
 
 on death of shulker:
-    string tag "special" of custom nbt of victim is "vault_boss"
-    set {_amount} to (random integer from 1 to 2)
+    (string tag "special" of (custom nbt of victim)) is "vault_boss"
     set {_tool} to ((direct entity of damage source)'s tool)
-    if {_tool} is enchanted with looting:
-        loop (level of looting of {_tool}) times:
-            chance of 0.33
-            add 1 to {_amount}
-    drop {_amount} of (custom item "turtle:chorium_cluster") at (victim ~ vector(0.5,0.5,0.5))
+    drop 1 of (custom item "turtle:chorium_cluster") at (victim ~ vector(0.5,0.5,0.5))

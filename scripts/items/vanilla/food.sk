@@ -1,0 +1,38 @@
+
+when ready to register custom items:
+    # sugar
+    set (custom item "minecraft:sugar") to sugar
+    apply food component to (custom item "minecraft:sugar"):
+        nutrition: 1
+        saturation: 0.6
+        can_always_eat: true
+    apply consumable component to (custom item "minecraft:sugar"):
+        consume_seconds: 0.8 seconds
+        on_consume_effect: apply_effects(potion effect of speed for 10 seconds, 1/3)
+    # resin clump
+    set (custom item "minecraft:resin_clump") to resin clump
+    apply food component to (custom item "minecraft:resin_clump"):
+        nutrition: 1
+        saturation: 0.6
+        can_always_eat: true
+    apply consumable component to (custom item "minecraft:resin_clump"):
+        consume_seconds: 0.8 seconds
+    # nether wart
+    set (custom item "minecraft:nether_wart") to nether wart
+    apply food component to (custom item "minecraft:nether_wart"):
+        nutrition: 3
+        saturation: 1.2
+        can_always_eat: true
+    apply consumable component to (custom item "minecraft:nether_wart"):
+        consume_seconds: 0.8 seconds
+        on_consume_effect: apply_effects(potion effect of nausea for 15 seconds, 0.2)
+    # cookie
+    set (custom item "minecraft:cookie") to cookie
+    apply consumable component to (custom item "minecraft:cookie"):
+        consume_seconds: 1.2 seconds
+    # dried kelp
+    set (custom item "minecraft:dried_kelp") to dried kelp
+    apply food component to (custom item "minecraft:dried_kelp"):
+        nutrition: 1
+        saturation: 0.6
+        can_always_eat: true

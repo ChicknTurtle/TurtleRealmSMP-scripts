@@ -18,6 +18,10 @@ when ready to register custom items:
                 blocks: minecraft block tag "mineable/pickaxe"
                 speed: 8
                 correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/hoe"
+                speed: 8
+                correct_for_drops: true
 
 when ready to load recipes:
     register shaped recipe:

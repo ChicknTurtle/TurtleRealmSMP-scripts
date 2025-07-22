@@ -66,6 +66,10 @@ every tick:
 
 # handle player death
 on death of player:
+    # phantom
+    if (environment of event-world) is end:
+        spawn phantom at victim
+    # drops
     set {_e} to enchantment from key "turtle:soulbound"
     event.getKeepInventory() is false
     set {_drops::*} to ...event.getDrops()
@@ -76,13 +80,14 @@ on death of player:
     # cookie
     if (lowercase name of victim) contains "cookie":
         add cookie to {_drops::*}
+    set {_protectDeathLoot} to getConfigValue("root.players.protectDeathLoot")
     loop {_drops::*}:
         # soulbound
         if loop-value is enchanted with {_e}:
             event.getItemsToKeep().add(loop-value)
         # protected items
         else:
-            if getConfigValue("root.players.protectDeathLoot") is true:
+            if {_protectDeathLoot} is true:
                 event.getDrops().add(protectItemStack(loop-value))
             else:
                 event.getDrops().add(loop-value)
