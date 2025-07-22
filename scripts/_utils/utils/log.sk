@@ -31,7 +31,7 @@ effect:
         [custom] log debug %object% [to (console|terminal)]
         [custom] log %object% [to (console|terminal)] (with|at) (severity|level) debug
     trigger:
-        {-env::logDebug} is true
+        getConfigValue("root.server.logDebug") is true
         set {_msg} to "&3[Skript] &b%expr-1%"
         replace "§r" with "§r§b" in {_msg}
         send {_msg} to console

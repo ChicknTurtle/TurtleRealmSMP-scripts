@@ -91,6 +91,9 @@ on item spawn:
         delete tag loop-value of {_nbt}
     set {_spawntype} to (minecraft entity type from key (string tag "entityType" of custom nbt of event-item))
     mc spawn {_spawntype} at {_p}:
+        clear (armor of event-entity)
+        clear (tool of event-entity)
+        clear (offhand tool of event-entity)
         add {_nbt} to full nbt of event-entity
         set {_size} to event-entity.getBoundingBox().getVolume()
         set {_force} to max(0.75,1.5-{_size})

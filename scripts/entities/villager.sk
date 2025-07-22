@@ -3,19 +3,6 @@ import:
     com.destroystokyo.paper.entity.villager.Reputation
     com.destroystokyo.paper.entity.villager.ReputationType
 
-on load:
-    set {-features::infinitetrading::name} to "Infinite trading"
-    set {-features::infinitetrading::desc} to "Villager trades have infinite stock and no raising demand"
-    set {-features::infinitetrading::warn} to "When disabled, previously interacted with villagers will\nstill have (virtually) infinite trades"
-    set {-features::infinitetrading::icon} to emerald
-    set {-features::sharedcuring::name} to "Shared curing"
-    set {-features::sharedcuring::desc} to "Villager cures will be shared between all players"
-    set {-features::sharedcuring::warn} to "When disabled, the player with the cure discount will be\nthe last one to interact with the villager"
-    set {-features::sharedcuring::icon} to golden apple
-    set {-features::rerolltrades::name} to "Reroll trades"
-    set {-features::rerolltrades::desc} to "Use glowstone dust to reroll trades of a villager"
-    set {-features::rerolltrades::icon} to glowstone dust
-
 # forget far away job-sites
 on entity start pathfinding:
     event-entity is a villager
@@ -24,20 +11,20 @@ on entity start pathfinding:
     if any:
         {_workstation} is air
         world of event-entity isn't world of {_workstation}
-        distance between event-entity and {_workstation} > 256
+        distance between event-entity and {_workstation} > getConfigValue("root.world.villagers.forgetJobDistance")
     then:
         delete (compound tag "Brain;memories;minecraft:job_site" of (nbt of event-entity))
 
 on right click on villager:
     set {_trades::*} to merchant recipes of event-entity
     # infinite trading
-    if {enabledFeatures::infinitetrading} is true:
+    if getConfigValue("root.world.villagers.infiniteTrading") is true:
         loop {_trades::*}:
             loop-value.setMaxUses(2147483647)
             loop-value.setUses(0)
             loop-value.setDemand(0)
     # shared curing
-    if {enabledFeatures::sharedcuring} is true:
+    if getConfigValue("root.world.villagers.sharedCuring") is true:
         set {_reputations} to event-entity.getReputations()
         # check if any player has cure discount
         (...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE) >= 20]) is set
@@ -46,9 +33,8 @@ on right click on villager:
         {_playerRep}.setReputation(ReputationType.MAJOR_POSITIVE, 20)
         event-entity.setReputation(player's uuid, {_playerRep})
     # reroll trades
-    if {enabledFeatures::rerolltrades} is true:
-        size of {_trades::*} > 0
-        (item id of player's tool) is "minecraft:glowstone_dust"
+    if size of {_trades::*} > 0:
+        (item id of player's tool) is getConfigValue("root.world.villagers.rerollTradesItem")
         if event-entity.getVillagerExperience() is 0:
             cancel event
             event-entity.resetOffers()

@@ -1,6 +1,6 @@
 
-import:
-    io.papermc.paper.event.entity.EntityAttemptSmashAttackEvent
+#import:
+#    io.papermc.paper.event.entity.EntityAttemptSmashAttackEvent
 
 function cloudJumpBoost(p:player):
     # boost
@@ -37,7 +37,7 @@ on join:
         wait 1 tick
         if player isn't online:
             exit loop
-    set {-playerdata::%player%::canCloudJump} to true
+    set {-playerData::%player%::canCloudJump} to true
 
 on player press of jump key:
     player isn't climbing
@@ -46,12 +46,12 @@ on player press of jump key:
     player isn't in lava
     player isn't in bubble column
     player isn't flying
-    {-playerdata::%player%::lastonground} >= 1
+    {-playerData::%player%::lastOnGround} >= 1
     set {_e} to enchantment from key "turtle:cloud_jump"
     player's leggings are enchanted with {_e}
-    {-playerdata::%player%::canCloudJump} isn't false
+    {-playerData::%player%::canCloudJump} isn't false
     cloudJumpBoost(player)
-    set {-playerdata::%player%::canCloudJump} to false
+    set {-playerData::%player%::canCloudJump} to false
     wait 1 tick
     if player is on ground:
         wait 1 tick
@@ -59,11 +59,13 @@ on player press of jump key:
         wait 1 tick
         if player isn't online:
             exit loop
-    set {-playerdata::%player%::canCloudJump} to true
+    set {-playerData::%player%::canCloudJump} to true
 
-on riptide:
-    set {-playerdata::%event-player%::canCloudJump} to true
-on EntityAttemptSmashAttackEvent:
-    event.getEntity() is a player
-    event.getOriginalResult() is true
-    set {-playerdata::%event.getEntity()%::canCloudJump} to true
+on jump:
+    set {-playerData::%player%::canCloudJump} to true
+#on riptide:
+#    set {-playerData::%player%::canCloudJump} to true
+#on EntityAttemptSmashAttackEvent:
+#    event.getEntity() is a player
+#    event.getOriginalResult() is true
+#    set {-playerData::%event.getEntity()%::canCloudJump} to true

@@ -13,8 +13,16 @@ function hexToDecimal(hex:string) :: number:
 import:
     java.lang.String as javaString
     java.awt.Color as javaColor
+
 function rgbToHex(r:integer, g:integer, b:integer) :: string:
     return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
+
+function colorToHex(col:color) :: string:
+    set {_r} to (red value of {_col})
+    set {_g} to (green value of {_col})
+    set {_b} to (blue value of {_col})
+    return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
+
 function hexToColor(hex:string) :: color:
     set {_c} to javaColor.decode({_hex})
     return rgb({_c}.getRed(),{_c}.getGreen(),{_c}.getBlue())

@@ -8,46 +8,61 @@ on load:
     set {-features::protectdeathloot::icon} to chest
 
 on join:
-    set {-playerdata::%player%::lastonground} to 1
-    set {-playerdata::%player%::lastmoved} to now
+    set {-playerData::%player%::lastOnGround} to 1
+    set {-playerData::%player%::afkSince} to now
 
-on player tick:
-    # last on ground
-    add 1 to {-playerdata::%player%::lastonground}
-    if player is on ground:
-        set {-playerdata::%player%::lastonground} to 0
-    
-    # last moved
-    if any:
-        player is pressing jump key
-        player is pressing sneak key
-        player is pressing forward key
-        player is pressing backward key
-        player is pressing left key
-        player is pressing right key
-    then:
-        set {-playerdata::%player%::lastmoved} to now
-    
-    # afk, name pain
-    if any:
-        player's gamemode is creative
-        player's gamemode is spectator
-    then:
-        set {_health} to 1
-    else:
-        set {_health} to player's health/player's max health
+on input key press:
+    set {-playerData::%player%::afkSince} to now
+on inventory click:
+    set {-playerData::%player%::afkSince} to now
+
+local function getHeartColor(p:player) :: color:
+    set {_health} to ({_p}'s health/{_p}'s max health)
     set {_health} to round({_health}*255)
-    set {_gb} to {_health}
-    set {_r} to 255
-    if {-playerdata::%player%::lastmoved} < (now - 5 minutes):
-        set {_r} to round({_r}/2)
-        set {_gb} to round({_gb}/2)
-    set {_hex} to rgbToHex({_r}, {_gb}, {_gb})
-    set {_name} to colored "<%{_hex}%>%player's name%"
-    set player's tablist name to {_name}
-    
-    # tablist
-    updateTablist(player)
+    return rgb({_health},0,0)
+
+local function getAfkNameColor(p:player, base:color) :: color:
+    set {_r} to (red value of {_base})
+    set {_g} to (green value of {_base})
+    set {_b} to (blue value of {_base})
+    set {_afkTime} to (time since {-playerData::%{_p}%::afkSince})
+    set {_s} to (ticks of {_afkTime})
+    set {_min} to 0.5
+    set {_start} to 30*20
+    set {_end} to 90*20
+    set {_x} to (1-(({_s}-{_start})/({_end}-{_start}))*(1-{_min}))
+    set {_x} to clamp({_x},{_min},1)
+    return rgb({_r}*{_x},{_g}*{_x},{_b}*{_x})
+
+every tick:
+    # vars
+    set {_tablistHealth} to getConfigValue("root.players.tablistHealth")
+    set {_tps} to ({-formattedTps} ? "§f. . .")
+    set {_mspt} to ({-formattedMspt} ? "§f. . .")
+    set {_servername} to ("§x§F§F§5§F§1§5&lTurtleRealmSMP Dev" if (getConfigValue("root.server.devMode") is true) else "§x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm§x§2§d§b§4§4§1SMP")
+
+    loop all players:
+        # last on ground
+        if loop-player is on ground:
+            set {-playerData::%loop-player%::lastOnGround} to 0
+        else:
+            add 1 to {-playerData::%loop-player%::lastOnGround}
+        # afk, name pain
+        set {_heartColor} to colorToHex(getHeartColor(loop-player))
+        set {_chatColor} to ({-chatColors::%{PlayerData::%loop-player%::chatColor}%} if ({PlayerData::%loop-player%::chatColor} is set) else rgb(255,255,255))
+        set {_nameColor} to colorToHex(getAfkNameColor(loop-player, {_chatColor}))
+        set {_heart} to ""
+        if all:
+            {_tablistHealth} is true
+            loop-player is alive
+            gamemode of loop-player isn't creative or spectator
+        then:
+            set {_heart} to " <%{_heartColor}%>❤"
+        set {_name} to colored "<%{_nameColor}%>%loop-player's name%%{_heart}%"
+        set (loop-player's tablist name) to {_name}
+        # tablist
+        set tablist header of loop-player to "                                     %nl%%{_servername}%%nl%"
+        set tablist footer of loop-player to "%nl%&7TPS: %{_tps}% &8- &7MSPT: %{_mspt}%%nl%"
 
 # handle player death
 on death of player:
@@ -56,8 +71,7 @@ on death of player:
     set {_drops::*} to ...event.getDrops()
     event.getDrops().clear()
     # drop skull
-    if {enabledFeatures::dropskull} is true:
-        attacker is a player
+    if attacker is a player:
         add (nbt skull of "%victim%").getRandom() to {_drops::*}
     # cookie
     if (lowercase name of victim) contains "cookie":
@@ -68,7 +82,7 @@ on death of player:
             event.getItemsToKeep().add(loop-value)
         # protected items
         else:
-            if {enabledFeatures::protectdeathloot} is true:
+            if getConfigValue("root.players.protectDeathLoot") is true:
                 event.getDrops().add(protectItemStack(loop-value))
             else:
                 event.getDrops().add(loop-value)

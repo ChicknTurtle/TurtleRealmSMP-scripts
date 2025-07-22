@@ -16,6 +16,8 @@ local function playerInfo(p:player) :: string:
 
 function playerComponent(p:player) :: object:
     set {_c} to text component from ({_p}'s display name)
-    set hover event of {_c} to (hover event showing (playerInfo({_p})))
-    set click event of {_c} to (click event to suggest command "/msg %{_p}%")
+    set (hover event of {_c}) to (hover event showing (playerInfo({_p})))
+    set (click event of {_c}) to (click event to suggest command "/msg %{_p}%")
+    if {PlayerData::%{_p}%::chatColor} is set:
+        set (color format of {_c}) to {-chatColors::%{PlayerData::%{_p}%::chatColor}%}
     return {_c}

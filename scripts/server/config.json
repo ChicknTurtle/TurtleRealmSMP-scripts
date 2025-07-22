@@ -1,0 +1,166 @@
+{
+  "root": {
+    "name": "Config",
+    "title": "Server Configuration",
+    "desc": "Server configuration for TurtleRealm\nChanging pages or clicking the save button saves the current page,\npushing escape exits without saving the current page.",
+    "item": "minecraft:turtle_spawn_egg",
+    "nodes": {
+      "test": {
+        "name": "Test",
+        "nodes": {
+          "testBoolean": {
+            "type": "boolean"
+          },
+          "testBoolean2": {
+            "name": "Cool Boolean",
+            "desc": "Cooler than testBoolean",
+            "type": "boolean",
+            "default": true
+          },
+          "testSlider": {
+            "type": "slider",
+            "start": 0,
+            "end": 10
+          },
+          "testSlider2": {
+            "name": "Cool Slider",
+            "desc": "Cooler than testSlider",
+            "type": "slider",
+            "start": -100,
+            "end": 0,
+            "default": -69,
+            "step": 1
+          },
+          "testText": {
+            "type": "text"
+          },
+          "testText2": {
+            "name": "Cool Text",
+            "desc": "Cooler than testText",
+            "type": "text",
+            "max": 64,
+            "lines": 4,
+            "default": "some default text...\nand some more..."
+          },
+          "testText3": {
+            "name": "Looooooong text",
+            "type": "text",
+            "max": 512,
+            "lines": 56,
+            "default": "1\n2\n3\n4"
+          },
+          "testOptions": {
+            "type": "options",
+            "options": {
+              "option1": "Option 1",
+              "option2": "Option 2",
+              "option3": "Option 3"
+            }
+          },
+          "testOptions2": {
+            "name": "Cool Options",
+            "desc": "Cooler than testOptions",
+            "type": "options",
+            "options": {
+              "option1": "Cool Option",
+              "option2": "Cooler Option",
+              "option3": "Coolest Option"
+            }
+          }
+        }
+      },
+      "server": {
+        "name": "Server",
+        "desc": "General server configuration",
+        "item": "minecraft:test_block",
+        "nodes": {
+          "chat": {
+            "name": "Chat",
+            "desc": "Nicer looking chat messages",
+            "item": {
+              "id": "minecraft:test_block",
+              "nbt": "{\"minecraft:block_state\":{mode:\"log\"}}"
+            },
+            "nodes": {
+              "commands": {
+                "name": "Commands",
+                "nodes": {}
+              }
+            }
+          },
+          "logDebug": {
+            "name": "Log debug",
+            "desc": "Whether debug messages should be visible in console",
+            "type": "boolean",
+            "default": false
+          },
+          "devMode": {
+            "name": "Dev mode",
+            "desc": "Whether development mode is enabled.\nThis currently only affects the tablist and motd.",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "world": {
+        "name": "World",
+        "desc": "World settings",
+        "item": "minecraft:grass_block",
+        "nodes": {
+          "villagers": {
+            "name": "Villagers",
+            "item": "minecraft:villager_spawn_egg",
+            "nodes": {
+              "infiniteTrading": {
+                "name": "Infinite trading",
+                "desc": "Villager trades have infinite stock and no raising demand.\nWhen disabled, previously interacted with villagers will\nstill have (virtually) infinite trades.",
+                "type": "boolean",
+                "default": true
+              },
+              "sharedCuring": {
+                "name": "Shared Curing",
+                "desc": "Make it so villagers only have to be cured once for all players to recieve the discount.\nWhen disabled, only the last player to interact with the villager will have the cure discount.",
+                "type": "boolean",
+                "default": true
+              },
+              "rerollTradesItem": {
+                "name": "Reroll trades item",
+                "desc": "Use this item to reroll a villager's trades.\nSupports custom item ids. Blank or invalid item to disable.",
+                "type": "text",
+                "default": "minecraft:glowstone"
+              },
+              "forgetJobDistance": {
+                "name": "Forget far-away workstations",
+                "desc": "Force villagers to forget job sites that are this many blocks away.\n0 to disable.",
+                "type": "slider",
+                "start": 0,
+                "end": 512,
+                "default": 256,
+                "step": 16
+              }
+            }
+          }
+        }
+      },
+      "players": {
+        "name": "Players",
+        "desc": "Player configuration",
+        "item": "minecraft:player_head",
+        "nodes": {
+          "tablistHealth": {
+            "name": "Show health in tablist",
+            "desc": "Players' health will show in tablist as a colored heart",
+            "type": "boolean",
+            "default": true
+          },
+          "protectDeathLoot": {
+            "name": "Protect death loot",
+            "desc": "Player death loot will glow and be protected from all sources.\nChanging this setting will not affect previously dropped items.",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    }
+  }
+}
