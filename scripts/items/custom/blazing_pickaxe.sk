@@ -22,6 +22,10 @@ when ready to register custom items:
                 blocks: minecraft block tag "mineable/pickaxe"
                 speed: 8
                 correct_for_drops: true
+            apply tool rule:
+                blocks: minecraft block tag "mineable/hoe"
+                speed: 8
+                correct_for_drops: true
     set (max durability of (custom item "turtle:blazing_paxel")) to 1000
     make (custom item "turtle:blazing_paxel") fire resistant
 
@@ -44,13 +48,17 @@ when ready to load recipes:
             set ingredient of "i" to (custom item "turtle:blazing_ingot")
             set ingredient of "h" to (custom item "turtle:reinforced_handle")
 
+on damage:
+    (item id of attacker's tool) is "turtle:blazing_pickaxe" or "turtle:blazing_paxel"
+    ignite victim for 4 seconds
+
 on break:
     gamemode of player isn't creative
-    ("turtle:blazing_pickaxe", "turtle:blazing_paxel") contains (item id of player's tool)
+    (item id of player's tool) is "turtle:blazing_pickaxe" or "turtle:blazing_paxel"
     inventory of event-block isn't set
     # smelt drops
     clear drops
     loop drops of event-block using player's tool as player:
-        drop smelted loop-value at event-block's location ~ vector(0.5,0.5,0.5)
-        if smelted loop-value isn't loop-value:
+        drop ((smelted loop-value) ? loop-value) at (event-block's location) ~ vector(0.5,0.5,0.5)
+        if ((smelted loop-value) ? loop-value) isn't loop-value:
             draw 5 of flame at event-block with extra 0.05
