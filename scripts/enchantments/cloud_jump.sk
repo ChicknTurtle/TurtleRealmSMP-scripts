@@ -1,6 +1,6 @@
 
-#import:
-#    io.papermc.paper.event.entity.EntityAttemptSmashAttackEvent
+import:
+    io.papermc.paper.event.entity.EntityAttemptSmashAttackEvent
 
 function cloudJumpBoost(p:player):
     # boost
@@ -61,11 +61,11 @@ on player press of jump key:
             exit loop
     set {-playerData::%player%::canCloudJump} to true
 
+# cloud jump hopping
 on jump:
     set {-playerData::%player%::canCloudJump} to true
-#on riptide:
-#    set {-playerData::%player%::canCloudJump} to true
-#on EntityAttemptSmashAttackEvent:
-#    event.getEntity() is a player
-#    event.getOriginalResult() is true
-#    set {-playerData::%event.getEntity()%::canCloudJump} to true
+
+on EntityAttemptSmashAttackEvent:
+    event.getEntity() is a player
+    event.getOriginalResult() is true
+    set {-playerData::%event.getEntity()%::canCloudJump} to true

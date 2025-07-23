@@ -40,7 +40,7 @@ on right click on lodestone:
             subtract 1 from (item amount of player's tool)
     add event-block to {loadstones::*}
     play sound "minecraft:block.beacon.activate" in blocks category at event-block
-    grantAdvancement("turtle:nether/loadstone", player)
+    grantAdvancement("turtle:adventure/loadstone", player)
     cancel event
     make player swing their hand
     make 20 of sculk_charge using 0 at event-block with extra 0.1
