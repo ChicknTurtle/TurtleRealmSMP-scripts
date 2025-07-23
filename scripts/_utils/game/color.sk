@@ -1,6 +1,8 @@
 
-# Returns a number of the decimal value of the input, as a positive integer
-# Made by Sovde, modified by ChicknTurtle
+import:
+    java.lang.String as javaString
+    java.awt.Color as javaColor
+
 function hexToDecimal(hex:string) :: number:
     if first character of {_hex} is "#":
         set {_hex} to (substring of {_hex} from index 2 to index (length of {_hex}))
@@ -9,10 +11,6 @@ function hexToDecimal(hex:string) :: number:
         set {_result} to ({_result} + ((first index of loop-value in "0123456789ABCDEF") - 1) * 16 ^ ({_i} - 1))
         add 1 to {_i}
     return {_result}
-
-import:
-    java.lang.String as javaString
-    java.awt.Color as javaColor
 
 function rgbToHex(r:integer, g:integer, b:integer) :: string:
     return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
@@ -27,46 +25,36 @@ function hexToColor(hex:string) :: color:
     set {_c} to javaColor.decode({_hex})
     return rgb({_c}.getRed(),{_c}.getGreen(),{_c}.getBlue())
 
-# Get the dye color string from a color object
+# color to dye color str
 # e.g. light green > "lime"
-expression:
-    patterns:
-        [the] [dye] color str[ing] (of|from) %color%
-        %color%'s [dye] color str[ing]
-    get:
-        if expr-1 is gray:
-            return "light gray"
-        else if expr-1 is dark gray:
-            return "gray"
-        else if expr-1 is light green:
-            return "lime"
-        else if expr-1 is light cyan:
-            return "light blue"
-        return expr-1
+function colorToDyeColor(color:color) :: string:
+    if {_color} is gray:
+        return "light_gray"
+    else if {_color} is dark gray:
+        return "gray"
+    else if {_color} is light green:
+        return "lime"
+    else if {_color} is light cyan:
+        return "light_blue"
+    return "%{_color}%"
 
-# Get the color of a colored item from item name
-# Supports custom item ids
-expression:
-    patterns:
-        [the] dye color (of|from) %itemstack%
-        %itemstack%'s dye color
-    get:
-        set {_id} to (last element of ((item id of expr-1) split at ":"))
-        replace "_" with " " in {_id}
-        set {_colors::*} to "black", "white", "light gray", "gray", "brown", "red", "orange", "yellow", "lime", "green", "cyan", "light blue", "blue", "purple", "magenta", "pink"
-        sort {_colors::*} by length of input
-        loop {_colors::*}:
-            if {_id} is loop-value:
-                set {_return1} to loop-value
-                exit loop
-            if {_id} starts with "%loop-value% ":
-                set {_return2} to loop-value
-            if {_id} ends with " %loop-value%":
-                set {_return3} to loop-value
-        set {_return1} to (dark gray if {_return1} is "gray" else ({_return1} parsed as color))
-        set {_return2} to (dark gray if {_return2} is "gray" else ({_return2} parsed as color))
-        set {_return3} to (dark gray if {_return3} is "gray" else ({_return3} parsed as color))
-        return {_return1} ? {_return2} ? {_return3}
+# dye color str to color
+function dyeColorToColor(color:string) :: color:
+    if {_color} is "gray":
+        return dark gray
+    replace "_" with " " in {_color}
+    return {_color} parsed as color
+
+# item to its color str
+function dyeColorOf(item:item) :: string:
+    set {_id} to (last element of ((item id of {_item}) split at ":"))
+    set {_colors::*} to "black", "white", "light_gray", "gray", "brown", "red", "orange", "yellow", "lime", "green", "cyan", "light_blue", "blue", "purple", "magenta", "pink"
+    sort {_colors::*} by length of input
+    loop {_colors::*}:
+        if {_id} is loop-value:
+            return loop-value
+        if {_id} starts with "%loop-value%_":
+            return loop-value
 
 # Ping color
 # Get a color based on the ping value

@@ -1,8 +1,11 @@
 
 when ready to register custom items:
-    set (custom item "turtle:shulker_soul") to (quartz with nbt from "{""minecraft:item_model"":""turtle:shulker_soul"",""minecraft:item_name"":""Shulker Soul"",""minecraft:max_stack_size"":16}")
+    set (custom item "turtle:shulker_soul") to (firework star with nbt from "{""minecraft:item_model"":""turtle:shulker_soul"",""minecraft:item_name"":""Shulker Soul"",""minecraft:max_stack_size"":16}")
     loop "red","orange","yellow","lime","green","cyan","light_blue","blue","purple","magenta","pink","black","gray","light_gray","white","brown":
-        set (custom item "turtle:shulker_shell_%loop-value%") to (shulker shell with nbt from "{""minecraft:item_model"":""turtle:shulker_shell_%loop-value%"",""minecraft:item_name"":""%proper case loop-value% Shulker Shell""}")
+        set {_name} to loop-value
+        replace "_" with " " in {_name}
+        set (custom item "turtle:%loop-value%_shulker_shell") to (shulker shell with nbt from "{""minecraft:item_model"":""turtle:shulker_shell_%loop-value%"",""minecraft:item_name"":""%proper case {_name}% Shulker Shell""}")
+        set (custom item "turtle:shulker_shell_%loop-value%") to (shulker shell with custom nbt from "{customItems:{changeId:""turtle:%loop-value%_shulker_shell""}}")
 
 # packing
 on right click:
@@ -16,14 +19,15 @@ on right click:
         player's tool is shulker shell
         player's offhand tool is shulker shell
         (item id of player's tool) is (item id of player's offhand tool)
+        set {_color} to dyeColorToColor(dyeColorOf(player's tool))
+        {_color} is set
         cancel event
-        kill entity within {_e}
+        delete entity within {_e}
         if player's gamemode isn't creative:
             remove (1 of player's tool) from (player's tool)
             remove (1 of player's offhand tool) from (player's offhand tool)
-        set {_col} to (dye color of player's tool) ? ""
         spawn shulker at {_e}:
-            set color of event-entity to {_col}
+            set color of event-entity to {_color}
             play sound "minecraft:item.bottle.fill_dragonbreath" in player category at (event-entity's location)
             make 10 of poof at event-entity with extra 0.2
     # chest
@@ -31,13 +35,26 @@ on right click:
         player's tool is shulker shell
         player's offhand tool is shulker shell
         (item id of player's tool) is (item id of player's offhand tool)
+        set {_color} to dyeColorOf(player's tool)
+        {_color} is set
         cancel event
         if player's gamemode isn't creative:
             remove (1 of player's tool) from (player's tool)
             remove (1 of player's offhand tool) from (player's offhand tool)
-        set {_col} to (dye color str of (dye color of player's tool)) ? ""
-        set {_shulker} to ("%{_col}% shulker box" parsed as itemtype)
+        set {_shulker} to (itemtype from key "%{_color}%_shulker_box")
         set block only of event-block to {_shulker}
         set blockdata tag "facing" of (block at event-block) to "up"
         play sound "minecraft:item.bottle.fill_dragonbreath" in player category at event-block
         make 10 of poof at event-block with extra 0.2
+
+# craft into colored shulkers
+on preparing craft:
+    event-slot is a shulker box
+    set {_shells::*} to (items of event-inventory) where [input is shulker shell]
+    size of {_shells::*} is 2
+    set {_shell} to (1st element of {_shells::*})
+    if (item id of {_shell}) isn't (item id of (2nd element of {_shells::*})):
+        set event-slot to air
+        exit trigger
+    set {_color} to dyeColorOf({_shell})
+    set event-slot to (itemtype from key "%{_color}%_shulker_box")

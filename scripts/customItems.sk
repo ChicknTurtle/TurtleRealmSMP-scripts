@@ -223,6 +223,8 @@ expression:
             set {_keptLore::*} to (first {_keepLore} elements of (component lore of {_item}))
         # update nbt
         set {_rawitem} to (custom item (item id of {_item})) ? {_item}
+        if (string tag "customItems;changeId" of (custom nbt of {_rawitem})) is set:
+            set {_rawitem} to (custom item (string tag "customItems;changeId" of (custom nbt of {_rawitem}))) ? {_item}
         if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
             (int tag "minecraft:damage" of (vanilla nbt of {_rawitem})) isn't set
             delete (int tag "minecraft:damage" of (nbt of {_item}))
