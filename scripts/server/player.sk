@@ -32,7 +32,7 @@ local function getAfkNameColor(p:player, base:color) :: color:
     set {_end} to 90*20
     set {_x} to (1-(({_s}-{_start})/({_end}-{_start}))*(1-{_min}))
     set {_x} to clamp({_x},{_min},1)
-    return rgb({_r}*{_x},{_g}*{_x},{_b}*{_x})
+    return rgb(({_r}*{_x}),({_g}*{_x}),({_b}*{_x}))
 
 every tick:
     # vars

@@ -20,20 +20,23 @@ on toggle gliding:
     wait 1 tick
     while player is gliding:
         wait 1 tick
-        item id of (player's chestplate) is "turtle:chorium_elytra"
-        set {_speed} to (vector length of (player's velocity))
-        {_speed} > 0.8
-        set {_loc} to (location 1 block in front of player)
-        set {_loc} to {_loc} ~ vector(0,0.5,0)
-        set {_leftwing} to (location 1.25 blocks left of {_loc})
-        set {_rightwing} to (location 1.25 blocks right of {_loc})
-        make 1 of witch at {_leftwing} with extra 0 with force
-        make 1 of witch at {_rightwing} with extra 0 with force
-        set {_e::*} to (entities in radius 2.5 of (location 0.5 blocks under player))
-        set {_e::*} to ({_e::*} where [input isn't player])
-        set {_source} to (damage source of player attack caused by player directly by player at player)
-        damage {_e::*} by (3.5*{_speed}) with {_source}
-        loop {_e::*}:
-            push loop-value (player's velocity) with force (1-(knockback resistance attribute of loop-value))
-            if loop-value is ("end crystal" parsed as entity type):
-                make player attack loop-value
+        (item id of (player's chestplate)) is "turtle:chorium_elytra"
+        player is pressing sneak key
+        apply slow falling without particles without the icon to (player) for (5 ticks) replacing existing effect
+        chance of 0.25
+        make 1 of poof at player with extra 0.1
+
+on press of jump key:
+    player is gliding
+    player isn't pressing sneak key
+    y of (velocity of player) <= 0
+    (item id of (player's chestplate)) is "turtle:chorium_elytra"
+    if player's gamemode isn't creative:
+        loop 6 times:
+            (durability of player's chestplate) > 1
+            player.damageItemStack(chest slot, 1)
+    make 1 explosion at player
+    loop 10 times:
+        push player up with speed 0.1
+        make 1 witch at player with extra 0.25
+        wait 1 tick

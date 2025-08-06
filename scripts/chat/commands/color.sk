@@ -6,7 +6,7 @@ on load:
     set {-chatColors::lime} to rgb(100, 230, 50)
     set {-chatColors::cyan} to rgb(0, 180, 200)
     set {-chatColors::blue} to rgb(60, 120, 255)
-    set {-chatColors::purple} to rgb(160, 80, 255)
+    set {-chatColors::purple} to rgb(130, 70, 255)
     set {-chatColors::magenta} to rgb(240, 50, 200)
     set {-chatColors::pink} to rgb(255, 150, 200)
     set {-chatColors::white} to rgb(255, 255, 255)
@@ -14,7 +14,7 @@ on load:
 
 brig command /turtle:color:
     arguments:
-        register literal arg "color" using ("reset","red","orange","yellow","lime","aqua","blue","purple","magenta","pink","white","black")
+        register literal arg "color" using ("reset","red","orange","yellow","lime","cyan","blue","purple","magenta","pink","white","black")
     trigger:
         if {_color} is "reset":
             delete {PlayerData::%player%::chatColor}

@@ -31,8 +31,8 @@ local function dropOrHopper(items:items, hoppers:blocks, loc:location):
                 (inventory of loop-value-1) has space for loop-value-2
                 checkHopperFilter(loop-value-2, loop-value-1) is false
             then:
-                add loop-value-2 to inventory of loop-value-1
-                remove loop-value-2 from {_items::*}
+                add (loop-value-2) to (inventory of (loop-value-1))
+                remove (loop-value-2) from {_items::*}
     drop {_items::*} at {_loc} without velocity
 
 on entity inside block:

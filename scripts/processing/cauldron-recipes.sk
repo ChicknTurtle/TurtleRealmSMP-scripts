@@ -40,7 +40,7 @@ when ready to load recipes:
     addSimpleCauldronRecipe("washing", "turtle:crushed_raw_copper", (getSimpleResult(custom item "turtle:copper_nugget", 9), getSimpleResult(clay_ball, 1, 0.5)))
     addSimpleCauldronRecipe("washing", "minecraft:gravel", (getSimpleResult(flint, 1, 0.25), getSimpleResult(iron nugget, 1, 0.12)))
     addSimpleCauldronRecipe("washing", "minecraft:ice", getSimpleResult(packed ice))
-    addSimpleCauldronRecipe("washing", "minecraft:magma_block", getSimpleResult(obsidian))
+    addSimpleCauldronRecipe("washing", "minecraft:magma_block", getSimpleResult(stone))
     addSimpleCauldronRecipe("washing", "minecraft:sand", getSimpleResult(clay ball, 1, 0.25))
     addSimpleCauldronRecipe("washing", "minecraft:red_sand", (getSimpleResult(gold nugget, 3, 0.12), getSimpleResult(dead bush, 1, 0.05)))
     addSimpleCauldronRecipe("washing", "minecraft:soul_sand", (getSimpleResult(quartz, 4, 0.12), getSimpleResult(gold nugget, 1, 0.02)))

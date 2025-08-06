@@ -1,10 +1,86 @@
 
-# Random of world
+import:
+    java.util.Random
+    java.util.Arrays
+    java.util.Collections
+
+# Get a random seed
 expression:
     patterns:
-        [next] random [float|num[ber]] (of|from) %world%
-        %world%'s [next] random [float|num[ber]]
+        [a] random[ized] seed
     get:
-        if expr-1 isn't set:
-            return 0
-        return expr-1.getHandle().getRandom().nextFloat()
+        return new Random().nextLong()
+
+# Get a new Random instance
+expression:
+    patterns:
+        [a] [new] random instance [(with seed|using) %-integer%]
+    get:
+        if expr-1 is set:
+            return new Random(expr-1)
+        else:
+            return new Random()
+
+# Random number using seed
+expression:
+    patterns:
+        [a|next] random (:integer|number) (from|between) %number% (to|and) %number% (with|of|from|using) [random] [instance] %javaobject%
+    get:
+        set {_isInteger} to (true if (parse tags contains "integer") else false)
+        set {_min} to expr-1
+        set {_max} to expr-2
+        set {_random} to expr-3
+        {_random} is instance of Random
+        if {_isInteger} is true:
+            return {_random}.longs({_min}, {_max}+1).findFirst().orElse({_min})
+        else:
+            return {_min} + {_random}.nextDouble() * ({_max}-{_min})
+
+# Random element of objects using seed
+expression:
+    patterns:
+        [a] random element [out] of %objects% (with|of|from|using) [random] [instance] %javaobject%
+    get:
+        set {_items::*} to expr-1
+        set {_random} to expr-2
+        return {_items::%{_random}.nextInt(size of {_items::*})+1%}
+
+# Shuffle using seed
+plural expression:
+    patterns:
+        shuffled %objects% (with|of|from|using) [random] [instance] %javaobject%
+    get:
+        if size of exprs-1 is 0:
+            return
+        expr-2 is instance of Random
+        set {_list} to Arrays.asList([expr-1])
+        Collections.shuffle({_list}, expr-2)
+        return ...{_list}
+
+# Weighted shuffle, optionally with seed
+plural expression:
+    patterns:
+        shuffled %objects% (with|using) weights %numbers% [(with|of|from|using) [random] [instance] %-javaobject%]
+    get:
+        set {_items::*} to expr-1
+        set {_weights::*} to expr-2
+        set {_random} to expr-3 ? (new random instance)
+        if (size of {_items::*}) isn't (size of {_weights::*}):
+            return
+        loop {_weights::*}:
+            if loop-value isn't a number:
+                return
+            add loop-value to {_totalWeight}
+        loop (size of {_items::*}) times:
+            set {_r} to {_random}.nextDouble() * {_totalWeight}
+            set {_accum} to 0
+            loop {_weights::*}:
+                add loop-value-2 to {_accum}
+                if {_r} <= {_accum}:
+                    remove loop-value-2 from {_totalWeight}
+                    add {_items::%loop-iteration-2%} to {_result::*}
+                    delete {_items::%loop-iteration-2%}
+                    set {_items::*} to {_items::*}
+                    delete {_weights::%loop-iteration-2%}
+                    continue 1st loop
+        return {_result::*}

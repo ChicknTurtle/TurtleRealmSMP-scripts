@@ -10,6 +10,7 @@ expression:
 
 # Facing of vector
 # Get the cardinal direction of a vector
+# TODO: support up/down, specify with 'horizontal' in pattern
 expression:
     patterns:
         [the] facing of [vector] %vector%
@@ -34,7 +35,6 @@ expression:
 # Get a vector from a cardinal direction
 expression:
     patterns:
-        [the] vector of [direction] %direction%
-        [direction] %direction%'[s] vector
+        [the] vector (of|from) dir[ection] %direction%
     get:
         return expr-1.getDirection()

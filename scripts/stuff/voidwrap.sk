@@ -23,14 +23,15 @@ local function warp(e:entity, world:text, coord:number):
 
 on entity remove from world:
     str(event-entityremovecause) is "out_of_world"
-    (environment of event-world) is end
+    event-world is (world {@endWorld})
     voidProcess(event-entity)
     warp(event-entity, {@overworld}, {@upWrapY})
 
 on damage:
     damage cause is void
-    cancel event
-    (environment of event-world) is end
+    if (gamerule keepInventory of event-world) isn't true:
+        cancel event
+    event-world is (world {@endWorld})
     warp(victim, {@overworld}, {@upWrapY})
     while (y-coord of victim) > ({@upWrapY}-10):
         push victim down with force 0.25

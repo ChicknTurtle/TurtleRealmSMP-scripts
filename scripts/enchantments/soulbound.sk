@@ -5,4 +5,4 @@ on drop:
     event-item is enchanted with {_e}
     cancel event
     send actionbar "§cSneak to drop a soulbound item"
-    play sound "minecraft:block.note_block.hat" with volume 0.25 to player
+    play sound "minecraft:block.note_block.hat" in (ui) with volume 0.25 to player
