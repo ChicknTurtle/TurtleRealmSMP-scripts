@@ -47,6 +47,8 @@ when ready to load recipes:
     addPressingRecipe("minecraft:large_fern", (getSimpleResult(green_dye, 2), getSimpleResult(green_dye, 1, 0.5), getSimpleResult(wheat_seeds, 1, 0.1)))
     addPressingRecipe("minecraft:grass", getSimpleResult(wheat_seeds, 1, 0.25))
     addPressingRecipe("minecraft:tall_grass", getSimpleResult(wheat_seeds, 1, 0.5))
+    addPressingRecipe("minecraft:stone", getSimpleResult(cobblestone))
+    addPressingRecipe("minecraft:deepslate", getSimpleResult(cobbled deepslate))
     addPressingRecipe("minecraft:cobblestone", getSimpleResult(gravel))
     addPressingRecipe("minecraft:gravel", (getSimpleResult(sand), getSimpleResult(flint, 1, 0.1), getSimpleResult(clay_ball, 1, 0.05)))
     addPressingRecipe("minecraft:sandstone", getSimpleResult(sand))

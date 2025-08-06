@@ -1,0 +1,18 @@
+
+function formatLocation(loc:location, includeWorld:boolean=true, includeRotation:boolean=false) :: string:
+    if {_loc} isn't set:
+        return {_}
+    set {_str} to "%x-coord of {_loc}%,%y-coord of {_loc}%,%z-coord of {_loc}%"
+    if {_includeWorld} is true:
+        add ",w:%world of {_loc}%" to {_str}
+    if {_includeRotation} is true:
+        add ",r:%yaw of {_loc}%,%pitch of {_loc}%" to {_str}
+    return {_str}
+
+function formatVector(v:vector, includeY:boolean=true) :: string:
+    if {_v} isn't set:
+        return {_}
+    if {_includeY} is true:
+        return "%x of {_v}%,%y of {_v}%,%z of {_v}%"
+    else:
+        return "%x of {_v}%,%z of {_v}%"

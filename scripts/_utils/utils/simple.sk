@@ -1,16 +1,12 @@
 
 # Pass
-# Does nothing, useful for placeholders.
+# Does nothing.
 effect:
     patterns:
         pass
         do nothing
     trigger:
         exit
-
-expression colon:
-    get:
-        return ":"
 
 function str(val:object) :: string:
     return "%{_val}%"

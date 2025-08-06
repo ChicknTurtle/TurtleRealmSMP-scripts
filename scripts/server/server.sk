@@ -6,9 +6,8 @@ options:
 
 # gamerules
 on load:
-    loop all worlds:
-        set gamerule playersSleepingPercentage of loop-world to 0
-        set gamerule doInsomnia of loop-world to false
+    set gamerule playersSleepingPercentage of (world "world") to 0
+    set gamerule doInsomnia of (world "world") to false
 
 function findResourcePackHash():
     log info "Fetching resource pack hash from {@resourcePackUrl}§r..."

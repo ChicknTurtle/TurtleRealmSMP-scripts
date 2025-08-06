@@ -53,8 +53,11 @@ local function updateItem(item:item) :: item:
 local function getMirrorLoc(mirrorLoc:nbtcompound) :: location:
     {_mirrorLoc} is set
     set {_pos::*} to (int array tag "pos" of {_mirrorLoc})
-    set {_world} to (world from key (string tag "dimension" of {_mirrorLoc}))
-    set {_loc} to location(1st element of {_pos::*},2st element of {_pos::*},3st element of {_pos::*},{_world})
+    set {_world} to (world (string tag "world" of {_mirrorLoc})) ? (world from key (string tag "dimension" of {_mirrorLoc}))
+    set {_x} to (1st element of {_pos::*})
+    set {_y} to (2nd element of {_pos::*})
+    set {_z} to (3rd element of {_pos::*})
+    set {_loc} to location({_x},{_y},{_z},{_world})
     return {_loc}
 
 local function mirrorTp(p:player,loc:location):
@@ -74,14 +77,14 @@ on custom item interact with "turtle:chorium_mirror":
     set {_mirror} to (player's offhand tool) if (event-equipmentslot is off hand slot) else (player's tool)
     if durability of {_mirror} <= 1:
         play sound "minecraft:item.ominous_bottle.dispose" in player category at player
-        exit
+        exit trigger
     set {_mirrorLoc} to (compound tag "mirrorLoc" of (custom nbt of {_mirror}))
     if ({_mirrorLoc} ? empty nbt compound) is (empty nbt compound):
         # bind location
         set {_mirrorLoc} to (empty nbt compound)
         set {_loc} to (player's location)
         set (int array tag "pos" of {_mirrorLoc}) to (floor(x-coord of {_loc}),floor(y-coord of {_loc}),floor(z-coord of {_loc}))
-        set (string tag "dimension" of {_mirrorLoc}) to "%event-world.getKey()%"
+        set (string tag "world" of {_mirrorLoc}) to "%event-world%"
         set (compound tag "mirrorLoc" of (custom nbt of {_mirror})) to {_mirrorLoc}
         set (boolean tag "hasMirrorLoc" of (custom nbt of {_mirror})) to true
         play sound "minecraft:entity.illusioner.prepare_mirror" in player category at player

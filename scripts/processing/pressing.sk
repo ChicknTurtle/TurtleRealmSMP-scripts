@@ -21,7 +21,7 @@ local function getCompactedItem(item:itemtype,amount:integer) :: objects:
 on entity change block:
     event-entity is falling block
     (block tag "minecraft:anvil") contains event-blockdata
-    pressProcessBlock(event-block, vector of down)
+    pressProcessBlock(event-block, vector of dir down)
 
 # piston crush items
 on piston extend:
