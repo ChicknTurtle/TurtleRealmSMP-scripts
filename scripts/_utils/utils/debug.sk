@@ -3,8 +3,10 @@
 # Makes a small particle and sound at a location.
 effect:
     patterns:
-        [make|play] [a] (debug|pop|debug pop) [effect] [at] %locations%
+        [make|play] [a] [:silent] (debug|pop|debug pop) [effect] [:colored %-color%] [at] %locations%
     trigger:
-        loop exprs-1:
-            make 1 of flame at loop-value with extra 0
+        set {_color} to expr-1 ? white
+        loop exprs-2:
+            make 1 of trail using trail(loop-value, {_color}, 1 tick) at loop-value
+            parse tags doesn't contain "silent"
             play sound "minecraft:block.note_block.xylophone" at loop-value

@@ -19,11 +19,12 @@ on BlockPreDispenseEvent:
     set {_dispenser} to event.getBlock()
     set {_item} to event.getItemStack()
     set {_front_block} to (block in front of {_dispenser})
+    set {_fronter_block} to (block 2 blocks in front of {_dispenser})
     # bonemealing
     if {_item} is bone meal:
         {enabledFeatures::bonemealing} is true
         # vertical growth block
-        if (sugar cane, cactus) contains (type of {_front_block}):
+        if (sugar cane) contains (type of {_front_block}):
             bonemealVerticalGrowthBlock({_front_block}) is true
             dispenserBonemeal(event)
         # crop block
@@ -41,6 +42,13 @@ on BlockPreDispenseEvent:
         # flower block
         else if (tag values of block tag "small_flowers" where [(wither rose, torchflower) doesn't contain input]) contains (type of {_front_block}):
             bonemealFlowerBlock({_front_block}) is true
+            dispenserBonemeal(event)
+        # cactus block
+        else if all:
+            (cactus (itemtype)) contains (type of {_fronter_block})
+            {_front_block} isn't solid
+        then:
+            bonemealCactusBlock({_fronter_block}) is true
             dispenserBonemeal(event)
         exit trigger
     # breeding

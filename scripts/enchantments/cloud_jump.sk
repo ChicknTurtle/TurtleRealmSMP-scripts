@@ -8,8 +8,8 @@ function cloudJumpBoost(p:player):
         if {_p} is sneaking:
             exit trigger
         # tailwind
-        push {_p} forwards with force 0.4 + 2*0.15
-        push {_p} up with force 0.4 + 2*0.15
+        push {_p} forwards with force 0.5
+        push {_p} up with force 0.4
     else:
         # cloud jump
         set {_x} to 0

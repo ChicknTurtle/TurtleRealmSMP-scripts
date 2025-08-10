@@ -33,6 +33,7 @@ expression:
 
 # Vector of direction
 # Get a vector from a cardinal direction
+# Because skript's expression is broken https://skripthub.net/docs/?id=10169
 expression:
     patterns:
         [the] vector (of|from) dir[ection] %direction%

@@ -1,0 +1,11 @@
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:calcite"
+        result: 2 of calcite
+        category: "building"
+        shape: "dq","qd"
+        ingredients:
+            set ingredient of "d" to diorite
+            set ingredient of "q" to quartz
+

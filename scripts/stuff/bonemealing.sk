@@ -21,12 +21,26 @@ local function playerBonemeal(p:player):
 
 # handle each type of block
 
-function bonemealVerticalGrowthBlock(block:block) :: boolean:
-    set {_type} to type of {_block}
-    loop blocks between {_block} and location 1000 blocks above {_block}:
-        if loop-block is {_type}:
+function bonemealCactusBlock(block:block) :: boolean:
+    set {_type} to (type of {_block})
+    loop (blocks between {_block} and (location 64 blocks above {_block})):
+        if (loop-block is {_type}):
+            (age of loop-block) isn't 15
+            set {_prev} to loop-block
             continue loop
-        if loop-block is air:
+        if (loop-block is air):
+            loop 16 times:
+                {_prev}.randomTick()
+            bonemealEffect({_block})
+            return true
+        return false
+
+function bonemealVerticalGrowthBlock(block:block) :: boolean:
+    set {_type} to (type of {_block})
+    loop (blocks between {_block} and (location 64 blocks above {_block})):
+        if (loop-block is {_type}):
+            continue loop
+        if (loop-block is air):
             set loop-block to {_type}
             loop-block.tick()
             bonemealEffect({_block})
@@ -72,8 +86,12 @@ function bonemealFlowerBlock(block:block) :: boolean:
 on right click:
     {enabledFeatures::bonemealing} is true
     player's tool is bone meal
+    # cactus block
+    if (cactus (itemtype)) contains (type of event-block):
+        bonemealCactusBlock(event-block) is true
+        playerBonemeal(player)
     # vertical growth block
-    if (sugar cane, cactus (itemtype)) contains (type of event-block):
+    if (sugar cane) contains (type of event-block):
         bonemealVerticalGrowthBlock(event-block) is true
         playerBonemeal(player)
     # crop block
