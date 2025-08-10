@@ -1,4 +1,4 @@
-
+###
 on load:
     set {-features::whitelist::name} to "Whitelist"
     set {-features::whitelist::desc} to "Enable a whitelist that players can add to"
@@ -53,3 +53,4 @@ on player connect:
     if (indexes of {pendingWhitelist::*}) contains (lowercase name of player):
         delete {pendingWhitelist::%lowercase name of player%}
         add (lowercase name of player) to {whitelist::*}
+###

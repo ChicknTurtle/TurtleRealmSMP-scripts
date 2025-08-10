@@ -14,14 +14,12 @@ on inventory pickup:
 
 on player attempt item pickup:
     player isn't sneaking
-    if any:
-        (short tag "washingStart" of custom nbt of event-dropped item) is set
-        (short tag "blastingStart" of custom nbt of event-dropped item) is set
-        (short tag "smokingStart" of custom nbt of event-dropped item) is set
-        (short tag "hauntingStart" of custom nbt of event-dropped item) is set
-        (short tag "freezingStart" of custom nbt of event-dropped item) is set
-    then:
+    set {_cnbt} to (custom nbt of event-dropped item)
+    loop "washing","blasting","smoking","haunting","freezing":
+        (short tag "%loop-value%Start" of {_cnbt}) is set
+        (short tag "%loop-value%Latest" of {_cnbt}) > (event-dropped item.getTicksLived())-40
         cancel event
+        exit trigger
 
 local function dropOrHopper(items:items, hoppers:blocks, loc:location):
     loop {_hoppers::*}:
@@ -38,6 +36,7 @@ local function dropOrHopper(items:items, hoppers:blocks, loc:location):
 on entity inside block:
     event-block is tagged with (block tag "cauldrons")
     event-entity is a dropped item
+    # prevent lava cauldrons from burning all items
     if event-block is lava cauldron:
         cancel event
     set {_item} to (item of event-entity)
@@ -50,9 +49,10 @@ on entity inside block:
         indexes of {-cauldronRecipes::freezing::%item id of {_item}%::*} is set
     then:
         make 1 of poof at event-entity with extra 0.1
-        if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
-            set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
-        (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
+        if (short tag "freezingStart" of (custom nbt of event-entity)) isn't set:
+            set (short tag "freezingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "freezingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        (event-entity.getTicksLived()-(short tag "freezingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
             loop indexes of {-cauldronRecipes::freezing::%item id of {_item}%::*}:
                 chance of {-cauldronRecipes::freezing::%item id of {_item}%::%loop-value-2%::chance}
@@ -69,6 +69,7 @@ on entity inside block:
         make 1 of lava at event-entity
         if (short tag "blastingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "blastingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "blastingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "blastingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
             loop indexes of {-cauldronRecipes::blasting::%item id of {_item}%::*}:
@@ -84,6 +85,7 @@ on entity inside block:
         make 1 of lava at event-entity
         if (short tag "blastingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "blastingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "blastingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "blastingStart" of (custom nbt of event-entity))) >= {@processingTime}
         if (smoked {_item} is {_item}):
             dropOrHopper(((item amount of {_item}) of smelted {_item}), {_hoppers::*}, event-entity's location)
@@ -92,13 +94,14 @@ on entity inside block:
     # haunting recipes
     else if all:
         event-block is water cauldron
-        block under event-block is soul campfire[lit=true]
+        (block under event-block) is soul campfire[lit=true]
         indexes of {-cauldronRecipes::haunting::%item id of {_item}%::*} is set
     then:
         make 1 of splash at event-entity
         make 1 of soul at event-entity with extra 0.05
         if (short tag "hauntingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "hauntingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "hauntingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "hauntingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
             loop indexes of {-cauldronRecipes::haunting::%item id of {_item}%::*}:
@@ -111,12 +114,13 @@ on entity inside block:
     # smoking recipes
     else if all:
         event-block is water cauldron
-        block under event-block is campfire[lit=true]
+        (block under event-block) is campfire[lit=true]
         indexes of {-cauldronRecipes::smoking::%item id of {_item}%::*} is set
     then:
         make 1 of splash at event-entity
         if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "smokingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
             loop indexes of {-cauldronRecipes::smoking::%item id of {_item}%::*}:
@@ -129,12 +133,13 @@ on entity inside block:
     # smoker smelting
     else if all:
         event-block is water cauldron
-        block under event-block is campfire[lit=true]
+        (block under event-block) is campfire[lit=true]
     then:
         smoked {_item} isn't {_item}
         make 1 of splash at event-entity
         if (short tag "smokingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "smokingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "smokingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "smokingStart" of (custom nbt of event-entity))) >= {@processingTime}
         dropOrHopper(((item amount of {_item}) of smelted {_item}), {_hoppers::*}, event-entity's location)
         delete event-entity
@@ -142,11 +147,13 @@ on entity inside block:
     # washing
     else if all:
         event-block is water cauldron
+        (block under event-block) isn't campfire[lit=true] or soul_campfire[lit=true]
         indexes of {-cauldronRecipes::washing::%item id of {_item}%::*} is set
     then:
         make 1 of splash at event-entity
         if (short tag "washingStart" of (custom nbt of event-entity)) isn't set:
             set (short tag "washingStart" of (custom nbt of event-entity)) to event-entity.getTicksLived()
+        set (short tag "washingLatest" of (custom nbt of event-entity)) to event-entity.getTicksLived()
         (event-entity.getTicksLived()-(short tag "washingStart" of (custom nbt of event-entity))) >= {@processingTime}
         loop (item amount of {_item}) times:
             loop indexes of {-cauldronRecipes::washing::%item id of {_item}%::*}:

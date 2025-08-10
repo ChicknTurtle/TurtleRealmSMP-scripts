@@ -1,12 +1,6 @@
 
-on load:
-    set {-features::croptrample::name} to "Crop trampling"
-    set {-features::croptrample::desc} to "Crops cannot be trampled while wearing feather falling"
-    set {-features::croptrample::icon} to farmland
-
-# no trample with feather falling
+# Disable crop trampling with feather falling
 on block trample:
-    {enabledFeatures::croptrample} is true
-    if type of event-block is farmland:
-        boots of event-entity are enchanted with feather falling
-        cancel event
+    event-block is farmland
+    (boots of event-entity) are enchanted with feather falling
+    cancel event

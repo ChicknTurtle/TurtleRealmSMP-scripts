@@ -6,7 +6,13 @@ when ready to register custom items:
         slot: chest slot
         equip_sound: "minecraft:item.armor.equip_diamond"
         asset_id: "turtle:chorium_elytra"
-        damage_on_hurt: false
+        damage_on_hurt: true
+    apply attribute modifier to (custom item "turtle:chorium_elytra"):
+        attribute: armor
+        slot: chest slot group
+        id: "minecraft:armor.chestplate"
+        amount: 5
+        operation: add_number
 
 when ready to load recipes:
     register smithing transform recipe:
@@ -15,28 +21,3 @@ when ready to load recipes:
         template: custom item "turtle:chorium_upgrade_smithing_template"
         base: elytra
         addition: custom item "turtle:chorium_ingot"
-
-on toggle gliding:
-    wait 1 tick
-    while player is gliding:
-        wait 1 tick
-        (item id of (player's chestplate)) is "turtle:chorium_elytra"
-        player is pressing sneak key
-        apply slow falling without particles without the icon to (player) for (5 ticks) replacing existing effect
-        chance of 0.25
-        make 1 of poof at player with extra 0.1
-
-on press of jump key:
-    player is gliding
-    player isn't pressing sneak key
-    y of (velocity of player) <= 0
-    (item id of (player's chestplate)) is "turtle:chorium_elytra"
-    if player's gamemode isn't creative:
-        loop 6 times:
-            (durability of player's chestplate) > 1
-            player.damageItemStack(chest slot, 1)
-    make 1 explosion at player
-    loop 10 times:
-        push player up with speed 0.1
-        make 1 witch at player with extra 0.25
-        wait 1 tick
