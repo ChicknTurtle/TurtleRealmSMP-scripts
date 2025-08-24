@@ -17,6 +17,7 @@ local function dispenserBonemeal(event:object):
 on BlockPreDispenseEvent:
     {enabledFeatures::dispensers} is true
     set {_dispenser} to event.getBlock()
+    {_dispenser} is a dispenser
     set {_item} to event.getItemStack()
     set {_front_block} to (block in front of {_dispenser})
     set {_fronter_block} to (block 2 blocks in front of {_dispenser})

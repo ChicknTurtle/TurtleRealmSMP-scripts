@@ -4,22 +4,39 @@ on load:
     set {-chatColors::orange} to rgb(255, 130, 0)
     set {-chatColors::yellow} to rgb(255, 220, 40)
     set {-chatColors::lime} to rgb(100, 230, 50)
+    set {-chatColors::green} to rgb(2, 196, 89)
     set {-chatColors::cyan} to rgb(0, 180, 200)
     set {-chatColors::blue} to rgb(60, 120, 255)
     set {-chatColors::purple} to rgb(130, 70, 255)
     set {-chatColors::magenta} to rgb(240, 50, 200)
-    set {-chatColors::pink} to rgb(255, 150, 200)
+    set {-chatColors::pink} to rgb(255, 120, 185)
     set {-chatColors::white} to rgb(255, 255, 255)
     set {-chatColors::black} to rgb(50, 50, 100)
 
-brig command /turtle:color:
-    arguments:
-        register literal arg "color" using ("reset","red","orange","yellow","lime","cyan","blue","purple","magenta","pink","white","black")
+brig command tree /turtle:color:
     trigger:
-        if {_color} is "reset":
-            delete {PlayerData::%player%::chatColor}
-            send "Your chat color has been reset."
-            exit trigger
-        set {PlayerData::%player%::chatColor} to {_color}
-        set {_colorHex} to colorToHex({-chatColors::%{_color}%})
-        send colored "Your chat color has been set to <%{_colorHex}%>%{_color}%§r!"
+        set {_c::1} to (text component from "§fChoose a color: ")
+        set {_i} to 2
+        loop ("red","orange","yellow","lime","green","cyan","blue","purple","magenta","pink","white","black"):
+            set {_c::%{_i}%} to (text component from loop-value)
+            set (color format of {_c::%{_i}%}) to {-chatColors::%loop-value%}
+            set (click event of {_c::%{_i}%}) to (click event to run command "/turtle:color %loop-value%")
+            set {_h} to (text component from "Click to apply")
+            set (color format of {_h}) to {-chatColors::%loop-value%}
+            set (hover event of {_c::%{_i}%}) to (hover event showing {_h})
+            add 1 to {_i}
+            set {_c::%{_i}%} to (text component from "§f, ")
+            add 1 to {_i}
+        set {_c::%{_i}%} to (text component from "reset")
+        set (click event of {_c::%{_i}%}) to (click event to run command "/turtle:color reset")
+        set (hover event of {_c::%{_i}%}) to (hover event showing "Click to reset")
+        send components (merge components {_c::*})
+    literal arg "color" using ("red","orange","yellow","lime","green","cyan","blue","purple","magenta","pink","white","black","reset"):
+        trigger:
+            if {_color} is "reset":
+                delete {PlayerData::%player%::chatColor}
+                send "§fYour chat color has been reset."
+                exit trigger
+            set {PlayerData::%player%::chatColor} to {_color}
+            set {_colorHex} to colorToHex({-chatColors::%{_color}%})
+            send colored "§fYour chat color has been set to <%{_colorHex}%>%{_color}%§f!"

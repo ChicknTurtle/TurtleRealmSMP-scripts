@@ -1,0 +1,9 @@
+
+brig command /turtle:worldtp <entities> <world:world>:
+    permission: op
+    trigger:
+        teleport {_entities::*} to (spawn location of {_world})
+        if size of {_entities::*} is 1:
+            send "Warped %name of first element of {_entities::*}% to world %{_world}%"
+        else:
+            send "Warped %size of {_entities::*}% entities to world %{_world}%"
