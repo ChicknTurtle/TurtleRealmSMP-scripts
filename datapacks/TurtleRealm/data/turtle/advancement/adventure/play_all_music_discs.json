@@ -272,44 +272,6 @@
       },
       "trigger": "minecraft:item_used_on_block"
     },
-    "turtle:music_disc_megalovania": {
-      "conditions": {
-        "location": [
-          {
-            "condition": "minecraft:match_tool",
-            "predicate": {
-              "predicates": {
-                "minecraft:custom_data": {
-                  "customItems": {
-                    "id": "turtle:music_disc_megalovania"
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:item_used_on_block"
-    },
-    "turtle:music_disc_fly_octo_fly": {
-      "conditions": {
-        "location": [
-          {
-            "condition": "minecraft:match_tool",
-            "predicate": {
-              "predicates": {
-                "minecraft:custom_data": {
-                  "customItems": {
-                    "id": "turtle:music_disc_fly_octo_fly"
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:item_used_on_block"
-    },
     "turtle:music_disc_milky_ways": {
       "conditions": {
         "location": [

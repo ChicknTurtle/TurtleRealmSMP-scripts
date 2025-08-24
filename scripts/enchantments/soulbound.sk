@@ -1,6 +1,7 @@
 
 on drop:
     player isn't sneaking
+    player is alive
     set {_e} to enchantment from key "turtle:soulbound"
     event-item is enchanted with {_e}
     cancel event

@@ -25,7 +25,6 @@ when ready to load recipes:
 
 import:
     com.destroystokyo.paper.entity.villager.ReputationType
-    org.bukkit.entity.Animals
 
 on right click:
     (item id of player's tool) is "turtle:magnifying_glass"
@@ -66,10 +65,13 @@ on right click:
                 set (click event of {_workstationPos}) to (click event to run command "/turtle:lookat %{_x}% %{_y}% %{_z}%")
                 add (merge components ("   §7🏠 §fWorkstation: ",{_workstationName}," at ",{_workstationPos})) to {_info::*}
         # breeding cooldown
-        if ({_e} is instance of Animals):
-            set {_breedingCooldown} to (age of {_e})
-            set {_breedingCooldown} to ("§aNone" if {_breedingCooldown} <= 0 else "%ceil({_breedingCooldown}/20)%s")
-            add "   §d💕 §7Breeding Cooldown: §f%{_breedingCooldown}%" to {_info::*}
+        if {_e} is breedable:
+            set {_age} to (age of {_e})
+            if {_age} >= 0:
+                set {_breedingCooldown} to ("§aNone" if {_age} <= 0 else "%ceil({_age}/20)%s")
+                add "   §d💕 §7Breeding Cooldown: §f%{_breedingCooldown}%" to {_info::*}
+            else:
+                add "   §d🐤 §7Grows up in: §f%floor({_age}/-20)%s" to {_info::*}
         # wandering trader despawn
         set {_despawnDelay} to (try {_e}.getDespawnDelay())
         if {_despawnDelay} is set:

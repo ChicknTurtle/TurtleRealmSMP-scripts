@@ -6,8 +6,6 @@ on load:
     set {-features::musicdiscrecipes::icon} to music disc cat with nbt from "{""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}"
 
 when ready to register custom items:
-    set (custom item "turtle:music_disc_megalovania") to (music disc cat with nbt from "{""minecraft:item_model"":""turtle:music_disc_megalovania"",""minecraft:jukebox_playable"":""turtle:megalovania""}")
-    set (custom item "turtle:music_disc_fly_octo_fly") to (music disc cat with nbt from "{""minecraft:item_model"":""turtle:music_disc_fly_octo_fly"",""minecraft:rarity"":""rare"",""minecraft:jukebox_playable"":""turtle:fly_octo_fly""}")
     set (custom item "turtle:music_disc_milky_ways") to (music disc cat with nbt from "{""minecraft:item_model"":""turtle:music_disc_milky_ways"",""minecraft:rarity"":""epic"",""minecraft:jukebox_playable"":""turtle:milky_ways""}")
     set (custom item "minecraft:cake") to (cake with nbt from "{""minecraft:jukebox_playable"":""turtle:portal_radio"",""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}")
 
@@ -127,20 +125,3 @@ when ready to load recipes:
         ingredients:
             set ingredient of "f" to disc fragment 5
             set ingredient of "#" to echo shard
-    register shaped recipe:
-        id: "turtle:music_disc_megalovania"
-        result: custom item "turtle:music_disc_megalovania"
-        shape: "fff", "f#f", "fff"
-        category: "misc"
-        ingredients:
-            set ingredient of "f" to disc fragment 5
-            set ingredient of "#" to soul torch
-    register shaped recipe:
-        id: "turtle:music_disc_fly_octo_fly"
-        result: custom item "turtle:music_disc_fly_octo_fly"
-        shape: "fff", "f#f", "fqf"
-        category: "misc"
-        ingredients:
-            set ingredient of "f" to disc fragment 5
-            set ingredient of "#" to magenta wool
-            set ingredient of "q" to quartz

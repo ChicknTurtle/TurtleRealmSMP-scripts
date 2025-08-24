@@ -26,3 +26,13 @@ expression:
         if spawn egg of expr-1 is set:
             return spawn egg of expr-1
         return ((str(type of expr-1) parsed as item type) ? {_})
+
+# Breedable
+# Gets whether an entity is actually breedable
+condition:
+    patterns:
+        %livingentities% (is|are) breedable
+    check:
+        (int tag "InLove" of nbt of expr-1) is set
+        expr-1 isn't a parrot, happy ghast, mule, or skeleton horse
+        continue

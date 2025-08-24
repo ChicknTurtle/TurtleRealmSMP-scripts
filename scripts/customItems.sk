@@ -244,6 +244,19 @@ effect:
     trigger:
         set (raw expression expr-1) to (updated expr-1)
 
+###
+# Custom item recipe choice (doesn't work with ExactChoice)
+expression:
+    patterns:
+        [custom] [item] recipe[ ]choice (for|of|using) %item%
+        %item%'s [custom] [item] recipe[ ]choice
+    get:
+        set {_item} to expr-1
+        clear nbt of {_item}
+        set (item id of {_item}) to (item id of expr-1)
+        return {_item}
+###
+
 # Handle existing custom items
 
 # Custom interact behavior

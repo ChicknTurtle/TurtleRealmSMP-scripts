@@ -39,6 +39,8 @@ expression:
         set {_real_name} to (translate component from (translation key of {_e}))
         set {_custom_name} to (custom name of {_e})
         set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
+        if "%{_variant}%" is "SKELETON_HORSE":
+            delete {_variant}
         if {_variant} is set:
             if (try {_variant}.getKey()) is set:
                 set {_variant} to {_variant}.getKey().getKey()
