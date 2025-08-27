@@ -11,11 +11,8 @@ slash command list:
         loop {_p::*}:
             add (name of loop-value) to {_response}
             set {_afkTime} to (time since {-playerData::%loop-value%::afkSince})
-            if {_afkTime} > (30 seconds):
-                if {_afkTime} >= (1 minute):
-                    add " (AFK for %minutes of {_afkTime}%m)" to {_response}
-                else:
-                    add " (AFK for <1m)" to {_response}
+            if {_afkTime} > (60 seconds):
+                add " (AFK for %minutes of {_afkTime}%m)" to {_response}
             loop-iteration isn't (size of {_p::*})
             add ", " to {_response}
         reply with hidden {_response}

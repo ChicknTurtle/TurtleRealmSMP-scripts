@@ -13,6 +13,8 @@ on join:
 
 on input key press:
     set {-playerData::%player%::afkSince} to now
+on click:
+    set {-playerData::%player%::afkSince} to now
 on inventory click:
     set {-playerData::%player%::afkSince} to now
 
@@ -28,8 +30,8 @@ local function getAfkNameColor(p:player, base:color) :: color:
     set {_afkTime} to (time since {-playerData::%{_p}%::afkSince})
     set {_s} to (ticks of {_afkTime})
     set {_min} to 0.5
-    set {_start} to 30*20
-    set {_end} to 90*20
+    set {_start} to 60*20
+    set {_end} to 300*20
     set {_x} to (1-(({_s}-{_start})/({_end}-{_start}))*(1-{_min}))
     set {_x} to clamp({_x},{_min},1)
     return rgb(({_r}*{_x}),({_g}*{_x}),({_b}*{_x}))

@@ -19,8 +19,7 @@ on right click:
         player's tool is shulker shell
         player's offhand tool is shulker shell
         (item id of player's tool) is (item id of player's offhand tool)
-        set {_color} to dyeColorToColor(dyeColorOf(player's tool))
-        {_color} is set
+        set {_color} to dyeColorToColor(dyeColorOf(player's tool)) ? ""
         cancel event
         delete entity within {_e}
         if player's gamemode isn't creative:
@@ -35,13 +34,13 @@ on right click:
         player's tool is shulker shell
         player's offhand tool is shulker shell
         (item id of player's tool) is (item id of player's offhand tool)
-        set {_color} to dyeColorOf(player's tool)
-        {_color} is set
-        cancel event
+        set {_color} to dyeColorOf(player's tool) ? ""
+        if {_color} isn't "":
+            set {_color} to "%{_color}%_"
         if player's gamemode isn't creative:
             remove (1 of player's tool) from (player's tool)
             remove (1 of player's offhand tool) from (player's offhand tool)
-        set {_shulker} to (itemtype from key "%{_color}%_shulker_box")
+        set {_shulker} to (itemtype from key "%{_color}%shulker_box")
         set block only of event-block to {_shulker}
         set blockdata tag "facing" of (block at event-block) to "up"
         play sound "minecraft:item.bottle.fill_dragonbreath" in player category at event-block
@@ -53,6 +52,7 @@ on preparing craft:
     set {_shells::*} to (items of event-inventory) where [input is shulker shell]
     size of {_shells::*} is 2
     set {_shell} to (1st element of {_shells::*})
+    (item id of {_shell}) isn't "minecraft:shulker_shell"
     if (item id of {_shell}) isn't (item id of (2nd element of {_shells::*})):
         set event-slot to air
         exit trigger
