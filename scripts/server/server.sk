@@ -1,13 +1,17 @@
 
+import:
+    org.geysermc.floodgate.api.FloodgateApi
+
 options:
     resourcePackUrl: https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip
     resourcePackPrompt: "§bRequired for custom textures, sounds and other features"
     resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
-# gamerules
 on load:
     set gamerule playersSleepingPercentage of (world "world") to 0
     set gamerule doInsomnia of (world "world") to false
+
+    set {-fgApi} to FloodgateApi.getInstance()
 
 function findResourcePackHash():
     log info "Fetching resource pack hash from {@resourcePackUrl}§r..."
@@ -23,8 +27,9 @@ on skript load:
 # unlock recipes
 # send resource pack
 on join:
-    sendResourcePack(player)
     unlock recipes (all recipes) for player
+    (try {-fgApi}.isFloodgatePlayer(uuid of player)) isn't true
+    sendResourcePack(player)
 
 import:
     java.util.UUID
