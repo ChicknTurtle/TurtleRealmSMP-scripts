@@ -116,6 +116,7 @@ on custom item interact with "turtle:chorium_case_filled":
 on inventory click:
     # case in inv
     if (item id of event-slot) is "turtle:chorium_case" or "turtle:chorium_case_filled":
+        (boolean tag "inFilter" of (custom nbt of event-slot)) isn't true
         # insert
         if (player's cursor slot) is ender pearl:
             event-clicktype is left mouse button
@@ -155,6 +156,7 @@ on inventory click:
             play sound "minecraft:item.bundle.remove_one" in (players category) at player to player
     # case in cursor
     else if (item id of (player's cursor slot)) is "turtle:chorium_case" or "turtle:chorium_case_filled":
+        (boolean tag "inFilter" of (custom nbt of event-slot)) isn't true
         # insert
         if event-slot is ender pearl:
             event-clicktype is left mouse button

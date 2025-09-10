@@ -18,5 +18,6 @@ event "customItemInteract":
         [on] custom item (interact[ion]|use[d]) [(using|with) %-string%]
     check:
         if event-string isn't expr-1:
+            expr-1 is set
             stop
         continue

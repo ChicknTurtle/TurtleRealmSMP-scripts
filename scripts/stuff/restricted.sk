@@ -4,6 +4,9 @@ on place of barrier:
     player's gamemode isn't creative
     cancel event
 on player interact:
-    player's gamemode isn't creative
-    event-item is tagged with (item tag "spawn_eggs")
-    cancel event
+    if all:
+        player's gamemode isn't creative
+        player isn't op
+    then:
+        event-item is tagged with (item tag "spawn_eggs")
+        cancel event

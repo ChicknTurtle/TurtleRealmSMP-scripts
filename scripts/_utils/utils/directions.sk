@@ -10,16 +10,24 @@ expression:
 
 # Facing of vector
 # Get the cardinal direction of a vector
-# TODO: support up/down, specify with 'horizontal' in pattern
 expression:
     patterns:
-        [the] facing of [vector] %vector%
-        [vector] %vector%'[s] facing
+        [the] [:horizontal] facing of [vector] %vector%
+        [vector] %vector%'[s] [:horizontal] facing
     get:
+        set {_horizontal} to (true if parse tags contains "horizontal" else false)
         set {_x} to x of expr-1
+        set {_y} to y of expr-1
         set {_z} to z of expr-1
-        
-        # determine the dominant axis
+        if {_horizontal} is false:
+            if all:
+                abs({_y}) >= abs({_x})
+                abs({_y}) >= abs({_z})
+            then:
+                if {_y} > 0:
+                    return up
+                else:
+                    return down
         if abs({_x}) >= abs({_z}):
             if {_x} > 0:
                 return east
@@ -39,3 +47,17 @@ expression:
         [the] vector (of|from) dir[ection] %direction%
     get:
         return expr-1.getDirection()
+
+# Randomly rotate a vector within a cone
+expression:
+    patterns:
+        [vector] %vector% spread [randomly] by %number% [deg[rees]]
+    get:
+        set {_v} to expr-1
+        set {_maxAngle} to expr-2
+        set {_axis} to vector(0-(z of {_v}), 0, (x of {_v}))
+        set {_phi} to (random number from 0 to 360)
+        rotate {_axis} around {_v} by {_phi}
+        set {_theta} to (random number from 0 to {_maxAngle})
+        rotate {_v} around {_axis} by {_theta}
+        return {_v}

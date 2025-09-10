@@ -1,8 +1,11 @@
 
-function formatLocation(loc:location, includeWorld:boolean=true, includeRotation:boolean=false) :: string:
+function formatLocation(loc:location, includeWorld:boolean=true, includeRotation:boolean=false, round:boolean=false) :: string:
     if {_loc} isn't set:
         return {_}
-    set {_str} to "%x-coord of {_loc}%,%y-coord of {_loc}%,%z-coord of {_loc}%"
+    if {_round} is true:
+        set {_str} to "%round(x-coord of {_loc})%,%round(y-coord of {_loc})%,%round(z-coord of {_loc})%"
+    else:
+        set {_str} to "%x-coord of {_loc}%,%y-coord of {_loc}%,%z-coord of {_loc}%"
     if {_includeWorld} is true:
         add ",w:%world of {_loc}%" to {_str}
     if {_includeRotation} is true:
@@ -16,3 +19,10 @@ function formatVector(v:vector, includeY:boolean=true) :: string:
         return "%x of {_v}%,%y of {_v}%,%z of {_v}%"
     else:
         return "%x of {_v}%,%z of {_v}%"
+
+function formatTimespan(time:timespan) :: string:
+    set {_s} to (seconds of {_time})
+    set {_h} to floor({_s} / 3600)
+    set {_m} to floor(mod({_s}, 3600) / 60)
+    set {_s} to mod({_s}, 60)
+    return ("%{_h}%h " if {_h} isn't 0 else "") + ("%{_m}%m " if {_m} isn't 0 else "") + "%{_s}%s"

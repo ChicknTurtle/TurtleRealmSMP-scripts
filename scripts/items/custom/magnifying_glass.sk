@@ -68,15 +68,15 @@ on right click:
         if {_e} is breedable:
             set {_age} to (age of {_e})
             if {_age} >= 0:
-                set {_breedingCooldown} to ("§aNone" if {_age} <= 0 else "%ceil({_age}/20)%s")
+                set {_breedingCooldown} to ("§aNone" if {_age} <= 0 else formatTimespan({_age}*1 tick))
                 add "   §d💕 §7Breeding Cooldown: §f%{_breedingCooldown}%" to {_info::*}
             else:
-                add "   §d🐤 §7Grows up in: §f%floor({_age}/-20)%s" to {_info::*}
+                add "   §d🐤 §7Grows up in: §f%formatTimespan(({_age}*-1)*1 tick)%" to {_info::*}
         # wandering trader despawn
         set {_despawnDelay} to (try {_e}.getDespawnDelay())
         if {_despawnDelay} is set:
-            set {_despawnDelay} to ceil({_despawnDelay}/20)
-            add "   §3⌛ §7Despawns in: §f%{_despawnDelay}%s" to {_info::*}
+            set {_despawnDelay} to formatTimespan({_despawnDelay}*1 tick)
+            add "   §3⌛ §7Despawns in: §f%{_despawnDelay}%" to {_info::*}
         # pandas
         set {_mainGene} to (main gene of {_e})
         if {_mainGene} is set:
@@ -136,6 +136,15 @@ on right click:
             else:
                 add "   §6🎵 §7Empty" to {_record::*}
             add (merge components {_record::*}) to {_info::*}
+        # trial spawner
+        if {_b} is a trial spawner:
+            set {_cooldown} to (blockstate of {_b}).getCooldownEnd()
+            if {_cooldown} is 0:
+                set {_cooldownText} to "§fNone"
+            else:
+                set {_cooldownText} to "§f%formatTimespan(({_cooldown} - (game ticks of world of {_b})) * (1 tick))%"
+            add "   §6⌛ §7Cooldown: §f%{_cooldownText}%" to {_info::*}
+        
         if (size of {_info::*}) <= 1:
             exit trigger
         send components {_info::*} to player
