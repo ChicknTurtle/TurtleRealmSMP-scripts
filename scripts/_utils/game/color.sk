@@ -6,11 +6,39 @@ import:
 function hexToDecimal(hex:string) :: number:
     if first character of {_hex} is "#":
         set {_hex} to (substring of {_hex} from index 2 to index (length of {_hex}))
-    set {_i} to 0
-    loop reversed (split uppercase {_hex} at ""):
-        set {_result} to ({_result} + ((first index of loop-value in "0123456789ABCDEF") - 1) * 16 ^ ({_i} - 1))
-        add 1 to {_i}
+    set {_hex} to uppercase {_hex}
+    set {_chars} to "0123456789ABCDEF"
+    set {_rHi} to (first index of (character at 1 of {_hex}) in {_chars}) - 1
+    set {_rLo} to (first index of (character at 2 of {_hex}) in {_chars}) - 1
+    set {_gHi} to (first index of (character at 3 of {_hex}) in {_chars}) - 1
+    set {_gLo} to (first index of (character at 4 of {_hex}) in {_chars}) - 1
+    set {_bHi} to (first index of (character at 5 of {_hex}) in {_chars}) - 1
+    set {_bLo} to (first index of (character at 6 of {_hex}) in {_chars}) - 1
+    set {_r} to ({_rHi} * 16 + {_rLo})
+    set {_g} to ({_gHi} * 16 + {_gLo})
+    set {_b} to ({_bHi} * 16 + {_bLo})
+    set {_result} to ({_r} * 65536 + {_g} * 256 + {_b})
     return {_result}
+
+function decimalToHex(n:number) :: string:
+    if {_n} < 0:
+        add 4294967296 to {_n}
+    set {_r} to (bits 16-23 of {_n})
+    set {_g} to (bits 8-15 of {_n})
+    set {_b} to (bits 0-7 of {_n})
+    set {_hexchars} to "0123456789ABCDEF"
+    set {_result} to "%(character at ((bits 4-7 of {_r}) + 1) in {_hexchars})%%(character at ((bits 0-3 of {_r}) + 1) in {_hexchars})%"
+    set {_result} to "%{_result}%%(character at ((bits 4-7 of {_g}) + 1) in {_hexchars})%%(character at ((bits 0-3 of {_g}) + 1) in {_hexchars})%"
+    set {_result} to "%{_result}%%(character at ((bits 4-7 of {_b}) + 1) in {_hexchars})%%(character at ((bits 0-3 of {_b}) + 1) in {_hexchars})%"
+    return {_result}
+
+function decimalToColor(n:number) :: color:
+    if {_n} < 0:
+        add 4294967296 to {_n}
+    set {_r} to (bits 16-23 of {_n})
+    set {_g} to (bits 8-15 of {_n})
+    set {_b} to (bits 0-7 of {_n})
+    return rgb({_r}, {_g}, {_b})
 
 function rgbToHex(r:integer, g:integer, b:integer) :: string:
     return javaString.format("#%%02X%%02X%%02X", [{_r},{_g},{_b}])
@@ -24,6 +52,12 @@ function colorToHex(col:color) :: string:
 function hexToColor(hex:string) :: color:
     set {_c} to javaColor.decode({_hex})
     return rgb({_c}.getRed(),{_c}.getGreen(),{_c}.getBlue())
+
+function randomHexCode() :: string:
+    set {_chars::*} to "0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"
+    loop 6 times:
+        add (random element of {_chars::*}) to {_code::*}
+    return "#%join {_code::*}%"
 
 # color to dye color str
 # e.g. light green > "lime"

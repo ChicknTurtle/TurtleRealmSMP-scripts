@@ -335,7 +335,7 @@ databases:
 		# (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
 		# This is generally not required as the the .db file will only be used by Skript, unless you want to split different variables into different tables
 		
-		backup interval: 0 hours
+		backup interval: 24 hours
 		# Creates a backup of the file every so often. This can be useful if you ever want to revert variables to an older state.
 		# Variables are saved constantly no matter what is set here, thus a server crash will never make you lose any variables.
 		# Set this to 0 to disable this feature.
@@ -344,7 +344,7 @@ databases:
 		# If disabled (set to -1), no backup files will be deleted.
 		# Backups are removed from oldest to newest.
 		# if set to a value greater than -1, Skript will ensure only that many backups are kept.
-		backups to keep: -1
+		backups to keep: 10
 		
 	MySQL example:
 		# A MySQL database example, with options unrelated to MySQL removed.
@@ -405,7 +405,7 @@ databases:
 		
 		# ==== Settings that should not be changed ====
 		
-version: 2.12.1
+version: 2.12.2
 # DO NOT CHANGE THIS VALUE MANUALLY!
 # This saves for which version of Skript this configuration was written for.
 # If it does not match the version of the .jar file then the config will be updated automatically.

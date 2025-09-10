@@ -55,9 +55,11 @@ on custom item interact with "turtle:filter":
     set (compound tag "filter" of (custom nbt of slot 17 of {_inv})) to (compound tag "filter" of (custom nbt of event-item))
     set (uuid tag "player" of (custom nbt of slot 17 of {_inv})) to (uuid of player)
     set (boolean tag "offhand" of (custom nbt of slot 17 of {_inv})) to (false if (event-equipmentslot is main hand) else true)
+    # make filter items
     loop {_filters::*}:
         set {_item} to (custom item loop-value)
-        set max stack size component of {_item} to 1
+        set (max stack size component of {_item}) to 1
+        set (boolean tag "inFilter" of (custom nbt of {_item})) to true
         add {_item} to {_inv}
     open {_inv} to player
 
@@ -76,13 +78,13 @@ on inventory click:
     set {_player} to (uuid tag "player" of (custom nbt of (slot 17 of top inventory))) parsed as entity
     set {_isOffhand} to (boolean tag "offhand" of (custom nbt of (slot 17 of top inventory)))
     if {_isOffhand} is true:
-        set {_item} to (player's offhand tool)
+        set {_filterItem} to (player's offhand tool)
     else:
-        set {_item} to (player's tool)
+        set {_filterItem} to (player's tool)
     # close inv if filter is missing
     if any:
-        (item id of {_item}) isn't "turtle:filter"
-        (compound tag "filter" of (custom nbt of {_item})) isn't {_filter}
+        (item id of {_filterItem}) isn't "turtle:filter"
+        (compound tag "filter" of (custom nbt of {_filterItem})) isn't {_filter}
     then:
         cancel event
         close player's inventory
@@ -108,15 +110,18 @@ on inventory click:
             {_filters::*} doesn't contain (item id of player's cursor slot)
             remove (item id of clicked slot) from {_filters::*}
             add (item id of player's cursor slot) to {_filters::*}
-            set (clicked slot) to (custom item (item id of player's cursor slot))
+            set {_item} to (custom item (item id of player's cursor slot))
+            set (max stack size component of {_item}) to 1
+            set (boolean tag "inFilter" of (custom nbt of {_item})) to true
+            set (clicked slot) to {_item}
         set (string list tag "ids" of {_filter}) to {_filters::*}
     # update info item and filter item
     set (compound tag "filter" of (custom nbt of (slot 17 of top inventory))) to {_filter}
-    set (compound tag "filter" of (custom nbt of {_item})) to {_filter}
+    set (compound tag "filter" of (custom nbt of {_filterItem})) to {_filter}
     if {_isOffhand} is true:
-        set (compound tag "filter" of (custom nbt of player's offhand tool)) to (compound tag "filter" of custom nbt of {_item})
+        set (compound tag "filter" of (custom nbt of player's offhand tool)) to (compound tag "filter" of custom nbt of {_filterItem})
     else:
-        set (compound tag "filter" of (custom nbt of player's tool)) to (compound tag "filter" of custom nbt of {_item})
+        set (compound tag "filter" of (custom nbt of player's tool)) to (compound tag "filter" of custom nbt of {_filterItem})
 on inventory drag:
     (string tag "gui" of custom nbt of (slot 17 of event-inventory)) is "filterEditor"
     cancel event
