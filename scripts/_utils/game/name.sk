@@ -72,18 +72,33 @@ expression:
         %entity%'s (effective|shown) [entity] name
     get:
         set {_e} to expr-1
+        # get real name
         set {_real_name} to (translate component from (translation key of {_e}))
+        # get custom name
         set {_custom_name} to (custom name of {_e})
-        set {_variant} to (try {_e}.getVariant()) ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
-        if "%{_variant}%" is "SKELETON_HORSE":
+        # get variant/extra name
+        set {_variant} to (try {_e}.getVariant())
+        if {_e} is a horse or donkey or mule or llama or skeleton horse or zombie horse or camel:
             delete {_variant}
-        if {_variant} is set:
-            if (try {_variant}.getKey()) is set:
-                set {_variant} to {_variant}.getKey().getKey()
-            set {_variant} to (strict proper case str({_variant}))
-            set {_mob_name} to merge components "%{_variant}% ", {_real_name}
+        set {_extra} to {_variant} ? (try {_e}.getCatType()) ? (try {_e}.getColor()) ? (try {_e}.getCombinedGene()) ? ("screaming" if (try {_e}.isScreaming() is true) else {_}) ? ((translate component from (villager profession of {_e}).translationKey()) if (villager profession of {_e} isn't (no profession)) else "Unemployed")
+        if any:
+            try {_e}.isBaby() is true
+            (age of {_e}) < 0
+        then:
+            if {_extra} is set:
+                set {_extra} to "baby %{_extra}%"
+            else:
+                set {_extra} to "baby"
+        if {_extra} is set:
+            if (try {_extra}.getKey()) is set:
+                set {_extra} to {_extra}.getKey().getKey()
+            set {_extra} to "%{_extra}%"
+            replace "_" with " " in {_extra}
+            set {_extra} to (strict proper case {_extra})
+            set {_mob_name} to merge components "%{_extra}% ", {_real_name}
         else:
             set {_mob_name} to {_real_name}
+        
         if {_custom_name} is set:
             return "%{_custom_name}% (%{_mob_name}%)"
         else:
