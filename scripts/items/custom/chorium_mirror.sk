@@ -79,9 +79,9 @@ on custom item interact with "turtle:chorium_mirror":
         play sound "minecraft:item.ominous_bottle.dispose" in player category at player
         exit trigger
     set {_mirrorLoc} to (compound tag "mirrorLoc" of (custom nbt of {_mirror}))
-    if ({_mirrorLoc} ? empty nbt compound) is (empty nbt compound):
+    if ({_mirrorLoc} ? (nbt from "{}")) is (nbt from "{}"):
         # bind location
-        set {_mirrorLoc} to (empty nbt compound)
+        set {_mirrorLoc} to (nbt from "{}")
         set {_loc} to (player's location)
         set (int array tag "pos" of {_mirrorLoc}) to (floor(x-coord of {_loc}),floor(y-coord of {_loc}),floor(z-coord of {_loc}))
         set (string tag "world" of {_mirrorLoc}) to "%event-world%"

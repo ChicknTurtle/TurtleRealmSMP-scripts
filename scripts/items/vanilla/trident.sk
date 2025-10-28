@@ -1,3 +1,4 @@
+using damage source
 
 on riptide:
     set {-playerData::%player%::riptideitem} to event-item
@@ -5,7 +6,7 @@ on riptide:
 on damage:
     # check impaling
     victim is wet
-    set {_direct} to (direct entity of damage source)
+    set {_direct} to (direct entity)
     set {_weapon} to (({_direct}'s tool) ? (item of {_direct}))
     if ({_direct} is riptiding):
         set {_weapon} to ({-playerData::%{_direct}%::riptideitem} ? {_weapon})

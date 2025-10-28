@@ -1,3 +1,4 @@
+using damage source
 
 options:
     damage: 4
@@ -11,7 +12,11 @@ options:
     particleAmount: 10
 
 function shock(arrow:entity,shooter:entity,wet:boolean):
-    set {_source} to damage source from lightning bolt caused by {_shooter} directly by {_arrow}
+    set {_source} to custom damage source:
+        set damage type to (lightning bolt)
+        set causing entity to {_shooter}
+        set direct entity to {_arrow}
+
     set {_r} to {@radius}
     set {_damage} to {@damage}
     if {_wet} is true:
