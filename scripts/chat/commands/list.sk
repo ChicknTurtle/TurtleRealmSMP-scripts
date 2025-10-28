@@ -1,5 +1,5 @@
 
-brig command /minecraft:list:
+brig command /turtle:players:
     trigger:
         set {_p::*} to (all players)
         set {_size} to (size of {_p::*})

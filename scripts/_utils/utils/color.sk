@@ -2,6 +2,7 @@
 import:
     java.lang.String as javaString
     java.awt.Color as javaColor
+    net.kyori.adventure.text.format.NamedTextColor
 
 function hexToDecimal(hex:string) :: number:
     if first character of {_hex} is "#":
@@ -58,6 +59,88 @@ function randomHexCode() :: string:
     loop 6 times:
         add (random element of {_chars::*}) to {_code::*}
     return "#%join {_code::*}%"
+
+function colorObjectToColor(col:object) :: color:
+    return rgb({_col}.red(), {_col}.green(), {_col}.blue())
+
+# color code to color
+# e.g. "§d" > light purple
+function colorCodeToColor(code:string) :: color:
+    if {_code} starts with "§":
+        set {_code} to (character at 2 of {_code})
+    else if {_code} starts with "&":
+        set {_code} to (character at 2 of {_code})
+    if {_code} is "0":
+        return colorObjectToColor(NamedTextColor.BLACK)
+    else if {_code} is "1":
+        return colorObjectToColor(NamedTextColor.DARK_BLUE)
+    else if {_code} is "2":
+        return colorObjectToColor(NamedTextColor.DARK_GREEN)
+    else if {_code} is "3":
+        return colorObjectToColor(NamedTextColor.DARK_AQUA)
+    else if {_code} is "4":
+        return colorObjectToColor(NamedTextColor.DARK_RED)
+    else if {_code} is "5":
+        return colorObjectToColor(NamedTextColor.DARK_PURPLE)
+    else if {_code} is "6":
+        return colorObjectToColor(NamedTextColor.GOLD)
+    else if {_code} is "7":
+        return colorObjectToColor(NamedTextColor.GRAY)
+    else if {_code} is "8":
+        return colorObjectToColor(NamedTextColor.DARK_GRAY)
+    else if {_code} is "9":
+        return colorObjectToColor(NamedTextColor.BLUE)
+    else if {_code} is "a":
+        return colorObjectToColor(NamedTextColor.GREEN)
+    else if {_code} is "b":
+        return colorObjectToColor(NamedTextColor.AQUA)
+    else if {_code} is "c":
+        return colorObjectToColor(NamedTextColor.RED)
+    else if {_code} is "d":
+        return colorObjectToColor(NamedTextColor.LIGHT_PURPLE)
+    else if {_code} is "e":
+        return colorObjectToColor(NamedTextColor.YELLOW)
+    else if {_code} is "f":
+        return colorObjectToColor(NamedTextColor.WHITE)
+    return colorObjectToColor(NamedTextColor.WHITE)
+
+
+# color to color code
+# e.g. light purple > "§d"
+function colorToColorCode(color:color) :: string:
+    if {_color} is colorObjectToColor(NamedTextColor.BLACK):
+        return "§0"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_BLUE):
+        return "§1"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_GREEN):
+        return "§2"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_AQUA):
+        return "§3"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_RED):
+        return "§4"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_PURPLE):
+        return "§5"
+    else if {_color} is colorObjectToColor(NamedTextColor.GOLD):
+        return "§6"
+    else if {_color} is colorObjectToColor(NamedTextColor.GRAY):
+        return "§7"
+    else if {_color} is colorObjectToColor(NamedTextColor.DARK_GRAY):
+        return "§8"
+    else if {_color} is colorObjectToColor(NamedTextColor.BLUE):
+        return "§9"
+    else if {_color} is colorObjectToColor(NamedTextColor.GREEN):
+        return "§a"
+    else if {_color} is colorObjectToColor(NamedTextColor.AQUA):
+        return "§b"
+    else if {_color} is colorObjectToColor(NamedTextColor.RED):
+        return "§c"
+    else if {_color} is colorObjectToColor(NamedTextColor.LIGHT_PURPLE):
+        return "§d"
+    else if {_color} is colorObjectToColor(NamedTextColor.YELLOW):
+        return "§e"
+    else if {_color} is colorObjectToColor(NamedTextColor.WHITE):
+        return "§f"
+    return "§f"
 
 # color to dye color str
 # e.g. light green > "lime"

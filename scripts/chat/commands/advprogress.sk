@@ -1,0 +1,47 @@
+
+import:
+    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+
+local function formatName(key:object) :: string:
+    set {_key} to (namespacedkey from {_key}) ? {_key}
+    set {_value} to (try {_key}.value()) ? {_key}
+    replace "_" with " " in {_value}
+    return (proper case {_value})
+
+brig command /turtle:advprogress <advancement:greedystring>:
+    arguments:
+        set {_amp} to (LegacyComponentSerializer.legacyAmpersand())
+        set {_adv::*} to (all available advancements) where [input.getDisplay().doesAnnounceToChat() is true]
+        map {_adv::*} with ("%input% - " + "%{_amp}.serialize((input.getDisplay().title()))%")
+        set (suggestions of arg "advancement") to {_adv::*}
+    trigger:
+        set {_advancementId} to (first element of ({_advancement} split at " "))
+        set {_adv} to ("%{_advancementId}%" parsed as advancement)
+        if {_adv} isn't set:
+            send "§cInvalid advancement: %{_advancementId}%"
+            exit trigger
+        set {_prog} to (advancement progress of {_adv} for player)
+        set {_awarded::*} to (awarded criteria of {_prog})
+        map {_awarded::*} with formatName(input)
+        set {_remaining::*} to (remaining criteria of {_prog})
+        map {_remaining::*} with formatName(input)
+
+        set {_frame} to "%{_adv}.getDisplay().frame()%"
+
+        if ({_frame} is "TASK"):
+            set {_c} to "§a"
+        else if ({_frame} is "GOAL"):
+            set {_c} to "§6"
+        else if ({_frame} is "CHALLENGE"):
+            set {_c} to "§5"
+
+        set {_amp} to (LegacyComponentSerializer.legacyAmpersand())
+        set {_title} to ({_adv}.getDisplay().title())
+        set {_titleStr} to ({_amp}.serialize({_title}))
+        set {_desc} to ({_adv}.getDisplay().description())
+        set {_descStr} to ({_amp}.serialize({_desc}))
+
+        set {_awardedStr} to (join {_awarded::*} with ", ") ? "none"
+        set {_remainingStr} to (join {_remaining::*} with ", ") ? "none"
+
+        send "Your progress for %{_c}%%{_titleStr}% (%{_c}%%{_descStr}%):%nl% §2Completed: %{_awardedStr}%%nl% §6Remaining: %{_remainingStr}%"

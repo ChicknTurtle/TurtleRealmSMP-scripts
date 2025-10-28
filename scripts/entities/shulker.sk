@@ -1,3 +1,4 @@
+using damage source
 
 on entity add to world:
     event-entity is shulker
@@ -7,11 +8,11 @@ on entity add to world:
 
 # cancel special shulkers from doing stuff
 on shulker teleport:
-    boolean tag "noTeleport" of custom nbt of event-entity is true
+    (boolean tag "noTeleport" of (custom nbt of event-entity)) is true
     cancel event
 on vehicle enter:
     event-entity is a shulker
-    boolean tag "noTeleport" of custom nbt of event-entity is true
+    (boolean tag "noTeleport" of (custom nbt of event-entity)) is true
     cancel event
 
 # ender vault boss shulker
@@ -36,7 +37,7 @@ on shoot:
         set (double tag "TZD" of nbt of event-entity) to (double tag "TZD" of nbt of {_projectile})
 
 on damage by shulker bullet:
-    (glowing of (direct entity of damage source)) is true
+    (glowing of (direct entity)) is true
     if victim is a shulker:
         heal victim by damage
         apply glowing without particles to victim for 5 ticks
@@ -46,5 +47,5 @@ on damage by shulker bullet:
 
 on death of shulker:
     (string tag "special" of (custom nbt of victim)) is "vault_boss"
-    set {_tool} to ((direct entity of damage source)'s tool)
+    set {_tool} to ((direct entity)'s tool)
     drop 1 of (custom item "turtle:chorium_cluster") at (victim ~ vector(0.5,0.5,0.5))

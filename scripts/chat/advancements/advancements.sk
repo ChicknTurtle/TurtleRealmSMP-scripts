@@ -1,0 +1,56 @@
+
+import:
+    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+
+on load:
+    set {-features::advancementmsgs::name} to "Advancement messages"
+    set {-features::advancementmsgs::desc} to "Better advancement messages"
+    set {-features::advancementmsgs::icon} to gold block
+
+# Display in chat
+on advancement done:
+    {enabledFeatures::advancementmsgs} is true
+    (gamerule announceAdvancements of (world of player)) is true
+    (event-advancement.getDisplay().doesAnnounceToChat()) is true
+    event.message(null)
+
+    set {_frame} to "%event-advancement.getDisplay().frame()%"
+
+    if ({_frame} is "TASK"):
+        set {_c} to "§a"
+        set {_border::*} to ("[","]")
+    else if ({_frame} is "GOAL"):
+        set {_c} to "§6"
+        set {_border::*} to ("(",")")
+    else if ({_frame} is "CHALLENGE"):
+        set {_c} to "§5"
+        set {_border::*} to ("{","}")
+
+    set {_allAdv::*} to (all available advancements) where [input.getDisplay().doesAnnounceToChat() is true]
+    set {_total} to (size of {_allAdv::*})
+    set {_completed} to (size of {_allAdv::*} where [(advancement progress of input of player) is done])
+    
+    set {_amp} to (LegacyComponentSerializer.legacyAmpersand())
+    set {_title} to (event-advancement.getDisplay().title())
+    set {_titleStr} to ({_amp}.serialize({_title}))
+    set {_desc} to (event-advancement.getDisplay().description())
+    set {_descStr} to ({_amp}.serialize({_desc}))
+
+    set {_c::1} to (text component from " &6&l🏆 §f%player% has completed ")
+    set {_c::2} to (text component from "%{_c}%[")
+    if (try {_title}.key) is set:
+        set {_c::3} to (translate component from "%{_title}.key%")
+        set (color format of {_c::3}) to colorCodeToColor({_c})
+    else:
+        set {_c::3} to (text component from "%{_c}%%{_titleStr}%")
+    set {_c::4} to (text component from "%{_c}%]")
+    if ({_completed} is {_total}):
+        set {_c::5} to (text component from " §6(%{_completed}%/%{_total}%)")
+    else:
+        set {_c::6} to (text component from " §7(%{_completed}%/%{_total}%)")
+    set (hover event of {_c::2}) to (hover event showing "%{_c}%%{_titleStr}%%nl%%{_descStr}%")
+    set (hover event of {_c::3}) to (hover event showing "%{_c}%%{_titleStr}%%nl%%{_descStr}%")
+    set (hover event of {_c::4}) to (hover event showing "%{_c}%%{_titleStr}%%nl%%{_descStr}%")
+    send component (merge components {_c::*}) to (all players and console)
+
+    discordSend(":trophy: %player% has completed **%1st element of {_border::*}%%{_titleStr}%%2nd element of {_border::*}%** *(%{_completed}%/%{_total}%)*%nl%-# %{_descStr}%")

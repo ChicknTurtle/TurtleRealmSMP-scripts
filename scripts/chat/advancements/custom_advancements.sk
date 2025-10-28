@@ -1,53 +1,8 @@
 
-import:
-    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-
-on load:
-    set {-features::advancementmsgs::name} to "Advancement messages"
-    set {-features::advancementmsgs::desc} to "Better advancement messages"
-    set {-features::advancementmsgs::icon} to gold block
-
-# Display in chat
-on advancement done:
-    {enabledFeatures::advancementmsgs} is true
-    (gamerule announceAdvancements of (world of player)) is true
-    (event-advancement.getDisplay().doesAnnounceToChat()) is true
-    event.message(null)
-
-    set {_frame} to "%event-advancement.getDisplay().frame()%"
-
-    if ({_frame} is "TASK"):
-        set {_c} to "§a"
-    else if ({_frame} is "GOAL"):
-        set {_c} to "§6"
-    else if ({_frame} is "CHALLENGE"):
-        set {_c} to "§5"
-
-    loop (all available advancements):
-        (loop-value.getDisplay().doesAnnounceToChat()) is true
-        add 1 to {_total}
-        if ((advancement progress of loop-value of player) is done):
-            add 1 to {_completed}
-    
-    set {_amp} to (LegacyComponentSerializer.legacyAmpersand())
-    set {_title} to (event-advancement.getDisplay().title())
-    set {_title} to ({_amp}.serialize({_title}))
-    set {_desc} to (event-advancement.getDisplay().description())
-    set {_desc} to ({_amp}.serialize({_desc}))
-
-    set {_c::1} to (text component from " &6&l🏆 §f%player% has completed ")
-    set {_c::2} to (text component from "%{_c}%[%{_title}%]")
-    if ({_completed} is {_total}):
-        set {_c::3} to (text component from " §6(%{_completed}%/%{_total}%)")
-    else:
-        set {_c::3} to (text component from " §7(%{_completed}%/%{_total}%)")
-    set (hover event of {_c::2}) to (hover event showing "%{_c}%%{_title}%%nl%%{_desc}%")
-    send component (merge components {_c::*}) to (all players and console)
-
-    discordSend(":trophy: %player% has completed **[%{_title}%]** *(%{_completed}%/%{_total}%)*")
-
 # Grant advancements
 function grantAdvancement(adv:objects, p:objects):
+    {_adv::*} is set
+    {_p::*} is set
     loop {_adv::*}:
         set {_adv} to loop-value-1
         if ({_adv} isn't an advancement):
@@ -57,8 +12,11 @@ function grantAdvancement(adv:objects, p:objects):
             set {_prog} to (advancement progress of {_adv} for loop-value-2)
             loop criteria of {_adv}:
                 award criteria loop-value-3 of {_prog}
+
 # Revoke advancements
 function revokeAdvancement(adv:objects, p:objects):
+    {_adv::*} is set
+    {_p::*} is set
     loop {_adv::*}:
         set {_adv} to loop-value-1
         if ({_adv} isn't an advancement):
@@ -90,16 +48,12 @@ on death of wandering trader:
 
 # Under the Sea
 every 5 seconds:
-    loop all players where [biome at input is warm ocean]:
-        set {_blocks::*} to (blocks in chunk at loop-player)
-        if any:
-            {_blocks::*} contains tube coral block
-            {_blocks::*} contains brain coral block
-            {_blocks::*} contains bubble coral block
-            {_blocks::*} contains fire coral block
-            {_blocks::*} contains horn coral block
-        then:
-            grantAdvancement("turtle:adventure/under_the_sea", loop-player)
+    set {_p::*} to (all players)
+    filter {_p::*} to match all:
+        input is in water
+        (biome at input) is (warm ocean)
+        (chunk at input) has blockdata (tube_coral_block[], brain_coral_block[], bubble_coral_block[], fire_coral_block[], or horn_coral_block[])
+    grantAdvancement("turtle:adventure/under_the_sea", {_p::*})
 
 # On a Rail
 import:
