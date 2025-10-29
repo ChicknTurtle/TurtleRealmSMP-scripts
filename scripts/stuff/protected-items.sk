@@ -7,19 +7,19 @@ on load:
 
 function protectItemStack(item:item) :: item:
     {enabledFeatures::protecteditems} is true
-    set boolean tag "protectedItem" of custom nbt of {_item} to true
+    set (boolean tag "protectedItem" of (custom nbt of {_item})) to true
     return {_item}
 
 function protectItem(e:entity):
     {enabledFeatures::protecteditems} is true
     {_e} is a dropped item
-    set boolean tag "custom;protectedItem" of full nbt of {_e} to true
+    set (boolean tag "custom;protectedItem" of (full nbt of {_e})) to true
     set glowing of {_e} to true
 
 function isProtectedItem(e:entity) :: boolean:
     if all:
         {_e} is a dropped item
-        boolean tag "custom;protectedItem" of full nbt of {_e} is true
+        (boolean tag "custom;protectedItem" of (full nbt of {_e})) is true
     then:
         return true
     else:

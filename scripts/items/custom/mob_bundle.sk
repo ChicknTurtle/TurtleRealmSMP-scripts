@@ -1,7 +1,7 @@
 
 options:
     # Mobs that can be picked up by mob bundle
-    AllowedMobs: allay, armadillo, bat, bee, blaze, bogged, breeze, cat (entity type), cave spider, chicken (entity type), cod (entity type), cow, creeper, dolphin, drowned, endermite, evoker, fox, frog, glow squid, goat, guardian, husk, magma cube, mooshroom, ocelot, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entity type), rabbit (entity type), salmon (entity type), sheep, silverfish, skeleton, slime, snow golem, spider, squid, stray, strider, tadpole, tropical fish (entity type), vex, villager, vindicator, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin
+    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, cat (entity type), cave spider, chicken (entity type), cod (entity type), cow, creeper, dolphin, drowned, endermite, evoker, fox, frog, glow squid, goat, guardian, husk, magma cube, mooshroom, ocelot, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entity type), rabbit (entity type), salmon (entity type), sheep, silverfish, skeleton, slime, snow golem, spider, squid, stray, strider, tadpole, tropical fish (entity type), vex, villager, vindicator, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin
 
     # Baby mobs that can be picked up by mob bundle
     AllowedBabyMobs: camel, donkey, happy ghast, hoglin, horse, llama, mule, panda, sniffer, trader llama, turtle, zoglin
@@ -47,18 +47,18 @@ on player interact on entity:
     (item id of (player's tool)) is "turtle:mob_bundle"
     set {_fill} to (((spawn item of event-entity) ? barrier) with nbt from "{components:{max_stack_size:1,custom_data:{from_mob_bundle:1b}}}")
     set (name of {_fill}) to "§r%effective entity name of event-entity%"
-    set {_nbt} to nbt of event-entity
-    set compound tag "entityData" of custom nbt of {_fill} to {_nbt}
-    set string tag "entityType" of custom nbt of {_fill} to str(event-entity.getType().getKey())
+    set {_nbt} to getEntityNbtToStore(event-entity)
+    set (compound tag "entityData" of (custom nbt of {_fill})) to {_nbt}
+    set (string tag "entityType" of (custom nbt of {_fill})) to str(event-entity.getType().getKey())
     # fix villager bed
-    if int tag "SleepingX" of (full nbt of event-entity) is set:
-        set {_x} to int tag "SleepingX" of (full nbt of event-entity)
-        set {_y} to int tag "SleepingY" of (full nbt of event-entity)
-        set {_z} to int tag "SleepingZ" of (full nbt of event-entity)
+    if (int tag "SleepingX" of (full nbt of event-entity)) is set:
+        set {_x} to (int tag "SleepingX" of (full nbt of event-entity))
+        set {_y} to (int tag "SleepingY" of (full nbt of event-entity))
+        set {_z} to (int tag "SleepingZ" of (full nbt of event-entity))
         set {_bedLoc} to location({_x},{_y},{_z})
-        set blockdata tag "occupied" of block at {_bedLoc} to false
+        set (blockdata tag "occupied" of (block at {_bedLoc})) to false
     delete event-entity
-    set bundle contents of (player's tool) to {_fill}
+    set (bundle contents of (player's tool)) to {_fill}
     # play sound
     play sound "minecraft:item.bundle.insert" at player
     # grant advancement
@@ -87,8 +87,6 @@ on item spawn:
         exit trigger
     # get nbt and spawn mob
     set {_nbt} to compound tag "entityData" of custom nbt of event-item
-    loop ("Pos","Rotation","Motion","FallDistance","UUID","SleepingX","SleepingY","SleepingZ","TileX","TileY","TileZ"):
-        delete tag loop-value of {_nbt}
     set {_spawntype} to (minecraft entity type from key (string tag "entityType" of custom nbt of event-item))
     mc spawn {_spawntype} at {_p}:
         clear (armor of event-entity)
