@@ -86,6 +86,12 @@ on right click:
         if {_hiddenGene} is set:
             set {_hiddenGene} to (strict proper case "%{_hiddenGene}%")
             add "   §f🐼 §7Hidden Gene: §f%{_hiddenGene}%" to {_info::*}
+        # revived
+        if (boolean tag "revivedFromGrave" of (custom nbt of {_e})) is true:
+            add "   §e🪦 §7Revived from a Mob Grave" to {_info::*}
+        # friendly
+        if (boolean tag "isFriendly" of (custom nbt of {_e})) is true:
+            add "   §a❤ §7Friendly" to {_info::*}
         # VIBING
         if ({_e} is dancing):
             add "   §d🎶 §cV§6I§eB§aI§bN§dG" to {_info::*}

@@ -1,0 +1,86 @@
+
+options:
+    # Mobs that can drop graves
+    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, camel, cat (entity type), cave spider, chicken (entity type), cod (entity type), cow, creeper, dolphin, donkey, drowned, elder guardian, enderman, endermite, evoker, fox, frog, glow squid, goat, guardian, happy ghast, hoglin, horse, husk, iron golem, llama, magma cube, mooshroom, mule, ocelot, panda, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entity type), rabbit (entity type), ravager, salmon (entity type), sheep, shulker, silverfish, skeleton, skeleton horse, slime, sniffer, snow golem, spider, squid, stray, strider, tadpole, trader llama, tropical fish (entity type), turtle, vex, villager, vindicator, warden, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin, zoglin
+
+when ready to register custom items:
+    set (custom item "turtle:mob_grave") to (firework star with nbt from "{""minecraft:item_model"":""turtle:mob_grave"",""minecraft:item_name"":""Mob Grave"",""max_stack_size"":1,""minecraft:rarity"":""uncommon""}")
+    make (custom item "turtle:mob_grave") fire resistant
+
+on death of {@AllowedMobs}:
+    if all:
+        (custom name of victim) isn't set
+        (owner of victim) isn't set
+    then:
+        exit trigger
+    (boolean tag "doNotDropGrave" of (custom nbt of victim)) isn't true
+    clear drops
+    set {_item} to (custom item "turtle:mob_grave")
+    set {_deathMsg} to (try victim.getHandle().getCombatTracker().getDeathMessage().getString()) ? "Unknown"
+    set (lore of {_item}) to "§c☠ R.I.P. %effective entity name of victim%", "   §4%{_deathMsg}%", "§e✦ §6Revive with a Golden Apple", "§3⛏ §9Smash with a pickaxe to collect drops"
+    set (compound tag "entityData" of (custom nbt of {_item})) to getEntityNbtToStore(victim)
+    set (string tag "entityType" of (custom nbt of {_item})) to str(victim.getType().getKey())
+    drop {_item} at victim without velocity
+    protectItem(last dropped item)
+
+local function respawnMob(grave:item, loc:location) :: entity:
+    set {_nbt} to compound tag "entityData" of (custom nbt of {_grave})
+    set {_spawntype} to (minecraft entity type from key (string tag "entityType" of (custom nbt of {_grave})))
+    mc spawn {_spawntype} at {_loc}:
+        clear (armor of event-entity)
+        clear (tool of event-entity)
+        clear (offhand tool of event-entity)
+        add {_nbt} to (full nbt of event-entity)
+        set (boolean tag "revivedFromGrave" of (custom nbt of event-entity)) to true
+        heal (event-entity)
+        set {_respawned} to event-entity
+    return {_respawned}
+
+###
+import:
+    org.bukkit.Bukkit
+    net.minecraft.world.entity.player.Player as nmsPlayer
+on entity added to world:
+    (boolean tag "isFriendly" of (custom nbt of event-entity)) is true
+    set {_mobGoals} to Bukkit.getMobGoals()
+    set {_removeGoalIds::*} to ("minecraft:nearest_attackable", "minecraft:melee_attack", "minecraft:creeper_swell", "minecraft:evoker_summon_spell", "minecraft:evoker_attack_spell", "minecraft:enderman_look_for_player")
+    set {_removeGoals::*} to ((...Bukkit.getMobGoals().getAllGoals(event-entity)) where ["%input.getKey().getNamespacedKey()%" is (any of {_removeGoalIds::*})])
+    set {_removeGoals2::*} to (((...Bukkit.getMobGoals().getAllGoals(event-entity)) where ["%input.getKey().getNamespacedKey()%" is "minecraft:avoid_entity"]) where [input.getHandle().avoidClass is nmsPlayer.class])
+    loop {_removeGoals::*} and {_removeGoals2::*}:
+        {_mobGoals}.removeGoal(event-entity, loop-value)
+###
+
+on right click:
+    set {_e} to (target entity of player)
+    {_e} is (a dropped item)
+    (distance between {_e} and (head of player)) <= (entity interaction range final attribute of player) + 0.2
+    (player's tool) is any of (golden apple and (tag contents of item tag "pickaxes"))
+    set {_grave} to (item of {_e})
+    (item id of {_grave}) is "turtle:mob_grave"
+    cancel event
+    set {_respawned} to respawnMob({_grave}, ({_e}'s location))
+    {_respawned} is set
+    # consume apple or smash grave
+    if (player's tool is golden apple):
+        remove 1 from (item amount of player's tool)
+        play sound "minecraft:entity.zombie_villager.cure" in (players category) at ({_e}'s location)
+        play entity effect (totem resurrect) on {_respawned}
+    else if (player's tool is tagged with item tag "pickaxes"):
+        play sound "minecraft:block.decorated_pot.shatter" in (players category) at ({_e}'s location)
+        make 10 of soul at ({_e}'s location) with extra 0.05
+        set (boolean tag "doNotDropGrave" of (custom nbt of {_respawned})) to true
+        kill {_respawned}
+        delete (entity within {_respawned})
+    else:
+        exit trigger
+    delete (entity within {_e})
+
+on item despawn:
+    (event-item) is (firework star)
+    (item id of event-item) is "turtle:mob_grave"
+    set {_respawned} to respawnMob(event-item, (event-entity's location))
+    {_respawned} is set
+    play sound "minecraft:block.decorated_pot.shatter" in (players category) at (event-entity's location)
+    set (boolean tag "doNotDropGrave" of (custom nbt of {_respawned})) to true
+    kill {_respawned}
+    delete (entity within {_respawned})
