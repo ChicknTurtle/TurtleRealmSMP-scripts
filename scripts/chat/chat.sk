@@ -57,7 +57,7 @@ on async chat:
     if "%{_format}%" contains "[item]":
         (player's tool) isn't air
         set {_name} to (effective name of (player's tool))
-        component replace "\[item]" with (item chat component of (player's tool)) in {_format}
+        component replace first "[item]" with (item chat component of (player's tool)) in {_format}
         replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # send message
