@@ -1,0 +1,4 @@
+
+when ready to register custom items:
+    set (custom item "turtle:powdered_obsidian") to (firework star with nbt from "{""minecraft:item_model"":""turtle:powdered_obsidian"",""minecraft:item_name"":""Powdered Obsidian""}")
+    make (custom item "turtle:powdered_obsidian") fire resistant

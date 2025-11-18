@@ -1,0 +1,79 @@
+using reflection
+
+when ready to register custom items:
+    set (update function of "turtle:heavy_plow") to (function "updateItem" in script)
+    set (custom item "turtle:heavy_plow") to (firework star with nbt from "{""minecraft:item_name"":""Heavy Plow"",""minecraft:max_stack_size"":1,""minecraft:rarity"":""epic"",""minecraft:max_damage"":8}")
+    make (custom item "turtle:heavy_plow") fire resistant
+    apply use cooldown to (custom item "turtle:heavy_plow"):
+        seconds: 5 seconds
+        group: "turtle:heavy_plow"
+
+when ready to load recipes:
+    register shaped recipe:
+        id: "turtle:heavy_plow"
+        result: custom item "turtle:heavy_plow"
+        shape: " b ","ihb"," i "
+        category: "equipment"
+        ingredients:
+            set ingredient of "h" to (heavy core)
+            set ingredient of "i" to (iron ingot)
+            set ingredient of "b" to (iron block)
+
+local function updateItem(item:item) :: item:
+    add "§7Capable of transporting blocks like spawners and vaults" to {_l::*}
+    set {_holding} to (compound tag "holding" of (custom nbt of {_item}))
+    if ("%{_holding}%" ? "{}") isn't "{}":
+        set (item model of {_item}) to "turtle:heavy_plow_closed"
+        set {_spawnername} to (string tag "spawnername" of {_holding})
+        {_spawnername} is set
+        add "§fContains: §b%{_spawnername}%" to {_l::*}
+    else:
+        set (item model of {_item}) to "turtle:heavy_plow"
+    set (lore of {_item}) to {_l::*}
+    return {_item}
+
+local function getSpawnerName(b:object) :: string:
+    if (spawner type of {_b}) is set:
+        set {_c::1} to (translate component from (translation key of (spawner type of {_b})))
+        set {_c::2} to " "
+    if (blockdata tag "ominous" of (blockdata of {_b}) is true):
+        set {_c::3} to "Ominous "
+    set {_c::4} to (translate component from (translation key of {_b}))
+    if "%{_c::4}%" is "Monster Spawner":
+        set {_c::4} to "Spawner"
+    return (join {_c::*})
+
+on player interact:
+    event-equipmentslot is main hand
+    set {_item} to player's tool
+    set {_id} to (item id of {_item})
+    {_id} is "turtle:heavy_plow"
+    (item cooldown of (player's tool) for player) is 0 ticks
+    set {_holding} to (compound tag "holding" of (custom nbt of {_item}))
+    if ("%{_holding}%" ? "{}") isn't "{}":
+        set {_b} to (event-block.getRelative(event-blockface))
+        {_b} is air
+        cancel event
+        set {_blockdata} to ((string tag "holding;blockdata" of (custom nbt of {_item})) parsed as blockdata)
+        set {_nbt} to (compound tag "holding;nbt" of (custom nbt of {_item}))
+        set (block at {_b}) to {_blockdata}
+        add {_nbt} to (nbt of (block at {_b}))
+        delete (compound tag "holding" of (custom nbt of {_item}))
+        set (player's tool) to (updated {_item})
+        set (damage of tool) to (damage of tool)
+        player.damageItemStack(hand slot, 1)
+        set (item cooldown of (player's tool) for player) to (5 seconds)
+        play sound "minecraft:block.heavy_core.place" in (blocks category) at (block at {_b})
+    else:
+        (event-block) is (spawner (itemtype), trial spawner (itemtype), or vault)
+        cancel event
+        set (string tag "holding;blockdata" of (custom nbt of {_item})) to str(blockdata of (event-block))
+        set {_nbt} to (nbt of (event-block))
+        set (string tag "holding;spawnername" of (custom nbt of {_item})) to getSpawnerName(event-block)
+        loop "x","y","z":
+            delete (int tag loop-value of {_nbt})
+        set (compound tag "holding;nbt" of (custom nbt of {_item})) to {_nbt}
+        set (player's tool) to (updated {_item})
+        set (item cooldown of (player's tool) for player) to (5 seconds)
+        play sound "minecraft:block.heavy_core.break" in (blocks category) at (event-block)
+        delete (event-block)

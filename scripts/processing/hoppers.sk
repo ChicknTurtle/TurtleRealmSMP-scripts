@@ -20,10 +20,10 @@ on inventory pickup:
     make 1 of dust using dustOption(rgb(255,0,0),4) at {_b}
 # hopper/dropper > whatever
 on inventory item move:
-    checkHopperFilter(event-item, event-block) is true
+    checkHopperFilter(event-item, (future event-block)) is true
     cancel event
     chance of 0.5
-    make 1 of dust using dustOption(rgb(255,0,0),4) at (future event-block)
+    make 1 of dust using dustOption(rgb(255,0,0),4) at (event-block)
 
 # apply/remove filter
 on right click on hopper:

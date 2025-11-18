@@ -1,0 +1,4 @@
+
+on damage:
+    (attacker's tool) is a feather
+    set damage to 0

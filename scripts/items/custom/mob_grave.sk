@@ -1,7 +1,7 @@
 
 options:
     # Mobs that can drop graves
-    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, camel, cat (entity type), cave spider, chicken (entity type), cod (entity type), cow, creeper, dolphin, donkey, drowned, elder guardian, enderman, endermite, evoker, fox, frog, glow squid, goat, guardian, happy ghast, hoglin, horse, husk, iron golem, llama, magma cube, mooshroom, mule, ocelot, panda, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entity type), rabbit (entity type), ravager, salmon (entity type), sheep, shulker, silverfish, skeleton, skeleton horse, slime, sniffer, snow golem, spider, squid, stray, strider, tadpole, trader llama, tropical fish (entity type), turtle, vex, villager, vindicator, warden, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin, zoglin
+    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, camel, cat (entitytype), cave spider, chicken (entitytype), cod (entitytype), copper golem (entitytype), cow, creeper, dolphin, donkey, drowned, elder guardian, enderman, endermite, evoker, fox, frog, glow squid, goat, guardian, happy ghast, hoglin, horse, husk, iron golem, llama, magma cube, mooshroom, mule, ocelot, panda, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entitytype), rabbit (entitytype), ravager, salmon (entitytype), sheep, shulker, silverfish, skeleton, skeleton horse, slime, sniffer, snow golem, spider, squid, stray, strider, tadpole, trader llama, tropical fish (entitytype), turtle, vex, villager, vindicator, warden, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin, zoglin
 
 when ready to register custom items:
     set (custom item "turtle:mob_grave") to (firework star with nbt from "{""minecraft:item_model"":""turtle:mob_grave"",""minecraft:item_name"":""Mob Grave"",""max_stack_size"":1,""minecraft:rarity"":""uncommon""}")
@@ -25,7 +25,7 @@ on death of {@AllowedMobs}:
 
 local function respawnMob(grave:item, loc:location) :: entity:
     set {_nbt} to compound tag "entityData" of (custom nbt of {_grave})
-    set {_spawntype} to (minecraft entity type from key (string tag "entityType" of (custom nbt of {_grave})))
+    set {_spawntype} to (minecraft entitytype from key (string tag "entityType" of (custom nbt of {_grave})))
     mc spawn {_spawntype} at {_loc}:
         clear (armor of event-entity)
         clear (tool of event-entity)
@@ -69,7 +69,7 @@ on right click:
         play sound "minecraft:block.decorated_pot.shatter" in (players category) at ({_e}'s location)
         make 10 of soul at ({_e}'s location) with extra 0.05
         set (boolean tag "doNotDropGrave" of (custom nbt of {_respawned})) to true
-        kill {_respawned}
+        kill (entity within {_respawned})
         delete (entity within {_respawned})
     else:
         exit trigger
@@ -82,5 +82,5 @@ on item despawn:
     {_respawned} is set
     play sound "minecraft:block.decorated_pot.shatter" in (players category) at (event-entity's location)
     set (boolean tag "doNotDropGrave" of (custom nbt of {_respawned})) to true
-    kill {_respawned}
+    kill (entity within {_respawned})
     delete (entity within {_respawned})

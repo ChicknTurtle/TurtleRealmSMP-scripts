@@ -1,7 +1,7 @@
 
 options:
     # Mobs that can be picked up by mob bundle
-    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, cat (entity type), cave spider, chicken (entity type), cod (entity type), cow, creeper, dolphin, drowned, endermite, evoker, fox, frog, glow squid, goat, guardian, husk, magma cube, mooshroom, ocelot, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entity type), rabbit (entity type), salmon (entity type), sheep, silverfish, skeleton, slime, snow golem, spider, squid, stray, strider, tadpole, tropical fish (entity type), vex, villager, vindicator, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin
+    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, cat (entitytype), cave spider, chicken (entitytype), cod (entitytype), copper golem (entitytype), cow, creeper, dolphin, drowned, endermite, evoker, fox, frog, glow squid, goat, guardian, husk, magma cube, mooshroom, ocelot, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entitytype), rabbit (entitytype), salmon (entitytype), sheep, silverfish, skeleton, slime, snow golem, spider, squid, stray, strider, tadpole, tropical fish (entitytype), vex, villager, vindicator, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin
 
     # Baby mobs that can be picked up by mob bundle
     AllowedBabyMobs: camel, donkey, happy ghast, hoglin, horse, llama, mule, panda, sniffer, trader llama, turtle, zoglin
@@ -87,7 +87,7 @@ on item spawn:
         exit trigger
     # get nbt and spawn mob
     set {_nbt} to compound tag "entityData" of custom nbt of event-item
-    set {_spawntype} to (minecraft entity type from key (string tag "entityType" of custom nbt of event-item))
+    set {_spawntype} to (minecraft entitytype from key (string tag "entityType" of custom nbt of event-item))
     mc spawn {_spawntype} at {_p}:
         clear (armor of event-entity)
         clear (tool of event-entity)

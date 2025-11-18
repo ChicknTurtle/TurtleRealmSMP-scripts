@@ -1,28 +1,186 @@
+using reflection
 
 import:
     org.bukkit.Bukkit
-    org.bukkit.event.inventory.BrewEvent
-    com.destroystokyo.paper.event.inventory.PrepareResultEvent
-    org.bukkit.event.inventory.PrepareAnvilEvent
-
-# Initializing custom items
+    ch.njol.skript.Skript
 
 on skript start:
     loadCustomItems()
     loadAllRecipes()
-local function loadAllRecipes():
-    log info "‍🔥 Loading custom recipes..."
-    Bukkit.resetRecipes()
-    call custom event "recipesReady"
-    unlock recipes (all recipes) for (all players)
-    update server recipes
-    log info "Loaded &b%size of all recipes% &rrecipes."
 local function loadCustomItems():
     clear {-customItems::*}
     log info "‍🔥 Loading custom items..."
-    call custom event "customItemsReady"
-    set {_s} to "" if (size of {-customItems::*} is 1) else "s"
-    log info "Loaded &b%size of {-customItems::*}% &rcustom item%{_s}%."
+    call custom event "registerCustomItems"
+    set {_s} to "" if (size of (indexes of {-customItems::*}) is 1) else "s"
+    log info "Loaded &b%size of (indexes of {-customItems::*})% &rcustom item%{_s}%."
+local function loadAllRecipes():
+    log info "🛠️  Loading server recipes..."
+    Bukkit.resetRecipes()
+    set {_vanilla} to (size of all recipes)
+    call custom event "registerCustomRecipes"
+    unlock recipes (all recipes) for (all players)
+    update server recipes
+    set {_custom} to ((size of all recipes)-{_vanilla})
+    set {_s} to "" if ({_custom} is 1) else "s"
+    log info "Loaded &b%{_vanilla}% §rdefault and §b%{_custom}% &rcustom recipe%{_s}%."
+
+# Get/set/delete a custom item
+expression:
+    return type: itemtype
+    patterns:
+        [the] (custom item|ci) [with id|named] %string/namespacedkey%
+    get:
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        if {-customItems::%{_id}%::item} isn't set:
+            return (itemtype from key {_id})
+        return {-customItems::%{_id}%::item}
+    set:
+        set {_item} to (change value)
+        {_item} isn't air
+        {_item} is instance of itemtype
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        set (item id of {_item}) to {_id}
+        set {-customItems::%{_id}%::item} to (updated {_item})
+    delete:
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        delete {-customItems::%{_id}%::*}
+
+# Register a custom item (alias)
+effect:
+    patterns:
+        register [custom] item %itemtype% as %string/namespacedkey%
+        register %itemtype% as [custom] item %string/namespacedkey%
+    trigger:
+        set (custom item expr-2) to expr-1
+
+# Get all custom items
+plural expression:
+    return type: itemtype
+    loop of: item
+    patterns:
+        all [[of] the] [registered|defined|loaded] custom items
+    get:
+        return (indexes of {-customItems::*}) mapped with [{-customItems::%input%::item}]
+
+# Get/set/delete the custom id of an item
+itemtype property item id:
+    return type: string
+    get:
+        set {_id} to (string tag "customItems;id" of (custom nbt of expr-1))
+        return {_id} ? (raw name of expr-1)
+    set:
+        set {_item} to expr-1
+        set (string tag "customItems;id" of (custom nbt of {_item})) to "%change value%"
+        set (raw expression of expr-1) to {_item}
+    delete:
+        set {_item} to expr-1
+        delete (string tag "customItems;id" of (custom nbt of {_item}))
+        set (raw expression of expr-1) to {_item}
+
+# Get/set/delete the update function of a custom item
+string property update function:
+    return type: function
+    get:
+        return {-customItems::%expr-1%::updateFunction}
+    set:
+        change value is a function
+        set {-customItems::%expr-1%::updateFunction} to change value
+    delete:
+        delete {-customItems::%expr-1%::updateFunction}
+
+# Update an item based on its custom id
+expression:
+    patterns:
+        updated [[custom] item] %itemtype%
+    get:
+        set {_item} to expr-1
+        if {_item} ? air is air:
+            return {_item}
+        set {_original} to {_item}
+        # update legacy custom items
+        if (string tag "customId" of (custom nbt of {_item})) is set:
+            set (string tag "customItems;id" of (custom nbt of {_item})) to (string tag "customId" of (custom nbt of {_item}))
+            delete (string tag "customId" of (custom nbt of {_item}))
+        # update nbt
+        set {_id} to (item id of {_item})
+        set {_rawitem} to (custom item {_id}) ? {_item}
+        if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
+            (int tag "minecraft:max_damage" of (vanilla nbt of {_rawitem})) isn't set
+            delete (int tag "minecraft:damage" of (nbt of {_item}))
+        set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
+        add nbt of {_item} to nbt of {_newitem}
+        add nbt of {_rawitem} to nbt of {_newitem}
+        # call update function
+        if {-customItems::%{_id}%::updateFunction} is set:
+            set {_newitem} to (result of {-customItems::%{_id}%::updateFunction} with args {_newitem}) ? {_newitem}
+        # call event
+        set {_eventValues::item} to {_item}
+        set {_eventValues::string} to {_id}
+        set {_event} to (custom event "customItemUpdate" using event-values {_eventValues::*})
+        call {_event}
+        if {_event} is cancelled:
+            return {_original}
+        return {_newitem}
+effect:
+    patterns:
+        update [[custom] item] %itemtype%
+    trigger:
+        set (raw expression of expr-1) to (updated expr-1)
+
+# Add custom interact nbt to an item
+effect:
+    patterns:
+        add custom interact[ion] [nbt] to %itemtype%
+        set custom interact[ion] of %itemtype% to (true|on|enabled)
+    trigger:
+        set {_item} to expr-1
+        set (compound tag "minecraft:consumable" of (nbt of {_item})) to (nbt compound from "{consume_seconds:0.05,animation:""none"",sound:{sound_id:""""},has_consume_particles:false,on_consume_effects:[{type:""minecraft:play_sound"",sound:{sound_id:""""}}]}")
+        apply food component to {_item}:
+            nutrition: 0
+            saturation: 0
+            can_always_eat: true
+        set (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) to true
+        set raw expression of expr-1 to {_item}
+
+# Remove custom interact nbt from an item
+effect:
+    patterns:
+        remove custom interact[ion] [nbt] from %itemtype%
+        set custom interact[ion] of %itemtype% to (false|off|disabled)
+    trigger:
+        set {_item} to expr-1
+        delete (compound tag "minecraft:consumable" of (nbt of {_item}))
+        delete (compound tag "minecraft:food" of (nbt of {_item}))
+        delete (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item}))
+        set raw expression of expr-1 to {_item}
+
+# Custom interact behavior
+on consume with priority lowest:
+    set {_item} to event-item
+    (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) is true
+    cancel event
+    set event-item to {_item}
+    try player.setCooldown(event-item, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of event-item)))
+    set {_eventValues::player} to event-player
+    set {_eventValues::item} to event-item
+    set {_eventValues::world} to event-world
+    set {_eventValues::string} to (item id of event-item)
+    set {_eventValues::equipmentslot} to event.getHand()
+    call custom event "customItemInteract" using event-values {_eventValues::*}
+
+# Custom repair items
+item property custom repair[able] (item|material)s:
+    return type: items
+    get:
+        return (string list tag "customItems;repairItems" of (custom nbt of (expr-1))) mapped with [custom item input]
+    set:
+        set {_item} to expr-1
+        set (repairable items of {_item}) to (change values)
+        set (string list tag "customItems;repairItems" of (custom nbt of {_item})) to (item id of change values)
+        set (raw expression of expr-1) to {_item}
 
 # Custom items command
 brig command tree /turtle:customitems:
@@ -35,12 +193,12 @@ brig command tree /turtle:customitems:
                     apply suggestion (indexes of {-customItems::*})
                 optional int arg "count" with min 1 and max 6400:
                     trigger:
-                        set {_item} to {_item} ? ""
+                        set {_id} to {_item} ? ""
                         set {_count} to {_count} ? 1
-                        if {-customItems::%{_item}%} isn't set:
-                            send "§cUnknown custom item '%{_item}%'" to command sender
+                        if {-customItems::%{_id}%::item} isn't set:
+                            send "§cUnknown custom item '%{_id}%'" to command sender
                             stop
-                        set {_customItem} to {-customItems::%{_item}%}
+                        set {_customItem} to {-customItems::%{_id}%::item}
                         give or drop {_count} of {_customItem} to {_players::*}
                         set {_c::1} to (text component from "Gave %{_count}% ")
                         set {_c::2} to (item chat component of {_customItem})
@@ -76,239 +234,40 @@ brig command tree /turtle:customitems:
             loadAllRecipes()
             send "§aFinished reloading recipes!" to command sender
 
-# Effects and expressions for handling custom items
-
-# Add custom interact nbt to an item
-effect:
-    patterns:
-        add custom interact[ion] [nbt] to %item%
-        give %item% [a] custom interact[ion] [nbt]
-        set custom interact[ion] of %item% to (true|on|enabled)
-    trigger:
-        set {_item} to expr-1
-        set (compound tag "consumable" of (nbt of {_item})) to (nbt compound from "{consume_seconds:0.05,animation:""none"",sound:{sound_id:""""},has_consume_particles:false,on_consume_effects:[{type:""minecraft:play_sound"",sound:{sound_id:""""}}]}")
-        apply food component to {_item}:
-            nutrition: 0
-            saturation: 0
-            can_always_eat: true
-        set (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) to true
-        set raw expression expr-1 to {_item}
-
-# Set repairable item of an item
-# Supports custom items
-plural expression:
-    return type: items
-    loop of: item
-    patterns:
-        custom repair[able] (item|material)s of %item%
-        %item%'s custom repair[able] (item|material)s
-    get:
-        loop (string list tag "customItems;repairItems" of (custom nbt of (expr-1))):
-            add (custom item loop-value) to {_return::*}
-        return {_return::*}
-    set:
-        set {_item} to expr-1
-        set (repairable items of {_item}) to (change values)
-        set (string list tag "customItems;repairItems" of (custom nbt of {_item})) to (item id of change values)
-        set (raw expression expr-1) to {_item}
-
-# Set 'remove nbt tags' of an item
-# These tags will be forcefully removed from the item when it is updated
-plural expression:
-    return type: strings
-    loop of: tag
-    patterns:
-        remove nbt [strings|tags] of %item%
-        %item%'s remove nbt [strings|tags]
-    get:
-        return (string list tag "customItems;removeNbt" of (custom nbt of (expr-1)))
-    set:
-        set {_item} to expr-1
-        set (string list tag "customItems;removeNbt" of (custom nbt of {_item})) to (change values)
-        set (raw expression expr-1) to {_item}
-
-# Set 'kept lore amount' of an item
-# This number of lore lines will be retained when the item is updated
-expression:
-    return type: integer
-    patterns:
-        kept (lore|tooltip) (lines|amount) of %item%
-        %item%'s kept (lore|tooltip) (lines|amount)
-    get:
-        return (int tag "customItems;keepLore" of (custom nbt of (expr-1)))
-    set:
-        set {_item} to expr-1
-        set (int tag "customItems;keepLore" of (custom nbt of {_item})) to (change value)
-        set (raw expression expr-1) to {_item}
-
-# Get all custom items
-plural expression:
-    return type: item
-    loop of: item
-    patterns:
-        all [[of] the] [registered|defined] custom items
-    get:
-        return {-customItems::*}
-
-# Get/define/delete a custom item
-expression:
-    return type: item
-    patterns:
-        custom item [with id|named] %string%
-    get:
-        set {_id} to namespaced key from expr-1
-        if {_id} isn't set:
-            log error "Error retrieving custom item: '%expr-1%' isn't a valid namespaced key."
-            return
-        if {-customItems::%{_id}%} is set:
-            return {-customItems::%{_id}%}
-        else if (itemtype from key {_id}) is set:
-            return itemtype from key {_id}
-        return
-    set:
-        set {_id} to namespaced key from expr-1
-        if {_id} isn't set:
-            log error "Error registering custom item: '%expr-1%' isn't a valid namespaced key."
-            stop
-        # convert itemstack/itemtype/slot to itemstack
-        set {_item} to change value
-        set {_item} to try {_item}.getRandom() ? {_item}
-        set {_item} to try {_item}.getItem() ? {_item}
-        if {_item} isn't instance of item:
-            log error "Error registering custom item %{_id}%: Cannot define '%change value%' (%skript type of (change value)%) as a custom item, as it is not an item."
-            stop
-        if {_item} is air:
-            log error "Error registering custom item %{_id}%: Cannot define air as a custom item."
-            stop
-        set item id of {_item} to "%{_id}%"
-        set {-customItems::%{_id}%} to {_item}
-        log debug "Registered custom item &a%{_id}%"
-    delete:
-        set {_id} to namespaced key from expr-1
-        if {_id} isn't set:
-            log error "Error deleting custom item: '%expr-1%' isn't a valid namespaced key."
-            stop
-        delete {-customItems::%{_id}%}
-
-# Get/set/delete the custom id of an item
-item property item id:
-    return type: string
-    get:
-        set {_id} to (string tag "customItems;id" of (custom nbt of expr-1))
-        return {_id} if {_id} is set else (raw name of expr-1)
-    set:
-        set {_item} to expr-1
-        set (string tag "customItems;id" of (custom nbt of {_item})) to change value
-        set (raw expression expr-1) to {_item}
-    delete:
-        set {_item} to expr-1
-        delete (string tag "customItems;id" of (custom nbt of {_item}))
-        set (raw expression expr-1) to {_item}
-
-# Update an item based on its custom id
-expression:
-    patterns:
-        updated [[custom] item] %item%
-    get:
-        set {_item} to expr-1
-        if {_item} ? air is air:
-            return {_item}
-        # update legacy items
-        if (string tag "customId" of (custom nbt of {_item})) is set:
-            set (string tag "customItems;id" of (custom nbt of {_item})) to (string tag "customId" of (custom nbt of {_item}))
-            delete (string tag "customId" of (custom nbt of {_item}))
-        # kept lore
-        set {_keepLore} to (int tag "customItems;keepLore" of (custom nbt of {_item}))
-        if {_keepLore} is set:
-            set {_keptLore::*} to (first {_keepLore} elements of (component lore of {_item}))
-        # update nbt
-        set {_rawitem} to (custom item (item id of {_item})) ? {_item}
-        if (string tag "customItems;changeId" of (custom nbt of {_rawitem})) is set:
-            set {_rawitem} to (custom item (string tag "customItems;changeId" of (custom nbt of {_rawitem}))) ? {_item}
-        if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
-            (int tag "minecraft:damage" of (vanilla nbt of {_rawitem})) isn't set
-            delete (int tag "minecraft:damage" of (nbt of {_item}))
-        set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
-        add nbt of {_item} to nbt of {_newitem}
-        add nbt of {_rawitem} to nbt of {_newitem}
-        # finalize
-        loop (string list tag "customItems;removeNbt" of (custom nbt of {_rawitem})):
-            delete tag loop-value of (nbt of {_newitem})
-        if {_keepLore} is set:
-            loop {_keepLore} times:
-                set (line loop-iteration of component lore of {_newitem}) to {_keptLore::%loop-iteration%}
-        return {_newitem}
-effect:
-    patterns:
-        update [[custom] item] %item%
-    trigger:
-        set (raw expression expr-1) to (updated expr-1)
-
-###
-# Custom item recipe choice (doesn't work with ExactChoice)
-expression:
-    patterns:
-        [custom] [item] recipe[ ]choice (for|of|using) %item%
-        %item%'s [custom] [item] recipe[ ]choice
-    get:
-        set {_item} to expr-1
-        clear nbt of {_item}
-        set (item id of {_item}) to (item id of expr-1)
-        return {_item}
-###
-
-# Handle existing custom items
-
-# Custom interact behavior
-on consume with priority lowest:
-    set {_item} to event-item
-    (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) is true
-    cancel event
-    set event-item to {_item}
-    try player.setCooldown(event-item, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of event-item)))
-    set {_eventValues::player} to event-player
-    set {_eventValues::item} to event-item
-    set {_eventValues::world} to event-world
-    set {_eventValues::string} to (item id of event-item)
-    set {_eventValues::equipmentslot} to event.getHand()
-    call custom event "customItemInteract" using event-values {_eventValues::*}
-
+# update dropped items
 on entity add to world:
     event-entity is a dropped item
     update item (item of event-entity)
 
 # anvil logic
-# and update anvil/grindstone/smithing results
-on PrepareResultEvent:
-    event.getResult() is set
-    event.setResult(updated event.getResult())
-    event is instance of PrepareAnvilEvent
-    set {_inv} to event.getInventory()
-    set {_first} to {_inv}.getFirstItem()
-    set {_second} to {_inv}.getSecondItem()
+on anvil prepare:
+    set {_first} to (slot 0 of event-inventory)
+    set {_second} to (slot 1 of event-inventory)
+    set {_result} to (slot 2 of event-inventory)
     # trying to merge
     if (raw name of {_first}) is (raw name of {_second}):
         (item id of {_first}) isn't (item id of {_second}) # tried to merge with two different items
         # cancel if not a custom repair
-        (string list tag "customItems;repairItems" of custom nbt of {_first}) doesn't contain (item id of {_second})
-        event.setResult(null)
+        (string list tag "customItems;repairItems" of (custom nbt of {_first})) doesn't contain (item id of {_second})
+        set {_result} to air
     # trying to repair
     else if (repairable items of {_first}) contains {_second}:
         set {_repairItems::*} to (string list tag "customItems;repairItems" of custom nbt of {_first}) ? (item id of (repairable items of {_first}))
         {_repairItems::*} is set
         {_repairItems::*} doesn't contain (item id of {_second})
-        event.setResult(null)
+        set {_result} to air
     # trying to apply book
     else if {_second} is enchanted book:
         # temporary solution for custom enchants
         {_first} is firework star
         (item id of {_first}) isn't "turtle:chorium_mirror"
-        event.setResult(null)
+        set {_result} to air
+    set (slot 2 of event-inventory) to (updated {_result})
 
 # player joining
 on join:
     loop 41 times:
-        update (slot (loop-value)-1 of player)
+        update (slot (loop-iteration)-1 of player)
 
 # /give etc
 # doesn't work well when in creative
@@ -320,21 +279,9 @@ on inventory slot change:
 # chest loot generating
 on loot generate:
     loop loot:
-        add (updated loop-value) to {_newloot::*}
+        add (updated item loop-value) to {_newloot::*}
     set loot to {_newloot::*}
 
-# crafting
-on preparing craft:
-    update event-slot
-
-# smelting
-# updating result blocks more items from being smelted
-#on smelt:
-#    update smelted item
-
 # brewing
-on BrewEvent:
-    set {_block} to event.getBlock()
-    loop ...event.getResults():
-        set {_item} to (updated loop-value)
-        event.getResults().set((loop-iteration)-1, (try {_item}.getRandom()) ? {_item})
+on brew completed:
+    set brewing results to (brewing results mapped with [updated input])

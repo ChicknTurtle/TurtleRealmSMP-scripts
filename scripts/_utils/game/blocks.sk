@@ -25,10 +25,10 @@ expression:
             set blockdata tag loop-value of (block at expr-1) to {_blockdata::%loop-value%}
 
 local function naturallyPlaceItem(item:itemtype, loc:location) :: boolean:
-    set {_dir} to facing of loc {_loc}
+    set {_dir} to (facing of loc {_loc})
     set {_dir} to "up" if {_dir} is above
-    set {_dir} to "below" if {_dir} is below
-    set {_nmsDir} to Direction.byName(str({_dir}))
+    set {_dir} to "down" if {_dir} is below
+    set {_nmsDir} to Direction.byName("%{_dir}%")
     set {_level} to (world of {_loc}).getHandle()
     set {_nmsItem} to {_item}.getRandom().asNMSCopy()
     set {_x} to floor(x-coord of {_loc})

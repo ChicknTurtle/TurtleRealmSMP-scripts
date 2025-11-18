@@ -44,6 +44,7 @@ function pressProcessBlock(b:block, dir:vector):
         set {_hopper} to (block under {_crusher})
     # try to crush each item
     loop {_e::*}:
+        locally suppress constant condition warning
         if true is true:
             # check recipes
             set {_item} to (item of loop-value)

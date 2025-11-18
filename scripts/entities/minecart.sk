@@ -68,6 +68,7 @@ import:
     org.bukkit.event.block.BlockPhysicsEvent
 
 on load:
+    locally suppress constant condition warning
     set {-features::minecart::name} to "Minecart"
     set {-features::minecart::desc} to "Many minecart improvements, configurable in file"
     set {-features::minecart::warn} to "Placed carts need to be replaced when disabling"

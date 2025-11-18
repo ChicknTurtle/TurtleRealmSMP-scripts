@@ -5,7 +5,6 @@ when ready to register custom items:
         set {_name} to loop-value
         replace "_" with " " in {_name}
         set (custom item "turtle:%loop-value%_shulker_shell") to (shulker shell with nbt from "{""minecraft:item_model"":""turtle:shulker_shell_%loop-value%"",""minecraft:item_name"":""%proper case {_name}% Shulker Shell""}")
-        set (custom item "turtle:shulker_shell_%loop-value%") to (shulker shell with custom nbt from "{customItems:{changeId:""turtle:%loop-value%_shulker_shell""}}")
 
 # packing
 on right click:
