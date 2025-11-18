@@ -1,5 +1,7 @@
+using reflection
 
 when ready to register custom items:
+    set (update function of "turtle:chorium_mirror") to (function "updateItem" in script)
     set (custom item "turtle:chorium_mirror") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_mirror"",""minecraft:item_name"":""Chorium Mirror"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
     set max damage of (custom item "turtle:chorium_mirror") to 4
     set custom repair items of (custom item "turtle:chorium_mirror") to (custom item "turtle:chorium_ingot")
@@ -9,8 +11,16 @@ when ready to register custom items:
     apply use cooldown component to (custom item "turtle:chorium_mirror"):
         seconds: 10 seconds
         group: "turtle:chorium_mirror"
-    set component lore of (custom item "turtle:chorium_mirror") to getLore()
-    set (kept lore amount of (custom item "turtle:chorium_mirror")) to 1
+
+local function updateItem(item:item) :: item:
+    set {_loc} to getMirrorLoc(compound tag "mirrorLoc" of (custom nbt of {_item}))
+    if {_loc} is set:
+        add "§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%§f in §d%world of {_loc}%" to {_l::*}
+    else:
+        add "§fUnbound" to {_l::*}
+    add "§7Save a location and teleport to it from anywhere" to {_l::*}
+    set (lore of {_item}) to {_l::*}
+    return {_item}
 
 when ready to load recipes:
     register smithing transform recipe:
@@ -26,29 +36,7 @@ on preparing craft:
     (item id of {_item}) is "turtle:chorium_mirror"
     delete (compound tag "mirrorLoc" of custom nbt of {_item})
     delete (boolean tag "hasMirrorLoc" of custom nbt of {_item})
-    set recipe result to updateItem({_item})
-
-local function getLore(loc:location={_}) :: objects:
-    set {_c1} to (text component from "§fUnbound")
-    set (italic format of {_c1}) to false
-
-    # description
-    set {_c2} to (text component from "§7Save a location and teleport to it from anywhere")
-    set (italic format of {_c2}) to false
-    
-    return ({_c1}, {_c2})
-
-local function updateItem(item:item) :: item:
-    set {_loc} to getMirrorLoc(compound tag "mirrorLoc" of (custom nbt of {_item}))
-    # lore
-    if {_loc} isn't set:
-        set {_c} to (text component from "§fUnbound")
-    else:
-        set {_c} to (text component from "§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%§f in §d%world of {_loc}%")
-    set (italic format of {_c}) to false
-    set (line 1 of component lore of {_item}) to {_c}
-    
-    return updated {_item}
+    set recipe result to (updated {_item})
 
 local function getMirrorLoc(mirrorLoc:nbtcompound) :: location:
     {_mirrorLoc} is set
@@ -75,29 +63,34 @@ local function mirrorTp(p:player,loc:location):
 
 on custom item interact with "turtle:chorium_mirror":
     set {_mirror} to (player's offhand tool) if (event-equipmentslot is off hand slot) else (player's tool)
-    if durability of {_mirror} <= 1:
-        play sound "minecraft:item.ominous_bottle.dispose" in player category at player
+    if any:
+        durability of {_mirror} <= 1
+        event-world is "world_turtle_dungeon"
+    then:
+        play sound "minecraft:item.ominous_bottle.dispose" in (player category) at player
         exit trigger
     set {_mirrorLoc} to (compound tag "mirrorLoc" of (custom nbt of {_mirror}))
-    if ({_mirrorLoc} ? (nbt from "{}")) is (nbt from "{}"):
+    if ("%{_mirrorLoc}%" ? "{}") is "{}":
         # bind location
-        set {_mirrorLoc} to (nbt from "{}")
+        set {_mirrorLoc} to (empty nbt compound)
         set {_loc} to (player's location)
         set (int array tag "pos" of {_mirrorLoc}) to (floor(x-coord of {_loc}),floor(y-coord of {_loc}),floor(z-coord of {_loc}))
         set (string tag "world" of {_mirrorLoc}) to "%event-world%"
         set (compound tag "mirrorLoc" of (custom nbt of {_mirror})) to {_mirrorLoc}
         set (boolean tag "hasMirrorLoc" of (custom nbt of {_mirror})) to true
-        play sound "minecraft:entity.illusioner.prepare_mirror" in player category at player
+        play sound "minecraft:entity.illusioner.prepare_mirror" in (player category) at player
         make 25 of end rod at player with extra 0.1
     else:
         # tp
-        mirrorTp(player, getMirrorLoc({_mirrorLoc}))
+        set {_loc} to getMirrorLoc({_mirrorLoc})
+        {_loc} is set
+        mirrorTp(player, {_loc})
         player's gamemode isn't creative
         durability of {_mirror} > 1
-        chance of (1/((level of unbreaking of {_mirror} ? 0)+1))
+        chance of (1/(((level of unbreaking of {_mirror}) ? 0)+1))
         damage {_mirror} by 1
     # update item
-    set {_mirror} to updateItem({_mirror})
+    set {_mirror} to (updated {_mirror})
     if (event-equipmentslot is off hand slot):
         set player's offhand tool to {_mirror}
     else:

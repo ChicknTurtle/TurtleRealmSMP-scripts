@@ -1,7 +1,7 @@
     
 when ready to register custom items:
     # potion
-    set (custom item "minecraft:potion") to 1 potion
+    set (custom item "minecraft:potion") to potion (itemtype)
     set (max stack size component of (custom item "minecraft:potion")) to 16
     # elytra
     set (custom item "minecraft:elytra") to elytra with nbt from "{""minecraft:max_damage"":300,""minecraft:enchantable"":{value:3}}"
