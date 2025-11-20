@@ -220,7 +220,7 @@ slash command uploadnbs <attachment="file">:
                 reply with hidden "The file you tried to upload isn't a song file. Valid song files end with .nbs%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>)."
                 exit trigger
             # get filename
-            set {_filenameNoExt} to getFileName(file name of {_fileAttachment})
+            set {_filenameNoExt} to getFileName(attachment file name of {_fileAttachment})
             set {_filename} to (first 30 characters of {_filenameNoExt})
             replace "_" with " " in {_filename}
             set {_filename} to (try {_filename}.trim()) ? {_filename}
