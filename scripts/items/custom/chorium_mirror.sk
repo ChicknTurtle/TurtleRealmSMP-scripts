@@ -3,8 +3,9 @@ using reflection
 when ready to register custom items:
     set (update function of "turtle:chorium_mirror") to (function "updateItem" in script)
     set (custom item "turtle:chorium_mirror") to (firework star with nbt from "{""minecraft:item_model"":""turtle:chorium_mirror"",""minecraft:item_name"":""Chorium Mirror"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
-    set max damage of (custom item "turtle:chorium_mirror") to 4
-    set custom repair items of (custom item "turtle:chorium_mirror") to (custom item "turtle:chorium_ingot")
+    set (max damage of (custom item "turtle:chorium_mirror")) to 4
+    set (custom repair items of (custom item "turtle:chorium_mirror")) to (custom item "turtle:chorium_ingot")
+    set (allowed enchants of (custom item "turtle:chorium_mirror")) to (unbreaking, mending, (enchantment from key "turtle:soulbound"))
     add custom interact to (custom item "turtle:chorium_mirror")
     set (float tag "minecraft:consumable;consume_seconds" of nbt of (custom item "turtle:chorium_mirror")) to 1.5
     set (string tag "minecraft:consumable;animation" of nbt of (custom item "turtle:chorium_mirror")) to "block"

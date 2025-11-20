@@ -172,14 +172,30 @@ on consume with priority lowest:
     call custom event "customItemInteract" using event-values {_eventValues::*}
 
 # Custom repair items
-item property custom repair[able] (item|material)s:
-    return type: items
+plural expression:
+    patterns:
+        custom repair[able] (item|material)s of %itemtype%
+        %itemtype%'s custom repair[able] (item|material)s
+    return type: itemtypes
     get:
         return (string list tag "customItems;repairItems" of (custom nbt of (expr-1))) mapped with [custom item input]
     set:
         set {_item} to expr-1
         set (repairable items of {_item}) to (change values)
         set (string list tag "customItems;repairItems" of (custom nbt of {_item})) to (item id of change values)
+        set (raw expression of expr-1) to {_item}
+
+# Custom allowed enchants
+plural expression:
+    patterns:
+        (allowed|valid) enchant[ment]s of %itemtype%
+        %itemtype%'s (allowed|valid) enchant[ment]s
+    return type: enchantments
+    get:
+        return (string list tag "customItems;allowedEnchantments" of (custom nbt of (expr-1))) mapped with [enchantment from key input]
+    set:
+        set {_item} to expr-1
+        set (string list tag "customItems;allowedEnchantments" of (custom nbt of {_item})) to ((change values) mapped with ["%namespaced key of input%"])
         set (raw expression of expr-1) to {_item}
 
 # Custom items command
@@ -202,7 +218,6 @@ brig command tree /turtle:customitems:
                         give or drop {_count} of {_customItem} to {_players::*}
                         set {_c::1} to (text component from "Gave %{_count}% ")
                         set {_c::2} to (item chat component of {_customItem})
-                        set {_c::3} to (text component from " to ")
                         set {_c::3} to (text component from " to ")
                         if (size of {_players::*}) > 1:
                             set {_c::4} to (text component from "%size of {_players::*}% players")
@@ -243,26 +258,31 @@ on entity add to world:
 on anvil prepare:
     set {_first} to (slot 0 of event-inventory)
     set {_second} to (slot 1 of event-inventory)
-    set {_result} to (slot 2 of event-inventory)
     # trying to merge
-    if (raw name of {_first}) is (raw name of {_second}):
-        (item id of {_first}) isn't (item id of {_second}) # tried to merge with two different items
+    if (type of {_first}) is (type of {_second}):
+        ((item id of {_first}) ? "<none>") isn't ((item id of {_second}) ? "<none>")
         # cancel if not a custom repair
         (string list tag "customItems;repairItems" of (custom nbt of {_first})) doesn't contain (item id of {_second})
-        set {_result} to air
+        set event-slot to air
     # trying to repair
     else if (repairable items of {_first}) contains {_second}:
         set {_repairItems::*} to (string list tag "customItems;repairItems" of custom nbt of {_first}) ? (item id of (repairable items of {_first}))
         {_repairItems::*} is set
         {_repairItems::*} doesn't contain (item id of {_second})
-        set {_result} to air
+        set event-slot to air
     # trying to apply book
     else if {_second} is enchanted book:
-        # temporary solution for custom enchants
-        {_first} is firework star
-        (item id of {_first}) isn't "turtle:chorium_mirror"
-        set {_result} to air
-    set (slot 2 of event-inventory) to (updated {_result})
+        set {_allowedEnchants::*} to (allowed enchants of {_first})
+        loop (stored enchantments of {_second}):
+            {_allowedEnchants::*} contains (type of loop-value)
+            (enchantment level of loop-value) > ((level of (type of loop-value) of event-slot) ? 0)
+            add loop-value to {_enchants::*}
+        {_enchants::*} is set
+        if event-slot is air:
+            set event-slot to {_first}
+            set (name of event-slot) to colored (anvil text input of event-inventory)
+        enchant event-slot with {_enchants::*}
+    update event-slot
 
 # player joining
 on join:
