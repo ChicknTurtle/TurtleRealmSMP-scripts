@@ -11,6 +11,9 @@ on join:
     set {-playerData::%player%::lastOnGround} to 1
     set {-playerData::%player%::afkSince} to now
 
+on skript stop:
+    kick all players
+
 on input key press:
     set {-playerData::%player%::afkSince} to now
 on click:
