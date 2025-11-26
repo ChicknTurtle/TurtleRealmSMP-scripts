@@ -5,6 +5,7 @@ import:
     ch.njol.skript.Skript
 
 on skript start:
+    wait 1 tick
     loadCustomItems()
     loadAllRecipes()
 local function loadCustomItems():

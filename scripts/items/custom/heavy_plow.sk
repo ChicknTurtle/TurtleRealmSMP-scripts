@@ -45,19 +45,28 @@ local function getSpawnerName(b:object) :: string:
 
 on player interact:
     event-equipmentslot is main hand
+    event-blockaction is right_click_block
     set {_item} to player's tool
     set {_id} to (item id of {_item})
     {_id} is "turtle:heavy_plow"
     (item cooldown of (player's tool) for player) is 0 ticks
     set {_holding} to (compound tag "holding" of (custom nbt of {_item}))
     if ("%{_holding}%" ? "{}") isn't "{}":
-        set {_b} to (event-block.getRelative(event-blockface))
-        {_b} is air
+        if event-block.isReplaceable() is true:
+            set {_b} to event-block
+        else:
+            set {_b} to (event-block.getRelative(event-blockface))
+            {_b}.isReplaceable() is false
+            stop
+        (entities touching {_b}) where [input isn't a dropped item] isn't set
         cancel event
         set {_blockdata} to ((string tag "holding;blockdata" of (custom nbt of {_item})) parsed as blockdata)
         set {_nbt} to (compound tag "holding;nbt" of (custom nbt of {_item}))
         set (block at {_b}) to {_blockdata}
         add {_nbt} to (nbt of (block at {_b}))
+        if (blockdata tag "facing" of (blockdata of (block at {_b}))) is set:
+            set {_facing} to (facing of vector ((vector of dir (horizontal facing of player)) * -1))
+            set (blockdata tag "facing" of (blockdata of (block at {_b}))) to {_facing}
         delete (compound tag "holding" of (custom nbt of {_item}))
         set (player's tool) to (updated {_item})
         set (damage of tool) to (damage of tool)
