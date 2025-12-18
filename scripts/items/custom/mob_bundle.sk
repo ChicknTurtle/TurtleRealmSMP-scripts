@@ -1,10 +1,9 @@
 
-options:
+on load:
     # Mobs that can be picked up by mob bundle
-    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, cat (entitytype), cave spider, chicken (entitytype), cod (entitytype), copper golem (entitytype), cow, creeper, dolphin, drowned, endermite, evoker, fox, frog, glow squid, goat, guardian, husk, magma cube, mooshroom, ocelot, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entitytype), rabbit (entitytype), salmon (entitytype), sheep, silverfish, skeleton, slime, snow golem, spider, squid, stray, strider, tadpole, tropical fish (entitytype), vex, villager, vindicator, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin
-
+    set {-mobBundleAllowedMobs::*} to allay (entitytype), armadillo (entitytype), axolotl (entitytype), bat (entitytype), bee (entitytype), blaze (entitytype), bogged (entitytype), breeze (entitytype), cat (entitytype), cave spider (entitytype), chicken (entitytype), cod (entitytype), copper golem (entitytype), cow (entitytype), creeper (entitytype), dolphin (entitytype), drowned (entitytype), endermite (entitytype), evoker (entitytype), fox (entitytype), frog (entitytype), glow squid (entitytype), goat (entitytype), guardian (entitytype), husk (entitytype), magma cube (entitytype), mooshroom (entitytype), ocelot (entitytype), parrot (entitytype), phantom (entitytype), pig (entitytype), piglin (entitytype), piglin brute (entitytype), pillager (entitytype), polar bear (entitytype), pufferfish (entitytype), rabbit (entitytype), salmon (entitytype), sheep (entitytype), silverfish (entitytype), skeleton (entitytype), slime (entitytype), snow golem (entitytype), spider (entitytype), squid (entitytype), stray (entitytype), strider (entitytype), tadpole (entitytype), tropical fish (entitytype), vex (entitytype), villager (entitytype), vindicator (entitytype), witch (entitytype), wither skeleton (entitytype), wolf (entitytype), zombie (entitytype), zombie villager (entitytype), zombified piglin (entitytype)
     # Baby mobs that can be picked up by mob bundle
-    AllowedBabyMobs: camel, donkey, happy ghast, hoglin, horse, llama, mule, panda, sniffer, trader llama, turtle, zoglin
+    set {-mobBundleAllowedBabyMobs::*} to camel (entitytype), donkey (entitytype), happy ghast (entitytype), hoglin (entitytype), horse (entitytype), llama (entitytype), mule (entitytype), panda (entitytype), sniffer (entitytype), trader llama (entitytype), turtle (entitytype), zoglin (entitytype)
 
     # All entities can be picked up while in creative
 
@@ -33,11 +32,11 @@ on player interact on entity:
     if player's gamemode isn't creative:
         if any:
             target of event-entity is set
-            ({@AllowedMobs}, {@AllowedBabyMobs}) doesn't contain event-entity
+            {-mobBundleAllowedMobs::*}, {-mobBundleAllowedBabyMobs::*} doesn't contain event-entity
         then:
             exit trigger
         if age of event-entity >= 0:
-            ({@AllowedMobs}) doesn't contain event-entity
+            {-mobBundleAllowedMobs::*} doesn't contain event-entity
             exit trigger
         if entity size of event-entity > 2:
             exit trigger

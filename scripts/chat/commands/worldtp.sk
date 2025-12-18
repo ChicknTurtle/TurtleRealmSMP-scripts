@@ -1,5 +1,5 @@
 
-brig command /turtle:worldtp <entities> <world:world>:
+brig command /turtle:worldtp <entities:entities> <world:world>:
     permission: op
     trigger:
         teleport {_entities::*} to (spawn location of {_world})
