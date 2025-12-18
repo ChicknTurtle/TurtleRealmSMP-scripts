@@ -29,7 +29,7 @@ on entity remove from world:
 
 on damage:
     damage cause is void
-    if (gamerule keepInventory of event-world) isn't true:
+    if (gamerule keep_inventory of event-world) isn't true:
         cancel event
     event-world is (world {@endWorld})
     warp(victim, {@overworld}, {@upWrapY})

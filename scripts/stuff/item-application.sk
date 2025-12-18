@@ -7,7 +7,17 @@ on player interact:
         cancel event
         set {_success} to true
         set event-block to grass block
-        play sound "minecraft:item.crop.plant" in blocks category at event-block
+        play sound "minecraft:item.crop.plant" in (blocks category) at event-block
+    if event-item is torch:
+        event-block is carved pumpkin
+        player isn't sneaking
+        set {_facing} to (blockdata tag "facing" of event-block)
+        (1st element of (split "%event-blockface%" at "_")) is {_facing}
+        cancel event
+        set {_success} to true
+        set event-block to jack o lantern
+        set (blockdata tag "facing" of event-block) to {_facing}
+        play sound "minecraft:block.honey_block.hit" in (blocks category) at event-block
     else if (item id of event-item) is "turtle:tree_bark":
         set {_bark::minecraft;stripped_oak_log} to oak log
         set {_bark::minecraft;stripped_oak_wood} to oak wood

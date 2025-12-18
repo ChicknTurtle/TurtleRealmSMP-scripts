@@ -8,8 +8,8 @@ options:
     resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
 on load:
-    set gamerule playersSleepingPercentage of (world "world") to 0
-    set gamerule doInsomnia of (world "world") to false
+    set gamerule players_sleeping_percentage of (world "world") to 0
+    set gamerule spawn_phantoms of (world "world") to false
 
     set {-fgApi} to FloodgateApi.getInstance()
 

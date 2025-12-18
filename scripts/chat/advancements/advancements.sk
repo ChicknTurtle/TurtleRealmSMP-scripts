@@ -10,7 +10,7 @@ on load:
 # Display in chat
 on advancement done:
     {enabledFeatures::advancementmsgs} is true
-    (gamerule announceAdvancements of (world of player)) is true
+    (gamerule show_advancement_messages of (world of player)) is true
     (event-advancement.getDisplay().doesAnnounceToChat()) is true
     event.message(null)
 

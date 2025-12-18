@@ -103,8 +103,8 @@ on vehicle move:
     {_cart} is instance of Minecart
 
     # Get max speed
-    if gamerule minecartMaxSpeed of world of {_cart} isn't {@maximumSpeed}:
-        set gamerule minecartMaxSpeed of world of {_cart} to {@maximumSpeed}
+    if gamerule max_minecart_speed of world of {_cart} isn't {@maximumSpeed}:
+        set gamerule max_minecart_speed of world of {_cart} to {@maximumSpeed}
     set {_maxSpeed} to ({@maximumSpeed}/20)
 
     # Increase minecart speed

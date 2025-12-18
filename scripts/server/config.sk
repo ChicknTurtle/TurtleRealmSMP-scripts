@@ -15,10 +15,7 @@ local function reloadServerConfig(initial:boolean=false):
 brig command tree /turtle:config:
     permission: op
     trigger:
-        if command sender is console:
-            send "&cCannot open config gui in console."
-            exit trigger
-        openConfigPage(player)
+        send "&cConfig doesn't have a gui right now. Use /config <path> [set <value>|reset]"
     literal arg "reload":
         trigger:
             send "Reloading server config..."
@@ -103,10 +100,6 @@ function getConfigPaths(nodesJson:object, prefix:string, valuesOnly:boolean) :: 
             add getConfigPaths({_childNodes}, {_fullPath}, {_valuesOnly}) to {_paths::*}
     return {_paths::*}
 
-function getAllConfigPaths(noRoot:boolean=false) :: strings:
-    set {_prefix} to "" if {_noRoot} is true else "root"
-    return getConfigPaths({-serverConfigJson}.get("root").get("nodes"), {_noRoot}, false)
-
 function getAllConfigValuePaths(noRoot:boolean=false) :: strings:
     set {_prefix} to "" if {_noRoot} is true else "root"
     return getConfigPaths({-serverConfigJson}.get("root").get("nodes"), {_prefix}, true)
@@ -156,144 +149,3 @@ function getConfigElement(path:string) :: object:
         loop-iteration isn't size of {_path::*}
         set {_pageJson} to {_pageJson}.get("nodes")
     return {_pageJson}
-
-function openConfigPage(p:player, path:string="root"):
-    set {_path::*} to ({_path} split at ".")
-    set {_pageJson} to {-serverConfigJson}
-    loop {_path::*}:
-        set {_pageJson} to {_pageJson}.get(loop-value)
-        add ({_pageJson}.get("name").getAsString() ? loop-value) to {_pathNames::*}
-        loop-iteration isn't size of {_path::*}
-        set {_pageJson} to {_pageJson}.get("nodes")
-    set {_pageName} to {_pageJson}.get("name").getAsString() ? {_path}
-    set {_pageTitle} to {_pageJson}.get("title").getAsString()
-    set {_pageDesc} to {_pageJson}.get("desc").getAsString()
-    set {_itemJson} to {_pageJson}.get("item")
-    if {_itemJson}.isJsonPrimitive():
-        set {_itemKey} to {_itemJson}.getAsString()
-    else:
-        set {_itemKey} to {_itemJson}.get("id").getAsString()
-        set {_itemNbtStr} to {_itemJson}.get("nbt").getAsString() ? "{}"
-    if {_itemKey} is set:
-        (namespaced key from {_itemKey}) is set
-        set {_item} to (itemtype from key {_itemKey})
-        hide entire tooltip of {_item}
-        add nbt from {_itemNbtStr} to nbt of {_item}
-    set {_nodes} to {_pageJson}.get("nodes")
-    open multi action dialog to {_p}:
-        title: "%join {_pathNames::*} with " > "%"
-        body:
-            if {_item} is set:
-                add item body:
-                    item: {_item}
-            add plain message body:
-                contents: "§n%{_pageTitle} ? {_pageName}%"
-                width: 600
-            if {_pageDesc} is set:
-                add plain message body:
-                    contents: {_pageDesc}
-                    width: 600
-            loop ...{_nodes}.keySet():
-                set {_settingType} to try {_nodes}.get(loop-value).get("type").getAsString()
-                {_settingType} is set
-                set {_settingDesc} to try {_nodes}.get(loop-value).get("desc").getAsString()
-                {_settingDesc} is set
-                set {_settingName} to (try {_nodes}.get(loop-value).get("name").getAsString() ? loop-value)
-                add plain message body:
-                    contents: "§b%{_settingName}%%nl%§f%{_settingDesc}%"
-                    width: 600
-        inputs:
-            loop ...{_nodes}.keySet():
-                set {_key} to loop-value
-                set {_element} to {_nodes}.get({_key})
-                set {_settingType} to try {_element}.get("type").getAsString()
-                {_settingType} is set
-                set {_settingName} to (try {_element}.get("name").getAsString() ? {_key})
-                set {_settingDesc} to try {_element}.get("desc").getAsString()
-                set {_descStr} to "%nl%%{_settingDesc}%" if {_settingDesc} is set else ""
-                set {_settingDefaultPrimitive} to try {_element}.get("default")
-                if {_settingDefaultPrimitive} is set:
-                    if {_settingDefaultPrimitive}.isBoolean():
-                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsBoolean()
-                    else if {_settingDefaultPrimitive}.isNumber():
-                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsFloat()
-                    else:
-                        set {_settingDefault} to {_settingDefaultPrimitive}.getAsString()
-                if {_settingType} is "boolean":
-                    add boolean input:
-                        key: {_key}
-                        label: {_settingName}
-                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault}
-                else if {_settingType} is "slider":
-                    set {_settingStart} to try {_element}.get("start").getAsFloat()
-                    set {_settingEnd} to try {_element}.get("end").getAsFloat()
-                    set {_settingStep} to try {_element}.get("step").getAsFloat()
-                    add number range input:
-                        key: {_key}
-                        label: {_settingName}
-                        start: {_settingStart}
-                        end: {_settingEnd}
-                        step: {_settingStep}
-                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault} ? {_settingStart}
-                else if {_settingType} is "text":
-                    set {_settingMax} to try {_element}.get("max").getAsInt()
-                    if {_settingMax} is set:
-                        set {_maxLength} to max(1,{_settingMax},length of ({configValues::%{_path}%.%{_key}%} ? {_settingDefault}))
-                    set {_settingLines} to try {_element}.get("lines").getAsInt()
-                    if {_settingLines} is set:
-                        set {_multilineMaxLines} to max(1,{_settingLines})
-                        set {_multilineHeight} to clamp({_settingLines}*9+8,1,512)
-                    add text input:
-                        key: {_key}
-                        label: {_settingName}
-                        initial: {configValues::%{_path}%.%{_key}%} ? {_settingDefault}
-                        max_length: {_maxLength}
-                        multiline_max_lines: {_multilineMaxLines}
-                        multiline_height: {_multilineHeight}
-                else if {_settingType} is "options":
-                    set {_options} to try {_pageJson}.get("nodes").get({_key}).get("options")
-                    loop ...{_options}.keySet():
-                        set {_options::%loop-value-2%} to try {_options}.get(loop-value-2).getAsString()
-                    add single option input:
-                        key: {_key}
-                        label: {_settingName}
-                        options:
-                            loop indexes of {_options::*}:
-                                set {_initial} to true if {configValues::%{_path}%.%{_key}%} is loop-value else false
-                                add options entry:
-                                    id: loop-value
-                                    display: {_options::%loop-value%}
-                                    initial: {_initial}
-        actions:
-            loop ...{_nodes}.keySet():
-                set {_settingNodes::*} to try {_nodes}.get(loop-value).get("nodes")
-                {_settingNodes::*} is set
-                set {_settingName} to (try {_nodes}.get(loop-value).get("name").getAsString() ? loop-value)
-                set {_settingDesc} to try {_nodes}.get(loop-value).get("desc").getAsString()
-                add dynamic action button:
-                    label: {_settingName}
-                    tooltip: {_settingDesc}
-                    id: "config:page_button"
-                    additions: nbt from "{DATA:{page:""%{_path}%"",toPage:""%{_path}%.%loop-value%""}}"
-            if {_path} isn't "root":
-                add dynamic action button:
-                    label: "§c← Back"
-                    id: "config:back_button"
-                    additions: nbt from "{DATA:{page:""%{_path}%"",toPage:""%join (first (size of {_path::*} - 1) elements of {_path::*}) with "."%""}}"
-                add dynamic action button:
-                    label: "§b💾 Save & Exit"
-                    id: "config:save_button"
-                    additions: nbt from "{DATA:{page:""%{_path}%""}}"
-
-on dynamic button click:
-    # save input data
-    set {_page} to (string tag "DATA;page" of event-nbt)
-    if {_page} is set:
-        loop (nbt tags of event-nbt) where [input isn't "DATA"]:
-            set {_tagType} to (tag type of tag loop-value of event-nbt)
-            set {_tagType} to boolean tag if {_tagType} is byte tag else {_tagType}
-            set {configValues::%{_page}%.%loop-value%} to ({_tagType} loop-value of event-nbt)
-    # go to page
-    set {_toPage} to (string tag "DATA;toPage" of event-nbt)
-    if {_toPage} is set:
-        openConfigPage(player, {_toPage})
