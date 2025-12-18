@@ -1,8 +1,5 @@
 {
   "values": [
-    "minecraft:feather_falling",
-    "minecraft:projectile_protection",
-    "minecraft:power",
-    "turtle:aiming_curse"
+    "minecraft:lunge"
   ]
 }

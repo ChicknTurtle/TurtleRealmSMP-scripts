@@ -1,13 +1,14 @@
 
-options:
+on load:
     # Mobs that can drop graves
-    AllowedMobs: allay, armadillo, axolotl, bat, bee, blaze, bogged, breeze, camel, cat (entitytype), cave spider, chicken (entitytype), cod (entitytype), copper golem (entitytype), cow, creeper, dolphin, donkey, drowned, elder guardian, enderman, endermite, evoker, fox, frog, glow squid, goat, guardian, happy ghast, hoglin, horse, husk, iron golem, llama, magma cube, mooshroom, mule, ocelot, panda, parrot, phantom, pig, piglin, piglin brute, pillager, polar bear, pufferfish (entitytype), rabbit (entitytype), ravager, salmon (entitytype), sheep, shulker, silverfish, skeleton, skeleton horse, slime, sniffer, snow golem, spider, squid, stray, strider, tadpole, trader llama, tropical fish (entitytype), turtle, vex, villager, vindicator, warden, witch, wither skeleton, wolf, zombie, zombie villager, zombified piglin, zoglin
+    set {-mobGraveAllowedMobs::*} to allay (entitytype), armadillo (entitytype), axolotl (entitytype), bat (entitytype), bee (entitytype), blaze (entitytype), bogged (entitytype), breeze (entitytype), camel (entitytype), cat (entitytype), cave spider (entitytype), chicken (entitytype), cod (entitytype), copper golem (entitytype), cow (entitytype), creeper (entitytype), dolphin (entitytype), donkey (entitytype), drowned (entitytype), elder guardian (entitytype), enderman (entitytype), endermite (entitytype), evoker (entitytype), fox (entitytype), frog (entitytype), glow squid (entitytype), goat (entitytype), guardian (entitytype), happy ghast (entitytype), hoglin (entitytype), horse (entitytype), husk (entitytype), iron golem (entitytype), llama (entitytype), magma cube (entitytype), mooshroom (entitytype), mule (entitytype), ocelot (entitytype), panda (entitytype), parrot (entitytype), phantom (entitytype), pig (entitytype), piglin (entitytype), piglin brute (entitytype), pillager (entitytype), polar bear (entitytype), pufferfish (entitytype), rabbit (entitytype), ravager (entitytype), salmon (entitytype), sheep (entitytype), shulker (entitytype), silverfish (entitytype), skeleton (entitytype), skeleton horse (entitytype), slime (entitytype), sniffer (entitytype), snow golem (entitytype), spider (entitytype), squid (entitytype), stray (entitytype), strider (entitytype), tadpole (entitytype), trader llama (entitytype), tropical fish (entitytype), turtle (entitytype), vex (entitytype), villager (entitytype), vindicator (entitytype), warden (entitytype), witch (entitytype), wither skeleton (entitytype), wolf (entitytype), zombie (entitytype), zombie villager (entitytype), zombified piglin (entitytype), zoglin (entitytype)
 
 when ready to register custom items:
     set (custom item "turtle:mob_grave") to (firework star with nbt from "{""minecraft:item_model"":""turtle:mob_grave"",""minecraft:item_name"":""Mob Grave"",""max_stack_size"":1,""minecraft:rarity"":""uncommon""}")
     make (custom item "turtle:mob_grave") fire resistant
 
-on death of {@AllowedMobs}:
+on death:
+    {-mobGraveAllowedMobs::*} contains victim
     if all:
         (custom name of victim) isn't set
         (owner of victim) isn't set
