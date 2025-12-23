@@ -52,13 +52,20 @@ on async chat:
     set {_c::4} to (colored async chat message)
     set {_format} to (merge components {_c::*})
 
+    set {_c::1} to playerComponent(player, false, colorCodeToColor("7"))
+    set {_bedrockFormat} to (merge components {_c::*})
+
     # replace [item]
     if "%{_format}%" contains "[item]":
         (player's tool) isn't air
         set {_name} to (effective name of (player's tool))
         component replace first "[item]" with (item chat component of (player's tool)) in {_format}
+        component replace first "[item]" with (item chat component of (player's tool)) in {_bedrockFormat}
         replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # send message
-    set async chat format to {_format}
     discordChat({_msg}, player)
+    set async chat format to {_format}
+    set {_bedrockPlayers::*} to (all players where [(try {-fgApi}.isFloodgatePlayer(uuid of input)) is true])
+    remove {_bedrockPlayers::*} from async chat viewers
+    send component {_bedrockFormat} to {_bedrockPlayers::*}
