@@ -9,15 +9,21 @@ local function playerInfo(p:player) :: string:
         else:
             add "Discord: §cUnknown User%nl%§7@???" to {_lines::*}
     else:
-        add "Discord: §cNot linked" to {_lines::*}
+        add "Discord: §cUnlinked" to {_lines::*}
     if (uuid of {_p}) is set:
         add "§8%uuid of {_p}%" to {_lines::*}
     return (join {_lines::*} with "§r%nl%")
 
-function playerComponent(p:player) :: object:
-    set {_c} to text component from ({_p}'s display name)
-    set (hover event of {_c}) to (hover event showing (playerInfo({_p})))
-    set (click event of {_c}) to (click event to suggest command "/msg %{_p}%")
+function playerComponent(p:player, includePlayerHead:boolean=true, defaultColor:color=rgb(255,255,255)) :: object:
+    set {_c} to (text component from ({_p}'s display name))
     if {PlayerData::%{_p}%::chatColor} is set:
         set (color format of {_c}) to {-chatColors::%{PlayerData::%{_p}%::chatColor}%}
+    else:
+        set (color format of {_c}) to {_defaultColor}
+    if {_includePlayerHead} is true:
+        set {_head} to (object text component with player head of {_p})
+        set (color format of {_head}) to rgb(255,255,255)
+        set {_c} to (merge components ({_head}, " ", {_c}))
+    set (hover event of {_c}) to (hover event showing (playerInfo({_p})))
+    set (click event of {_c}) to (click event to suggest command "/msg %{_p}%")
     return {_c}
