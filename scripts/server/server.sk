@@ -46,6 +46,6 @@ every second:
 
 on server list ping:
     if getConfigValue("root.server.devMode") is true:
-        set the motd to "§x§F§F§5§F§1§5▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§F§F§5§F§1§5░▒▓§r%nl% §8────────── §x§F§F§5§F§1§5ᴅᴇᴠ §8──────────"
+        set motd to "§x§F§F§5§F§1§5▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§F§F§5§F§1§5░▒▓§r%nl% §8────────── §x§F§F§5§F§1§5ᴅᴇᴠ §8──────────"
     else:
-        set the motd to "§x§2§d§b§4§4§1▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§2§d§b§4§4§1░▒▓§r%nl% §8────────── §x§2§d§b§4§4§1sᴍᴘ §8──────────"
+        set motd to "§x§2§d§b§4§4§1▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§2§d§b§4§4§1░▒▓§r%nl% §8────────── §x§2§d§b§4§4§1sᴍᴘ §8──────────"

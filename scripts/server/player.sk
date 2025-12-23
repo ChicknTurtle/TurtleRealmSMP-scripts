@@ -44,7 +44,7 @@ every tick:
     set {_tablistHealth} to getConfigValue("root.players.tablistHealth")
     set {_tps} to ({-formattedTps} ? "§f. . .")
     set {_mspt} to ({-formattedMspt} ? "§f. . .")
-    set {_servername} to ("§x§F§F§5§F§1§5&lTurtleRealmSMP Dev" if (getConfigValue("root.server.devMode") is true) else "§x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm§x§2§d§b§4§4§1SMP")
+    set {_servername} to ((minimessage from "<gradient:#FF5F15:#ff9940>TurtleRealmSMP Dev") if (getConfigValue("root.server.devMode") is true) else (minimessage from "<gradient:#00FF7F:#C9FF5C>TurtleRealm<gradient:#00DFFF:#00B7FF>SMP"))
 
     loop all players:
         # last on ground
@@ -67,7 +67,7 @@ every tick:
         set (loop-player's tablist name) to {_name}
         # tablist
         set tablist header of loop-player to "                                     %nl%%{_servername}%%nl%"
-        set tablist footer of loop-player to "%nl%&7TPS: %{_tps}% &8- &7MSPT: %{_mspt}%%nl%"
+        set tablist footer of loop-player to "%nl%%{_tps}% §7ᴛᴘꜱ §8• %{_mspt}% §7ᴍꜱᴘᴛ%nl%"
 
 # handle player death
 on death of player:
