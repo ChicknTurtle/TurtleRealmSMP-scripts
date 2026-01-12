@@ -76,7 +76,7 @@ on right click:
         exit trigger
     delete (entity within {_e})
 
-on item despawn:
+on item despawn with priority highest:
     (event-item) is (firework star)
     (item id of event-item) is "turtle:mob_grave"
     set {_respawned} to respawnMob(event-item, (event-entity's location))
