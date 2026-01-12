@@ -1,0 +1,43 @@
+
+function checkObtainable(i:item) :: boolean:
+    if any:
+        {_i} is air
+        {_i} is bedrock
+        {_i} is farmland
+        {_i} is frogspawn
+        {_i} is reinforced deepslate
+        {_i} is player head
+        {_i} is end portal frames
+        {_i} is infested stone
+        {_i} is infested cobblestone
+        {_i} is infested stone bricks
+        {_i} is infested chiseled stone bricks
+        {_i} is infested cracked stone bricks
+        {_i} is infested mossy stone bricks
+        {_i} is infested deepslate
+        {_i} is petrified oak slab
+        {_i} is command block
+        {_i} is command block minecart
+        {_i} is jigsaw
+        {_i} is debug stick
+        {_i} is test instance block
+        {_i} is test block
+        {_i} is light (itemtype)
+        {_i} is knowledge book
+        {_i} is chain command block
+        {_i} is repeating command block
+        {_i} is structure block
+        {_i} is barrier
+        {_i} is structure void
+        {_i} is spawner (itemtype)
+        {_i} is vault
+        {_i} is trial spawner
+        {_i} is budding amethyst
+        {_i} is tagged with (item tag "spawn_eggs")
+    then:
+        return false
+    else:
+        return true
+
+on load:
+    set {-obtainableItems::*} to (all items where [checkObtainable(input) is true])

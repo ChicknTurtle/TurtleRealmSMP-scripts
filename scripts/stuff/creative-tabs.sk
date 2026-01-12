@@ -1,0 +1,15 @@
+
+import:
+    org.bukkit.Bukkit
+    net.minecraft.world.item.CreativeModeTabs
+
+on load:
+    set {_nms} to Bukkit.getServer().getServer()
+    set {_registries} to {_nms}.registryAccess()
+    set {_flags} to {_nms}.getWorldData().enabledFeatures()
+    CreativeModeTabs.tryRebuildTabContents({_flags}, false, {_registries})
+
+    wait 2 ticks
+    clear {-customItemTab::*}
+    loop ("turtle:ravager_hide", "turtle:mob_bundle", "turtle:strong_handle", "turtle:reinforced_handle", "turtle:diamond_paxel", "turtle:blazing_paxel", "turtle:blazing_pickaxe", "turtle:blazing_ingot", "turtle:blazing_nugget", "turtle:crushed_raw_iron", "turtle:crushed_raw_gold", "turtle:crushed_raw_copper", "turtle:experience_nugget", "turtle:powdered_obsidian", "turtle:chorium_cluster", "turtle:chorium_ingot", "turtle:chorium_upgrade_smithing_template", "turtle:chorium_case", "turtle:chorium_elytra", "turtle:chorium_mirror", "turtle:shulker_soul", "turtle:red_shulker_shell", "turtle:orange_shulker_shell", "turtle:yellow_shulker_shell", "turtle:lime_shulker_shell", "turtle:green_shulker_shell", "turtle:cyan_shulker_shell", "turtle:light_blue_shulker_shell", "turtle:blue_shulker_shell", "turtle:purple_shulker_shell", "turtle:magenta_shulker_shell", "turtle:pink_shulker_shell", "turtle:brown_shulker_shell", "turtle:black_shulker_shell", "turtle:gray_shulker_shell", "turtle:light_gray_shulker_shell", "turtle:white_shulker_shell", "turtle:magnifying_glass", "turtle:filter", "turtle:heavy_plow", "turtle:mob_grave", "turtle:tree_bark", "turtle:custom_music_disc", "turtle:music_disc_milky_ways"):
+        add (custom item loop-value) to {-customItemTab::*}

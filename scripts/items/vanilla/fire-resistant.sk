@@ -1,10 +1,10 @@
 
-local function addFireResItem(item:item):
+local function addFireResItem(item:itemtype):
     set {_id} to (raw name of {_item})
     set (custom item {_id}) to {_item}
     make (custom item {_id}) fire resistant
 
-when ready to register custom items:
+load custom items:
     addFireResItem(heavy core)
     addFireResItem(nether star)
     addFireResItem(blaze rod)

@@ -17,27 +17,24 @@ local function warp(e:entity, world:text, coord:number):
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
     make 15 of witch at {_loc} with force
     teleport {_e} to {_dest} while retaining (vehicle,passengers,xyz velocity)
-    try {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_e}),floor(y-coord of {_e}),floor(z-coord of {_e})))
+    try {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_dest}),floor(y-coord of {_dest}),floor(z-coord of {_dest})))
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
     make 15 of witch at {_dest} with force
+    while (chunk at {_dest} isn't loaded):
+        wait 1 tick
+        loop-iteration > 100
+        exit loop
+    voidProcess({_e})
 
 on entity remove from world:
-    str(event-entityremovecause) is "out_of_world"
-    event-world is (world {@endWorld})
-    voidProcess(event-entity)
+    event-entityremovecause is out_of_world
     warp(event-entity, {@overworld}, {@upWrapY})
 
 on damage:
     damage cause is void
     if (gamerule keep_inventory of event-world) isn't true:
         cancel event
-    event-world is (world {@endWorld})
     warp(victim, {@overworld}, {@upWrapY})
-    while (y-coord of victim) > ({@upWrapY}-10):
-        push victim down with force 0.25
-        wait 1 tick
-        if loop-iteration > 100:
-            exit loop
 
 every tick:
     ((try (world {@endWorld}).getEnderDragonBattle().hasBeenPreviouslyKilled()) ? true) is true

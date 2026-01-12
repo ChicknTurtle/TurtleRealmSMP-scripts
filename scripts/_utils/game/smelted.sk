@@ -8,8 +8,8 @@ import:
 expression:
     patterns:
         (smelt|cook)[ed] %item%
-        (smoke)[d] %item%
-        (blast)[ed] %item%
+        (smoke)[d] (smelt|cook)[ed] %item%
+        (blast)[ed] (smelt|cook)[ed] %item%
     get:
         if expr-1 ? air is air:
             return expr-1

@@ -35,7 +35,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_white\"}"
+              "tag": "{customId:\"turtle:white_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -54,7 +54,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_orange\"}"
+              "tag": "{customId:\"turtle:orange_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -73,7 +73,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_magenta\"}"
+              "tag": "{customId:\"turtle:magenta_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -92,7 +92,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_light_blue\"}"
+              "tag": "{customId:\"turtle:light_blue_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -111,7 +111,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_yellow\"}"
+              "tag": "{customId:\"turtle:yellow_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -130,7 +130,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_lime\"}"
+              "tag": "{customId:\"turtle:lime_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -149,7 +149,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_pink\"}"
+              "tag": "{customId:\"turtle:pink_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -168,7 +168,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_gray\"}"
+              "tag": "{customId:\"turtle:gray_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -187,7 +187,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_light_gray\"}"
+              "tag": "{customId:\"turtle:light_gray_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -206,7 +206,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_cyan\"}"
+              "tag": "{customId:\"turtle:cyan_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -225,7 +225,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_purple\"}"
+              "tag": "{customId:\"turtle:purple_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -244,7 +244,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_blue\"}"
+              "tag": "{customId:\"turtle:blue_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -263,7 +263,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_brown\"}"
+              "tag": "{customId:\"turtle:brown_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -282,7 +282,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_green\"}"
+              "tag": "{customId:\"turtle:green_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -301,7 +301,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_red\"}"
+              "tag": "{customId:\"turtle:red_shulker_shell\"}"
             }
           ],
           "conditions": [
@@ -320,7 +320,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_shell_black\"}"
+              "tag": "{customId:\"turtle:black_shulker_shell\"}"
             }
           ],
           "conditions": [
