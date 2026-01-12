@@ -1,0 +1,26 @@
+
+on load:
+    clear {-font::*}
+    set {-font::font} to "<font:turtle:custom>"
+    set {-font::id} to "turtle:custom"
+    set {-font::test} to "\u0008"
+
+    loop 256 times:
+        set {-font::space::-%loop-iteration%} to (character from codepoint loop-iteration)
+
+    set {-font::image::fletching_table} to (character from codepoint 39322) # \u999A
+    set {-font::image::item_catalog} to (character from codepoint 39323) # \u999B
+    set {-font::image::item_catalog_recipe_crafting} to (character from codepoint 39324) # \u999C
+    set {-font::image::item_catalog_tab1} to (character from codepoint 39325) # \u999D
+    set {-font::image::item_catalog_tab2} to (character from codepoint 39326) # \u999E
+    set {-font::image::item_catalog_tab3} to (character from codepoint 39327) # \u999F
+    set {-font::image::item_catalog_tab4} to (character from codepoint 39328) # \u99A0
+    set {-font::image::item_catalog_tab5} to (character from codepoint 39329) # \u99A1
+    set {-font::image::item_catalog_tab6} to (character from codepoint 39330) # \u99A2
+    set {-font::image::item_catalog_tab7} to (character from codepoint 39331) # \u99A3
+    set {-font::image::item_catalog_back} to (character from codepoint 39332) # \u99A4
+    set {-font::image::item_catalog_recipe_smithing} to (character from codepoint 39333) # \u99A5
+    set {-font::image::item_catalog_recipe_smelting} to (character from codepoint 39334) # \u99A6
+    set {-font::image::item_catalog_recipe_blank} to (character from codepoint 39335) # \u99A7
+    set {-font::image::item_catalog_recipe_simple} to (character from codepoint 39336) # \u99A8
+    set {-font::image::item_catalog_recipe_processing} to (character from codepoint 39337) # \u99A9

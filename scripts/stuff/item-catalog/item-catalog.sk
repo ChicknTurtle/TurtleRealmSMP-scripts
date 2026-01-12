@@ -1,0 +1,411 @@
+
+import:
+    java.lang.Character
+    org.bukkit.Bukkit
+    ch.njol.skript.aliases.ItemType
+    org.bukkit.inventory.ShapedRecipe
+    org.bukkit.inventory.ShapelessRecipe
+    org.bukkit.inventory.FurnaceRecipe
+    org.bukkit.inventory.BlastingRecipe
+    org.bukkit.inventory.SmokingRecipe
+    org.bukkit.inventory.CampfireRecipe
+    org.bukkit.inventory.StonecuttingRecipe
+    org.bukkit.inventory.SmithingRecipe
+    org.bukkit.inventory.MerchantRecipe
+    net.minecraft.world.item.CreativeModeTabs
+
+function getAllIngredients(recipe:javaobject) :: itemtypes:
+    if {_recipe} is instance of ShapedRecipe:
+        set {_map} to {_recipe}.getChoiceMap()
+        loop ...{_map}.values():
+            loop ...loop-value.getChoices():
+                set {_item} to new ItemType(loop-value-2)
+                set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of ShapelessRecipe:
+        loop ...{_recipe}.getChoiceList():
+            loop ...loop-value.getChoices():
+                set {_item} to new ItemType(loop-value-2)
+                set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of FurnaceRecipe:
+        loop ...{_recipe}.getInputChoice().getChoices():
+            set {_item} to new ItemType(loop-value)
+            set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of BlastingRecipe:
+        loop ...{_recipe}.getInputChoice().getChoices():
+            set {_item} to new ItemType(loop-value)
+            set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of SmokingRecipe:
+        loop ...{_recipe}.getInputChoice().getChoices():
+            set {_item} to new ItemType(loop-value)
+            set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of CampfireRecipe:
+        loop ...{_recipe}.getInputChoice().getChoices():
+            set {_item} to new ItemType(loop-value)
+            set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of StonecuttingRecipe:
+        loop ...{_recipe}.getInputChoice().getChoices():
+            set {_item} to new ItemType(loop-value)
+            set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of SmithingRecipe:
+        loop {_recipe}.getTemplate(), {_recipe}.getBase(), {_recipe}.getAddition():
+            loop ...loop-value.getChoices():
+                set {_item} to new ItemType(loop-value-2)
+                set {_ingredients::%{_item}%,%nbt of {_item}%} to {_item}
+    else if {_recipe} is instance of MerchantRecipe:
+        loop ...{_recipe}.getIngredients():
+            set {_ingredients::%loop-value%,%nbt of loop-value%} to loop-value
+    return {_ingredients::*}
+
+local function loadItemCatalogRecipe(id:string, recipe:javaobject):
+    # add to recipes/uses for items
+    set {_result} to {_recipe}.getResult()
+    set {-itemCatalog::recipes::%item id of {_result}%::%{_id}%} to {_id}
+    loop getAllIngredients({_recipe}):
+        set {-itemCatalog::uses::%item id of loop-value%::%{_id}%} to {_id}
+    # generate recipe data
+    set {-itemCatalog::recipeData::%{_id}%::recipe} to {_recipe}
+    set {-itemCatalog::recipeData::%{_id}%::recipeName} to {_id}
+    replace "_" with " " in {-itemCatalog::recipeData::%{_id}%::recipeName}
+    set {-itemCatalog::recipeData::%{_id}%::recipeName} to (proper case (2nd element of ({-itemCatalog::recipeData::%{_id}%::recipeName} split at ":")))
+    set {-itemCatalog::recipeData::%{_id}%::result} to {_result}
+    if {_recipe} is instance of ShapedRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Shaped Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (crafting table)
+    else if {_recipe} is instance of ShapelessRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Shapeless Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (crafting table)
+    else if {_recipe} is instance of FurnaceRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Furnace Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (furnace)
+    else if {_recipe} is instance of BlastingRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Blasting Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (blast furnace)
+    else if {_recipe} is instance of SmokingRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Smoking Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (smoker)
+    else if {_recipe} is instance of CampfireRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Campfire Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (campfire (itemtype))
+    else if {_recipe} is instance of StonecuttingRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Stonecutting Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (stonecutter)
+    else if {_recipe} is instance of SmithingRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Smithing Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (smithing table)
+    else if {_recipe} is instance of MerchantRecipe:
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Villager Trading"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (emerald)
+
+function loadItemCatalogProcessingRecipe(type:string, input:string):
+    set {_id} to {_input}
+    replace ":" with "_" in {_id}
+    set {_id} to "processing:%{_type}%_%{_id}%"
+    set {-itemCatalog::uses::%{_input}%::%{_id}%} to {_id}
+    loop (indexes of {-customRecipes::%{_type}%::%{_input}%::*}):
+        set {_item} to {-customRecipes::%{_type}%::%{_input}%::%loop-value%::item}
+        set {-itemCatalog::recipes::%item id of {_item}%::%{_id}%} to {_id}
+    set {-itemCatalog::recipeData::%{_id}%::input} to {_input}
+    set {-itemCatalog::recipeData::%{_id}%::inputItem} to (custom item {_input})
+
+    set {_recipeName} to (2nd element of ({_input} split at ":"))
+    set {_recipeName} to "%{_type}% %{_recipeName}%"
+    replace "_" with " " in {_recipeName}
+    set {-itemCatalog::recipeData::%{_id}%::recipeName} to (proper case {_recipeName})
+
+    set {-itemCatalog::recipeData::%{_id}%::processingType} to {_type}
+    if {_type} is "washing":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Washing Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (water bucket)
+    else if {_type} is "smoking":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Smoking Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (campfire (itemtype))
+    else if {_type} is "haunting":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Haunting Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (soul campfire)
+    else if {_type} is "blasting":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Blasting Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (lava bucket)
+    else if {_type} is "freezing":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Freezing Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (powder snow bucket)
+    else if {_type} is "pressing":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Pressing Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (piston)
+    else if {_type} is "voiding":
+        set {-itemCatalog::recipeData::%{_id}%::type} to "Voiding Recipe"
+        set {-itemCatalog::recipeData::%{_id}%::icon} to (black concrete)
+
+local function loadItemCatalogItem(item:item):
+    set {_iid} to (item id of {_item})
+    {-itemCatalog::items::%{_iid}%} isn't set
+    set {-itemCatalog::items::%{_iid}%} to {_item}
+    add {_item} to {-itemCatalog::itemOrder::*}
+
+function loadItemCatalog():
+    clear {-itemCatalog::*}
+    log info "Loading item catalog..."
+    # recipes
+    loop all recipes:
+        set {-allRecipes::%loop-value%} to Bukkit.getRecipe(namespaced key from loop-value)
+        loadItemCatalogRecipe(loop-value, {-allRecipes::%loop-value%})
+    loop (indexes of {-customRecipes::*}):
+        loop (indexes of {-customRecipes::%loop-value%::*}):
+            loadItemCatalogProcessingRecipe(loop-value-1, loop-value-2)
+    wait 1 tick
+    # item order
+    loop ...CreativeModeTabs.allTabs():
+        loop ...loop-value.getDisplayItems():
+            loadItemCatalogItem(loop-value-2.asBukkitCopy())
+    loop {-customItemTab::*}:
+        loadItemCatalogItem(loop-value)
+    wait 1 tick
+    log info "Finished loading item catalog with §b%size of {-itemCatalog::items::*}%§r items and §b%size of {-allRecipes::*}%§r recipes"
+
+register custom recipes:
+    wait 1 tick
+    loadItemCatalog()
+
+function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIndex:integer=1, cycleIndex:integer=0):
+    set {_recipes::*} to ({-itemCatalog::uses::%{_id}%::*} if ({_showUses} is true) else {-itemCatalog::recipes::%{_id}%::*})
+    set {_item} to {-itemCatalog::items::%{_id}%}
+    {_item} is set
+    set {_pageCount} to size of {_recipes::*}
+    set {_pageIndex} to min(max(1, {_pageIndex}), {_pageCount})
+    set {_pageDisplay} to "(%{_pageIndex}%/%{_pageCount}%)"
+    set {_maxStart} to max(1, {_pageCount} - 6)
+    set {_start} to max(1, min({_pageIndex} - 3, {_maxStart}))
+    set {_tab} to max(1, {_pageIndex} - {_start} + 1)
+    set {-playerData::%{_p}%::guiData::tabStart} to {_start}
+    set {-playerData::%{_p}%::guiData::pageCount} to {_pageCount}
+    set {_name} to (component item name of {_item})
+    loop 54 times:
+        set {_items::%(loop-iteration)-1%} to getGuiBarrier()
+    
+    if {_id} starts with "minecraft:":
+        set {_wiki} to knowledge book
+        set (name of {_wiki}) to "§r§7Minecraft wiki page"
+        set (lore of {_wiki}) to "§9%{_name}%"
+        set {_items::8} to {_wiki}
+    else:
+        set {_wiki} to book
+        set (name of {_wiki}) to "§r§7No wiki for this item"
+        set {_items::8} to {_wiki}
+
+    loop (elements from {_start} to {_start}+6 of {_recipes::*}):
+        set {_items::%loop-iteration%} to {-itemCatalog::recipeData::%loop-value%::icon}
+        set (name of {_items::%loop-iteration%}) to "§7%{-itemCatalog::recipeData::%loop-value%::type}%"
+        set (lore of {_items::%loop-iteration%}) to "§8%{-itemCatalog::recipeData::%loop-value%::recipeName}%"
+        {_start} + (loop-iteration)-1 is {_pageIndex}
+
+        set {_info} to getGuiBarrier()
+        show entire tooltip of {_info}
+        set (name of {_info}) to "§r§8Recipe: %loop-value%"
+        set {_items::53} to {_info}
+
+        set {_recipe} to {-itemCatalog::recipeData::%loop-value%::recipe}
+        set {_result} to {-itemCatalog::recipeData::%loop-value%::result}
+        set {_type} to {-itemCatalog::recipeData::%loop-value%::type}
+        set {_processingType} to {-itemCatalog::recipeData::%loop-value%::processingType}
+        if {_recipe} is instance of ShapedRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_crafting}
+            set {_items::33} to {_result}
+            set {_shape::*} to ...{_recipe}.getShape()
+            set {_choiceMap} to {_recipe}.getChoiceMap()
+            loop {_shape::*}:
+                set {_row} to (loop-iteration-2) - 1
+                loop 3 times:
+                    set {_col} to (loop-iteration-3)
+                    set {_char} to (character at {_col} of loop-value-2)
+                    {_char} is set
+                    {_char} isn't " "
+                    set {_choice} to {_choiceMap}.get(new Character({_char}))
+                    set {_choices::*} to ...{_choice}.getChoices()
+                    set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+                    {_item} is set
+                    set {_item} to new ItemType({_item})
+                    set {_items::%9*{_row} + {_col} + 18%} to {_item}
+        else if {_recipe} is instance of ShapelessRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_crafting}
+            set {_items::33} to {_result}
+            set {_choiceList::*} to ...{_recipe}.getChoiceList()
+            loop {_choiceList::*}:
+                set {_choices::*} to ...loop-value-2.getChoices()
+                set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+                {_item} is set
+                set {_item} to new ItemType({_item})
+                set {_row} to floor(((loop-iteration-2)-1)/3)
+                set {_col} to mod(((loop-iteration-2)-1), 3)
+                set {_items::%19 + 9*{_row} + {_col}%} to {_item}
+        else if {_recipe} is instance of FurnaceRecipe or BlastingRecipe or SmokingRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_smelting}
+            set {_items::33} to {_result}
+            set {_items::38} to (coal without entire tooltip)
+            set {_choice} to {_recipe}.getInputChoice()
+            set {_choices::*} to ...{_choice}.getChoices()
+            set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+            {_item} is set
+            set {_item} to new ItemType({_item})
+            set {_items::20} to {_item}
+        else if {_recipe} is instance of CampfireRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_simple}
+            set {_items::33} to {_result}
+            set {_choice} to {_recipe}.getInputChoice()
+            set {_choices::*} to ...{_choice}.getChoices()
+            set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+            {_item} is set
+            set {_item} to new ItemType({_item})
+            set {_items::29} to {_item}
+        else if {_recipe} is instance of StonecuttingRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_simple}
+            set {_items::33} to {_result}
+            set {_choice} to {_recipe}.getInputChoice()
+            set {_choices::*} to ...{_choice}.getChoices()
+            set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+            {_item} is set
+            set {_item} to new ItemType({_item})
+            set {_items::29} to {_item}
+        else if {_recipe} is instance of SmithingRecipe:
+            set {_image} to {-font::image::item_catalog_recipe_smithing}
+            set {_items::33} to {_result}
+            loop {_recipe}.getTemplate(), {_recipe}.getBase(), {_recipe}.getAddition():
+                set {_choices::*} to ...loop-value-2.getChoices()
+                set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
+                {_item} is set
+                set {_item} to new ItemType({_item})
+                set {_items::%27+(loop-iteration-2)%} to {_item}
+                loop-iteration-2 is 2
+                if {_result} is air:
+                    set {_items::33} to {_item}
+        else if {_processingType} is set:
+            set {_image} to {-font::image::item_catalog_recipe_processing}
+            set {_items::28} to {-itemCatalog::recipeData::%loop-value%::inputItem}
+            set {_input} to {-itemCatalog::recipeData::%loop-value%::input}
+            loop (first 12 elements of (indexes of {-customRecipes::%{_processingType}%::%{_input}%::*})):
+                set {_item} to {-customRecipes::%{_processingType}%::%{_input}%::%loop-value-2%::item}
+                set {_chance} to {-customRecipes::%{_processingType}%::%{_input}%::%loop-value-2%::chance}
+                set {_amount} to {-customRecipes::%{_processingType}%::%{_input}%::%loop-value-2%::amount}
+                add "§r§b%{_amount}%x §7• §a%{_chance}*100%%%" to (lore of {_item})
+                set {_items::%(loop-iteration-2) + 5*floor(((loop-iteration-2) - 1) / 4) + 21%} to {_item}
+        else:
+            set {_image} to {-font::image::item_catalog_recipe_blank}
+    set {_image} to {_image} ? {-font::image::item_catalog_recipe_blank}
+    set {_guiDisplayName} to "%"Uses" if {_showUses} is true else "Recipes"%: %trimTextWithEllipsis({_name}, 122-getTextWidth({_pageDisplay}))% %{_pageDisplay}%"
+    set {_gui} to (chest inventory with 6 rows named "§f%{-font::font} + {-font::space::-10} + {_image} + {-font::space::-181} + {-font::image::item_catalog_tab%{_tab}%} + {-font::space::-181} + {-font::image::item_catalog_back} + {-font::space::-174}%§r%{_guiDisplayName}%")
+    loop {_items::*}:
+        set (slot (loop-iteration)-1 of {_gui}) to loop-value
+    open {_gui} to {_p}
+    set {-playerData::%{_p}%::gui} to {_gui}
+    set {-playerData::%{_p}%::guiType} to "item_catalog_item"
+    set {-playerData::%{_p}%::guiData::itemId} to {_id}
+    set {-playerData::%{_p}%::guiData::showUses} to {_showUses}
+    set {-playerData::%{_p}%::pageIndex} to {_pageIndex}
+    set {_topinv} to (top inventory of {_p})
+    wait 40 ticks
+    (top inventory of {_p}) is {_topinv}
+    openItemCatalogItem({_p}, {_id}, {_showUses}, {_pageIndex}, {_cycleIndex}+1)
+
+function openItemCatalog(p:player, scroll:integer=0, search:string=""):
+    set {_items::*} to {-itemCatalog::itemOrder::*}
+    set {_name} to "§f%{-font::font} + {-font::space::-10} + {-font::image::item_catalog} + {-font::space::-174}%§rItem Catalog"
+    if {_search} isn't "":
+        set {_search} to (lowercase {_search})
+        set {_name} to "%{_name}%: %{_search}%"
+        if {-itemCatalog::searchCache::%{_search}%::*} is set:
+            set {_items::*} to {-itemCatalog::searchCache::%{_search}%::*}
+        else:
+            filter {_items::*} to match:
+                (lowercase uncolored component item name of input) contains {_search}
+            set {-itemCatalog::searchCache::%{_search}%::*} to {_items::*}
+    set {_gui} to (chest inventory with 6 rows named {_name})
+    set (slots 0,1,9,10,18,19,27,28,36,37,45,46 of {_gui}) to getGuiBarrier()
+    set {_scroll} to min(max(0,{_scroll}), ceil((size of {_items::*})/7)-6)
+    loop {_items::*}:
+        loop-iteration > {_scroll}*7
+        if {_gui} has space for loop-value:
+            add loop-value to {_gui}
+        else:
+            exit loop
+    while ({_gui} has space for getGuiBarrier()):
+        add getGuiBarrier() to {_gui}
+    open {_gui} to {_p}
+    set {-playerData::%{_p}%::gui} to {_gui}
+    set {-playerData::%{_p}%::guiType} to "item_catalog"
+    set {-playerData::%{_p}%::guiData::scroll} to {_scroll}
+    set {-playerData::%{_p}%::guiData::search} to {_search}
+
+on any inventory click:
+    set {_topinv} to (top inventory)
+    {-playerData::%player%::gui} is {_topinv}
+    (clicked inventory) is {_topinv}
+    if {-playerData::%player%::guiType} is "item_catalog":
+        set {_scroll} to {-playerData::%player%::guiData::scroll}
+        set {_search} to {-playerData::%player%::guiData::search}
+        if (index of clicked slot) is (18 or 19):
+            subtract 6 from {_scroll}
+            play sound "minecraft:block.copper_bulb.turn_on" in (ui) to player
+            openItemCatalog(player, {_scroll}, {_search})
+        else if (index of clicked slot) is (27 or 28):
+            subtract 2 from {_scroll}
+            openItemCatalog(player, {_scroll}, {_search})
+            play sound "minecraft:block.copper_bulb.turn_on" in (ui) to player
+        else if (index of clicked slot) is (36 or 37):
+            add 2 to {_scroll}
+            play sound "minecraft:block.copper_bulb.turn_on" in (ui) to player
+            openItemCatalog(player, {_scroll}, {_search})
+        else if (index of clicked slot) is (45 or 46):
+            add 6 to {_scroll}
+            play sound "minecraft:block.copper_bulb.turn_on" in (ui) to player
+            openItemCatalog(player, {_scroll}, {_search})
+        else if (index of clicked slot) is (0 or 1):
+            set {_b} to (block at (player ~ vector(0,-5,0)))
+            if {_b} is void air:
+                set {_b} to (block at (player ~ vector(0,5,0)))
+            make player see {_b} as pale oak sign
+            delete {-playerData::%player%::guiData::signText::*}
+            open virtual sign at {_b} to player
+            while (top inventory of player) is {_topinv}:
+                wait 1 tick
+                {-playerData::%player%::guiData::signText::*} is set
+                exit loop
+            make player see {_b} as {_b}
+            {-playerData::%player%::guiData::signText::*} is set
+            openItemCatalog(player, 0, "%1st element of ({-playerData::%player%::guiData::signText::*} where [str(input) isn't ""]) ? ""%")
+        # click in item area
+        else if (mod((index of clicked slot)-2, 9) < 7):
+            set {_item} to (clicked slot)
+            {_item} isn't air
+            {_item} isn't barrier
+            if player's gamemode is creative:
+                event-clicktype is mmb
+                if player's cursor slot is air:
+                    set player's cursor slot to (max stack size of clicked slot) of (clicked slot)
+                exit trigger
+            set {_id} to (item id of {_item})
+            openItemCatalogItem(player, {_id}, (whether event-clicktype is rmb), 1)
+    
+    else if {-playerData::%player%::guiType} is "item_catalog_item":
+        if (index of clicked slot) is 0:
+            openItemCatalog(player, {-playerData::%player%::guiData::scroll}, {-playerData::%player%::guiData::search})
+        
+        else if (index of clicked slot) is between 1 and 7:
+            set {_start} to {-playerData::%player%::guiData::tabStart}
+            set {_pageCount} to {-playerData::%player%::guiData::pageCount}
+            set {_newPage} to {_start} + (index of clicked slot) - 1
+            if {_newPage} <= {_pageCount}:
+                openItemCatalogItem(player, {-playerData::%player%::guiData::itemId}, {-playerData::%player%::guiData::showUses}, {_newPage})
+        
+        if (index of clicked slot) is 8:
+            (clicked slot) is knowledge book
+            set {_id} to {-playerData::%player%::guiData::itemId}
+            set {_id2} to (2nd element of (split {_id} at ":"))
+            set {_item} to {-itemCatalog::items::%{_id}%}
+            set {_name} to (component item name of {_item})
+            send component minimessage from "<click:open_url:""https://minecraft.wiki/Special:Search/%{_id2}%""><hover:show_text:""<gray>Click to open wiki""><white><sprite:items:item/knowledge_book> View %{_name}% on the Minecraft wiki" to player
+            close player's inventory
+        
+        else if (index of clicked slot) > 8:
+            (clicked slot) isn't barrier
+            openItemCatalogItem(player, (item id of clicked slot), (whether event-clicktype is rmb))
+
+on unchecked sign change:
+    set {-playerData::%player%::guiData::signText::*} to event-textcomponents

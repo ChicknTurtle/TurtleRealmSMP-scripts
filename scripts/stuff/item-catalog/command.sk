@@ -1,0 +1,7 @@
+
+brig command tree /turtle:catalog:
+    trigger:
+        openItemCatalog(player)
+    greedystring arg "search":
+        trigger:
+            openItemCatalog(player, 0, {_search})

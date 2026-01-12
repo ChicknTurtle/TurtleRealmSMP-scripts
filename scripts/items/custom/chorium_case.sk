@@ -5,7 +5,7 @@ options:
     maxDistance: 30
     maxDistanceSneaking: 15
 
-when ready to register custom items:
+load custom items:
     # chorium case
     set (update function of "turtle:chorium_case") to (function "updateItem" in script)
     set (custom item "turtle:chorium_case") to (firework star with nbt from "{""minecraft:item_name"":""Chorium Case"",""minecraft:rarity"":""epic"",""minecraft:max_stack_size"":1}")
@@ -20,7 +20,7 @@ local function legacyChoriumCaseFilled(item:item) :: item:
     set (item id of {_item}) to "turtle:chorium_case"
     return {_item}
 
-when ready to load recipes:
+load recipes:
     register smithing transform recipe:
         id: "turtle:chorium_case_smithing"
         result: custom item "turtle:chorium_case"

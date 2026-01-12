@@ -1,0 +1,27 @@
+
+import:
+    org.bukkit.map.MinecraftFont
+
+function getTextWidth(text:string) :: integer:
+    return MinecraftFont.Font.getWidth({_text})
+
+function trimText(text:string, width:integer) :: string:
+    set {_low} to 0
+    set {_high} to (length of {_text})
+    while {_low} < {_high}:
+        set {_mid} to floor(({_low} + {_high} + 1) / 2)
+        set {_sub} to (first {_mid} characters of {_text})
+        set {_w} to getTextWidth({_sub})
+        if {_w} <= {_width}:
+            set {_low} to {_mid}
+        else:
+            set {_high} to {_mid} - 1
+    return (first {_low} characters of {_text})
+
+function trimTextWithEllipsis(text:string, width:integer) :: string:
+    if getTextWidth({_text}) <= {_width}:
+        return {_text}
+    set {_ellipsis} to "..."
+    set {_ellipsisWidth} to getTextWidth({_ellipsis})
+    set {_trimmed} to trimText({_text}, {_width} - {_ellipsisWidth})
+    return {_trimmed} + {_ellipsis}

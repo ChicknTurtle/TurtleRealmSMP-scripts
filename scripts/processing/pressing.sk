@@ -48,10 +48,11 @@ function pressProcessBlock(b:block, dir:vector):
         if true is true:
             # check recipes
             set {_item} to (item of loop-value)
-            if indexes of {-pressingRecipes::%item id of {_item}%::*} is set:
-                loop indexes of {-pressingRecipes::%item id of {_item}%::*}:
-                    chance of {-pressingRecipes::%item id of {_item}%::%loop-value-2%::chance}
-                    add {-pressingRecipes::%item id of {_item}%::%loop-value-2%::amount} of {-pressingRecipes::%item id of {_item}%::%loop-value-2%::item} to {_spawnitems::*}
+            set {_id} to (item id of {_item})
+            if indexes of {-customRecipes::pressing::%{_id}%::*} is set:
+                loop indexes of {-customRecipes::pressing::%{_id}%::*}:
+                    chance of {-customRecipes::pressing::%{_id}%::%loop-value-2%::chance}
+                    add {-customRecipes::pressing::%{_id}%::%loop-value-2%::amount} of {-customRecipes::pressing::%{_id}%::%loop-value-2%::item} to {_spawnitems::*}
                 add (updated (use remainder of {_item})) to {_spawnitems::*}
                 add (break sound of {_item}) to {_playsounds::*}
                 make 10 of item particle using (type of item of loop-value-1) at loop-value-1 with extra 0.2

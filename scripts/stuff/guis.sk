@@ -1,0 +1,22 @@
+
+on inventory click with priority lowest:
+    {-playerData::%player%::gui} is (top inventory)
+    if any:
+        event-clicktype is double click
+        event-clicktype is left mouse with shift
+        event-clicktype is right mouse with shift
+    then:
+        cancel event
+        exit trigger
+    {-playerData::%player%::gui} is (clicked inventory)
+    cancel event
+on inventory drag with priority lowest:
+    {-playerData::%player%::gui} is (event-inventory)
+    cancel event
+
+function getGuiBarrier() :: itemtype:
+    set {_barrier} to barrier
+    set (item model of {_barrier}) to "minecraft:air"
+    set (max stack size of {_barrier}) to 1
+    hide entire tooltip of {_barrier}
+    return {_barrier}
