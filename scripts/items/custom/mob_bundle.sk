@@ -1,9 +1,9 @@
 
 on load:
     # Mobs that can be picked up by mob bundle
-    set {-mobBundleAllowedMobs::*} to allay (entitytype), armadillo (entitytype), axolotl (entitytype), bat (entitytype), bee (entitytype), blaze (entitytype), bogged (entitytype), breeze (entitytype), cat (entitytype), cave spider (entitytype), chicken (entitytype), cod (entitytype), copper golem (entitytype), cow (entitytype), creeper (entitytype), dolphin (entitytype), drowned (entitytype), endermite (entitytype), evoker (entitytype), fox (entitytype), frog (entitytype), glow squid (entitytype), goat (entitytype), guardian (entitytype), husk (entitytype), magma cube (entitytype), mooshroom (entitytype), ocelot (entitytype), parrot (entitytype), phantom (entitytype), pig (entitytype), piglin (entitytype), piglin brute (entitytype), pillager (entitytype), polar bear (entitytype), pufferfish (entitytype), rabbit (entitytype), salmon (entitytype), sheep (entitytype), silverfish (entitytype), skeleton (entitytype), slime (entitytype), snow golem (entitytype), spider (entitytype), squid (entitytype), stray (entitytype), strider (entitytype), tadpole (entitytype), tropical fish (entitytype), vex (entitytype), villager (entitytype), vindicator (entitytype), witch (entitytype), wither skeleton (entitytype), wolf (entitytype), zombie (entitytype), zombie villager (entitytype), zombified piglin (entitytype)
+    set {-mobBundleAllowedMobs::*} to "minecraft:allay", "minecraft:armadillo", "minecraft:axolotl", "minecraft:bat", "minecraft:bee", "minecraft:blaze", "minecraft:bogged", "minecraft:breeze", "minecraft:camel_husk", "minecraft:cat", "minecraft:cave_spider", "minecraft:chicken", "minecraft:cod", "minecraft:copper_golem", "minecraft:cow", "minecraft:creeper", "minecraft:dolphin", "minecraft:drowned", "minecraft:endermite", "minecraft:evoker", "minecraft:fox", "minecraft:frog", "minecraft:glow_squid", "minecraft:goat", "minecraft:guardian", "minecraft:husk", "minecraft:magma_cube", "minecraft:mooshroom", "minecraft:nautilus", "minecraft:ocelot", "minecraft:parched", "minecraft:parrot", "minecraft:phantom", "minecraft:pig", "minecraft:piglin", "minecraft:piglin_brute", "minecraft:pillager", "minecraft:polar_bear", "minecraft:pufferfish", "minecraft:rabbit", "minecraft:salmon", "minecraft:sheep", "minecraft:silverfish", "minecraft:skeleton", "minecraft:slime", "minecraft:snow_golem", "minecraft:spider", "minecraft:squid", "minecraft:stray", "minecraft:strider", "minecraft:tadpole", "minecraft:tropical_fish", "minecraft:vex", "minecraft:villager", "minecraft:vindicator", "minecraft:witch", "minecraft:wither_skeleton", "minecraft:wolf", "minecraft:zombie", "minecraft:zombie_nautilus", "minecraft:zombie_villager", "minecraft:zombified_piglin"
     # Baby mobs that can be picked up by mob bundle
-    set {-mobBundleAllowedBabyMobs::*} to camel (entitytype), donkey (entitytype), happy ghast (entitytype), hoglin (entitytype), horse (entitytype), llama (entitytype), mule (entitytype), panda (entitytype), sniffer (entitytype), trader llama (entitytype), turtle (entitytype), zoglin (entitytype)
+    set {-mobBundleAllowedBabyMobs::*} to "minecraft:camel", "minecraft:camel_husk", "minecraft:donkey", "minecraft:happy_ghast", "minecraft:hoglin", "minecraft:horse", "minecraft:llama", "minecraft:mule", "minecraft:panda", "minecraft:sniffer", "minecraft:trader_llama", "minecraft:turtle", "minecraft:zoglin"
 
     # All entities can be picked up while in creative
 
@@ -32,11 +32,11 @@ on player interact on entity:
     if player's gamemode isn't creative:
         if any:
             target of event-entity is set
-            {-mobBundleAllowedMobs::*}, {-mobBundleAllowedBabyMobs::*} doesn't contain event-entity
+            {-mobBundleAllowedMobs::*}, {-mobBundleAllowedBabyMobs::*} doesn't contain str(minecraft entity type of event-entity)
         then:
             exit trigger
         if age of event-entity >= 0:
-            {-mobBundleAllowedMobs::*} doesn't contain event-entity
+            {-mobBundleAllowedMobs::*} doesn't contain str(minecraft entity type of event-entity)
             exit trigger
         if entity size of event-entity > 2:
             exit trigger
@@ -48,7 +48,7 @@ on player interact on entity:
     set (name of {_fill}) to "§r%effective entity name of event-entity%"
     set {_nbt} to getEntityNbtToStore(event-entity)
     set (compound tag "entityData" of (custom nbt of {_fill})) to {_nbt}
-    set (string tag "entityType" of (custom nbt of {_fill})) to str(event-entity.getType().getKey())
+    set (string tag "entityType" of (custom nbt of {_fill})) to str(minecraft entity type of event-entity)
     # fix villager bed
     if (int tag "SleepingX" of (full nbt of event-entity)) is set:
         set {_x} to (int tag "SleepingX" of (full nbt of event-entity))
@@ -86,7 +86,7 @@ on item spawn:
         exit trigger
     # get nbt and spawn mob
     set {_nbt} to compound tag "entityData" of custom nbt of event-item
-    set {_spawntype} to (minecraft entitytype from key (string tag "entityType" of custom nbt of event-item))
+    set {_spawntype} to (string tag "entityType" of custom nbt of event-item)
     mc spawn {_spawntype} at {_p}:
         clear (armor of event-entity)
         clear (tool of event-entity)

@@ -34,7 +34,7 @@ on right click:
     if {_e} is set:
         # name
         set {_name} to (effective entity name of {_e})
-        add "§7🔎 §f%{_name}%" to {_info::*}
+        add "§7🔎 §f%{_name}%§r" to {_info::*}
         # health
         if {_e} is a living entity:
             set {_health} to round({_e}.getHealth())
@@ -82,10 +82,14 @@ on right click:
         if {_mainGene} is set:
             set {_mainGene} to (strict proper case "%{_mainGene}%")
             add "   §f🐼 §7Main Gene: §f%{_mainGene}%" to {_info::*}
-        set {_hiddenGene} to (hidden gene of {_e})
-        if {_hiddenGene} is set:
-            set {_hiddenGene} to (strict proper case "%{_hiddenGene}%")
-            add "   §f🐼 §7Hidden Gene: §f%{_hiddenGene}%" to {_info::*}
+            add "   §f🐼 §7Hidden Gene: §f???" to {_info::*}
+        # foxes
+        set {_firstTrustedPlayer} to try {_e}.getFirstTrustedPlayer()
+        if {_firstTrustedPlayer} is set:
+            add merge components ("   §6🦊 §7Trusted Player: " and playerComponent({_firstTrustedPlayer})) to {_info::*}
+        set {_secondTrustedPlayer} to try {_e}.getSecondTrustedPlayer()
+        if {_secondTrustedPlayer} is set:
+            add merge components ("   §6🦊 §7Other Trusted Player: " and playerComponent({_secondTrustedPlayer})) to {_info::*}
         # revived
         if (boolean tag "revivedFromGrave" of (custom nbt of {_e})) is true:
             add "   §e🪦 §7Revived from a Mob Grave" to {_info::*}
@@ -103,7 +107,7 @@ on right click:
         set {_name} to (translate component of {_b})
         set {_customName} to (name of block within {_b})
         if {_customName} is set:
-            add (merge components ("§7🔎 §f%{_customName}% (",{_name},")")) to {_info::*}
+            add (merge components ("§7🔎 §f%{_customName}%§r (",{_name},")")) to {_info::*}
         else:
             add (merge components ("§7🔎 ",{_name})) to {_info::*}
         # hopper filter
