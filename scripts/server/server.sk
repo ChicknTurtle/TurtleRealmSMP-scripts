@@ -29,6 +29,16 @@ on load:
     {_resourcePackUrl} isn't ""
     findResourcePackHash({_resourcePackUrl})
 
+brig command /findresourcepackhash:
+    permission: op
+    trigger:
+        set {_resourcePackUrl} to getConfigValue("root.server.resourcePackURL")
+        if {_resourcePackUrl} is "":
+            send "§cResource pack url is unset"
+            exit trigger
+        send "§fUpdating resource pack hash from §b%{_resourcePackUrl}%§f..."
+        findResourcePackHash({_resourcePackUrl})
+
 # unlock recipes
 # send resource pack
 on join:

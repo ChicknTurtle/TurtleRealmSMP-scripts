@@ -37,7 +37,7 @@ register recipes:
         ingredients:
             set ingredient of "b" to stone bricks
             set ingredient of "o" to obsidian
-            set ingredient of "#" to (custom item "turtle:warp_shard")
+            set ingredient of "#" to (custom item "turtle:warp_stone")
     register shaped recipe:
         id: "turtle:warp_shard"
         result: custom item "turtle:warp_shard"
