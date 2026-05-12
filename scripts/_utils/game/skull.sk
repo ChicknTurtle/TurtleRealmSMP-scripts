@@ -1,10 +1,9 @@
 
-# Get the skull of an online or offline player
-# Skull isn't updated when they change their skin
-expression:
-    patterns:
-        %string%'s [nbt|offline] (head|skull)
-        [the] [nbt|offline] (head|skull) of %string%
+# Get a dynamic skull of a player
+string property (nbt|dynamic) [player] (head|skull):
+    get:
+        return player head with nbt from "{profile:{name:""%expr-1%""}}"
+offlineplayer property (nbt|dynamic) [player] (head|skull):
     get:
         return player head with nbt from "{profile:{name:""%expr-1%""}}"
 
