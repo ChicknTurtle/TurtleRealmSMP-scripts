@@ -20,7 +20,15 @@ function getAllNbsFiles() :: objects:
         add getFileName(loop-value.getName()) to {_names::*}
     return {_names::*}
 
+function validateNbsFile(future:object) :: object:
+    {_future} is set
+    set {_inputStream} to {_future}.get()
+    set {_song} to (try NBSDecoder.parse({_inputStream}))
+    {_inputStream}.close()
+    return {_song}
+
 on load:
+    # get nbs song
     create new section with {_songName} stored in {-sections::getNbsSong}:
         # return from cache
         if {-nbsSongCache::%{_songName}%} is set:
@@ -38,9 +46,11 @@ on load:
             {_file}.exists() is true
             log debug "Loading and caching song '%{_songName}%'"
             {_file}.setLastModified(System.currentTimeMillis())
-            set {-nbsSongCache::%{_songName}%} to NBSDecoder.parse({_file})
+            set {-nbsSongCache::%{_songName}%} to validateNbsFile(fileToFuture({_file}))
         delete {-loadingNbsSongs::%{_songName}%}
         return {-nbsSongCache::%{_songName}%}
+    
+    # clear old nbs files
     create new section stored in {-sections::clearOldNbsFiles}:
         set {_dir} to new File("nbsSongs")
         # 30 days ago
@@ -56,11 +66,6 @@ on load:
         return {_deleted} ? 0
     
     run section {-sections::clearOldNbsFiles} async
-
-every 5 minutes:
-    size of {-nbsSongCache::*} > 0
-    log debug "Automatically clearing %size of {-nbsSongCache::*}% song(s) from cache"
-    clear {-nbsSongCache::*}
 
 function playNbsSongAtBlock(song:object, block:block) :: boolean:
     set {_songPlayer} to new PositionSongPlayer({_song}, SoundCategory.RECORDS)
@@ -198,54 +203,3 @@ brig command tree /turtle:nbs:
         trigger:
             run section {-sections::clearOldNbsFiles} async and store result in {_cleared} and wait
             send "Cleared %{_cleared}% old nbs file(s)"
-
-slash command uploadnbs <attachment="file">:
-    description: Upload a song file to use with a Custom Music Disc
-    bot: ChatLink
-    arguments:
-        file: File to upload, must be a .nbs file
-    trigger:
-        async run 0 ticks later:
-            # linked user
-            loop indexes of {discordLinks::*}:
-                {discordLinks::%loop-value%} is (discord id of event-user)
-                set {_linkeduuid} to loop-value
-                exit loop
-            if {_linkeduuid} isn't set:
-                reply with hidden "You must have your account linked to upload a song!"
-                exit trigger
-            # check .nbs file
-            set {_fileAttachment} to argument "file" as attachment
-            if file extension of {_fileAttachment} isn't "nbs":
-                reply with hidden "The file you tried to upload isn't a song file. Valid song files end with .nbs%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>)."
-                exit trigger
-            # get filename
-            set {_filenameNoExt} to getFileName(attachment file name of {_fileAttachment})
-            set {_filename} to (first 30 characters of {_filenameNoExt})
-            replace "_" with " " in {_filename}
-            set {_filename} to (try {_filename}.trim()) ? {_filename}
-            # msgs
-            log info "%event-user% is uploading '%{_filename}%.nbs'"
-            reply with hidden "Uploading `%{_filename}%.nbs`%nl%Your file could be deleted or overwritten by another user, so don't lose your original file!%nl%See [Custom Music Disc](<https://github.com/ChicknTurtle/TurtleRealmSMP-scripts/wiki/Custom-Music-Disc>) to learn how to listen to your song in-game."
-            # check if song file is valid
-            set {_inputStream} to {_fileAttachment}.getProxy().download().get()
-            set {_song} to try NBSDecoder.parse({_inputStream})
-            {_inputStream}.close()
-            if {_song} is set:
-                download {_fileAttachment} to path "nbsSongs/%{_filename}%.nbs"
-                log debug "Caching uploaded song '%{_filename}%'"
-                set {-nbsSongCache::%{_filename}%} to {_song}
-                set {_c::1} to "§b◎ "
-                set {_c::2} to (text component from (effective name of event-member))
-                set (color format of {_c::2}) to rgb(88, 101, 242)
-                set (hover event of {_c::2}) to (hover event showing "§f%event-user%%nl%§7@%discord name of event-user%")
-                set {_c::3} to " uploaded "
-                set {_c::4} to (text component from "§b%{_filename}%")
-                set (hover event of {_c::4}) to (hover event showing "§b%{_filename}%%nl%§3Click to apply to held disc")
-                set (click event of {_c::4}) to (click event to run command "/nbs apply %{_filename}%")
-                send component (merge components {_c::*}) to (all players and console)
-                discordSend(":cd: <@%discord id of event-member%> uploaded `%{_filename}%`")
-            else:
-                open private channel of event-user and store it in {_channel}
-                {_channel} is set
-                post "Your file `%file name of {_fileAttachment}%` was not uploaded because it was found to be an invalid song file.%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>)." to {_channel}

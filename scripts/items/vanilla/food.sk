@@ -1,14 +1,15 @@
 
-when ready to register custom items:
+register custom items:
     # sugar
     set (custom item "minecraft:sugar") to sugar
     apply food component to (custom item "minecraft:sugar"):
         nutrition: 1
         saturation: 0.6
         can_always_eat: true
+    set {_effect} to (potion effect of speed for 10 seconds)
     apply consumable component to (custom item "minecraft:sugar"):
         consume_seconds: 0.8 seconds
-        on_consume_effect: apply_effects(potion effect of speed for 10 seconds, 1/3)
+        on_consume_effect: apply_effects({_effect}, 1/3)
     # resin clump
     set (custom item "minecraft:resin_clump") to resin clump
     apply food component to (custom item "minecraft:resin_clump"):
@@ -23,9 +24,10 @@ when ready to register custom items:
         nutrition: 3
         saturation: 1.2
         can_always_eat: true
+    set {_effect} to (potion effect of nausea for 15 seconds)
     apply consumable component to (custom item "minecraft:nether_wart"):
         consume_seconds: 0.8 seconds
-        on_consume_effect: apply_effects(potion effect of nausea for 15 seconds, 0.2)
+        on_consume_effect: apply_effects({_effect}, 0.2)
     # cookie
     set (custom item "minecraft:cookie") to cookie
     apply consumable component to (custom item "minecraft:cookie"):
@@ -36,3 +38,13 @@ when ready to register custom items:
         nutrition: 1
         saturation: 0.6
         can_always_eat: true
+
+register recipes:
+    register shapeless recipe:
+        id: "minecraft:pumpkin_pie"
+        result: pumpkin_pie
+        category: "misc"
+        ingredients:
+            add pumpkin to ingredients
+            add sugar to ingredients
+            add (custom item "turtle:dough") to ingredients

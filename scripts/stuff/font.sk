@@ -1,12 +1,12 @@
 
 on load:
-    clear {-font::*}
+    delete {-font::*}
     set {-font::font} to "<font:turtle:custom>"
     set {-font::id} to "turtle:custom"
-    set {-font::test} to "\u0008"
 
     loop 256 times:
         set {-font::space::-%loop-iteration%} to (character from codepoint loop-iteration)
+        set {-font::space::%loop-iteration%} to (character from codepoint (loop-iteration)+256)
 
     set {-font::image::fletching_table} to (character from codepoint 39322) # \u999A
     set {-font::image::item_catalog} to (character from codepoint 39323) # \u999B
@@ -24,3 +24,17 @@ on load:
     set {-font::image::item_catalog_recipe_blank} to (character from codepoint 39335) # \u99A7
     set {-font::image::item_catalog_recipe_simple} to (character from codepoint 39336) # \u99A8
     set {-font::image::item_catalog_recipe_processing} to (character from codepoint 39337) # \u99A9
+    set {-font::image::quest_menu} to (character from codepoint 39338) # \u99AA
+    set {-font::image::quest_level_bar} to (character from codepoint 39339) # \u99AB
+    set {-font::image::quest_level_digit_0} to (character from codepoint 39340) # \u99AC
+    set {-font::image::quest_level_digit_1} to (character from codepoint 39341) # \u99AD
+    set {-font::image::quest_level_digit_2} to (character from codepoint 39342) # \u99AE
+    set {-font::image::quest_level_digit_3} to (character from codepoint 39343) # \u99AF
+    set {-font::image::quest_level_digit_4} to (character from codepoint 39344) # \u99B0
+    set {-font::image::quest_level_digit_5} to (character from codepoint 39345) # \u99B1
+    set {-font::image::quest_level_digit_6} to (character from codepoint 39346) # \u99B2
+    set {-font::image::quest_level_digit_7} to (character from codepoint 39347) # \u99B3
+    set {-font::image::quest_level_digit_8} to (character from codepoint 39348) # \u99B4
+    set {-font::image::quest_level_digit_9} to (character from codepoint 39349) # \u99B5
+    set {-font::image::quest_progress_bar} to (character from codepoint 39350) # \u99B6
+    set {-font::image::quest_progress_bar_part} to (character from codepoint 39351) # \u99B7

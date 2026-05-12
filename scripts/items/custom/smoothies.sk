@@ -1,0 +1,82 @@
+
+options:
+    smoothie_items: (apple, melon slice, sweet berries, glow berries, chorus fruit, carrot, spider eye, beetroot, slime ball, honey bottle, cocoa beans, nether wart, firework star)
+
+register custom items:
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:smoothie"",""minecraft:item_name"":""Smoothie"",""minecraft:max_stack_size"":1}")
+    add (hide dye) to (item flags of {_item})
+    apply food component to {_item}:
+        nutrition: 6
+        saturation: 6
+        can_always_eat: true
+    set (custom item "turtle:smoothie") to {_item}
+
+register recipes:
+    register shapeless recipe:
+        id: "turtle:smoothie"
+        result: custom item "turtle:smoothie"
+        category: "misc"
+        ingredients:
+            add potion to ingredients
+            add sugar to ingredients
+            add (material choice of {@smoothie_items}) to ingredients
+            add (material choice of {@smoothie_items}) to ingredients
+
+local function registerSmoothieIngredient(id:string, color:color, effect:potioneffecttype, singleDuration:timespan, doubleDuration:timespan):
+    set {-smoothies::ingredients::%{_id}%::color} to {_color}
+    set {-smoothies::ingredients::%{_id}%::effect} to {_effect}
+    set {-smoothies::ingredients::%{_id}%::singleDuration} to {_singleDuration}
+    set {-smoothies::ingredients::%{_id}%::doubleDuration} to {_doubleDuration}
+
+on load:
+    delete {-smoothies::ingredients::*}
+    registerSmoothieIngredient("minecraft:apple", rgb(200,30,30), jump boost, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:sweet_berries", rgb(150,20,50), regeneration, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:beetroot", rgb(100,10,5), resistance, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:honey_bottle", rgb(240,150,0), strength, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("turtle:banana", rgb(240,240,70), speed, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:melon_slice", rgb(200,30,100), absorption, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:cocoa_beans", rgb(85,50,30), haste, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:carrot", rgb(220,90,10), night vision, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:chorus_fruit", rgb(170,100,180), slow falling, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:glow_berries", rgb(255,190,80), glowing, 15 minutes, 20 minutes)
+    registerSmoothieIngredient("minecraft:slime_ball", rgb(100,180,100), oozing, 5 minutes, 10 minutes)
+    registerSmoothieIngredient("minecraft:spider_eye", rgb(30,50,30), poison, 5 minutes, 10 minutes)
+    registerSmoothieIngredient("minecraft:nether_wart", rgb(75,10,5), nausea, 5 minutes, 10 minutes)
+
+function getSmoothie(ingredients:items) :: item:
+    loop {_ingredients::*}:
+        loop-value is set
+        set {_id} to (item id of loop-value)
+        if {-smoothies::ingredients::%{_id}%::color} isn't set:
+            loop-value isn't air
+            loop-value isn't potion (itemtype)
+            loop-value isn't sugar
+            return air (itemtype)
+        {-smoothies::ingredients::%{_id}%::color} is set
+        add {-smoothies::ingredients::%{_id}%::color} to {_colors::*}
+        set {_effect} to {-smoothies::ingredients::%{_id}%::effect}
+        if {_effects::%{_effect}%} is set:
+            set {_effects::%{_effect}%} to (potion effect of {_effect} for {-smoothies::ingredients::%{_id}%::doubleDuration})
+        else:
+            set {_effects::%{_effect}%} to (potion effect of {_effect} for {-smoothies::ingredients::%{_id}%::singleDuration})
+    set {_item} to (custom item "turtle:smoothie")
+    set (dyed color of {_item}) to mixColors({_colors::*})
+    apply consumable component to {_item}:
+        animation: "drink"
+        sound: "minecraft:entity.generic.drink"
+        has_consume_particles: false
+        on_consume_effect: apply_effects({_effects::*}, 1)
+    apply potion contents to {_item}:
+        custom_effects:
+            apply -> {_effects::*}
+    return {_item}
+
+on preparing craft:
+    event-string is "turtle:smoothie"
+    set {_items::*} to ...event-inventory.getMatrix()
+    set recipe result to getSmoothie({_items::*})
+
+on crafter craft:
+    event-string is "turtle:smoothie"
+    set recipe result to getSmoothie(items in inventory of event-block)

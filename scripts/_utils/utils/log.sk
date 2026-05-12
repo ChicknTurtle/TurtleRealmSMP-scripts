@@ -6,6 +6,7 @@ effect:
     trigger:
         set {_msg} to "&8[Skript] &7%expr-1%"
         replace "§r" with "§r§7" in {_msg}
+        replace "&r" with "&r§7" in {_msg}
         send {_msg} to console
 
 effect:
@@ -15,6 +16,7 @@ effect:
     trigger:
         set {_msg} to "&6[Skript] &e%expr-1%"
         replace "§r" with "§r§e" in {_msg}
+        replace "&r" with "&r§e" in {_msg}
         send {_msg} to console
 
 effect:
@@ -24,6 +26,7 @@ effect:
     trigger:
         set {_msg} to "&4[Skript] &c%expr-1%"
         replace "§r" with "§r§c" in {_msg}
+        replace "&r" with "&r§c" in {_msg}
         send {_msg} to console
 
 effect:
@@ -34,5 +37,6 @@ effect:
         getConfigValue("root.server.logDebug") is true
         set {_msg} to "&3[Skript] &b%expr-1%"
         replace "§r" with "§r§b" in {_msg}
+        replace "&r" with "&r§b" in {_msg}
         send {_msg} to console
         #send "&3debug: &b%expr-1%" to all ops

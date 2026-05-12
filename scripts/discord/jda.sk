@@ -1,0 +1,173 @@
+
+import:
+    java.util.ArrayList
+    java.util.function.Consumer
+    net.dv8tion.jda.api.JDABuilder
+    net.dv8tion.jda.api.requests.GatewayIntent
+    net.dv8tion.jda.api.hooks.EventListener
+    net.dv8tion.jda.api.entities.Message
+    net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
+    net.dv8tion.jda.api.events.message.MessageReceivedEvent
+    net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+    net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
+    net.dv8tion.jda.api.interactions.commands.build.Commands
+    net.dv8tion.jda.api.entities.Activity
+
+# setup
+
+on load:
+    create section stored in {_setupJDA}:
+        set {-discord::blurple} to "#5865f2"
+
+        create section with {_id} stored in {-discord::sections::getUser}:
+            return getDiscordUser({_id})
+        create section with {_guild}, {_id} stored in {-discord::sections::getMember}:
+            return getDiscordMember({_guild}, {_id})
+
+        create section with {_proxy}, {_event} stored in {_f::onevent}:
+            # MessageReceivedEvent
+            if {_event} is instance of MessageReceivedEvent:
+                {_event}.getAuthor().isBot() is false
+                discordMessage({_event})
+            # SlashCommandInteractionEvent
+            else if {_event} is instance of SlashCommandInteractionEvent:
+                set {_callback} to {-discord::callbacks::commands::%{_event}.getName()%}
+                {_callback} is set
+                run section {_callback} async with {_event}
+            # ModalInteractionEvent
+            else if {_event} is instance of ModalInteractionEvent:
+                set {_callback} to {-discord::callbacks::modals::%{_event}.getModalId()%}
+                {_callback} is set
+                run section {_callback} async with {_event}
+        
+        # shutdown old bot
+        if {-discord::bot} is set:
+            {-discord::bot}.shutdown()
+            delete {-discord::bot}
+        delete {-discord::userCache::*}
+        # create new bot if token is set
+        if (getConfigValue("root.discord.botToken") ? "") is "":
+            log info "Discord bot token hasn't been configured, not enabling bot"
+            exit trigger
+        set {-discord::bot} to JDABuilder.createDefault(getConfigValue("root.discord.botToken")).enableIntents(GatewayIntent.MESSAGE_CONTENT).enableIntents(GatewayIntent.GUILD_MESSAGES).enableIntents(GatewayIntent.GUILD_MEMBERS).build()
+        # add event listener
+        set {_listener} to proxy instance of EventListener using {_f::*}
+        {-discord::bot}.addEventListener({_listener})
+        # register commands
+        delete {-discord::commands::*}
+        delete {-discord::commandData::*}
+        delete {-discord::callbacks::*}
+        jdaRegisterCommands()
+        create section with {_proxy}, {_commands} stored in {_f::accept}:
+            loop ...{_commands}:
+                set {-discord::commands::%loop-value.getName()%} to loop-value
+        set {_consumer} to proxy instance of Consumer using {_f::*}
+        {-discord::bot}.updateCommands().addCommands([{-discord::commandData::*}]).queue({_consumer})
+        # ready
+        {-discord::bot}.awaitReady()
+        set {_user} to {-discord::bot}.getSelfUser()
+        log info "🤖 Connected to Discord as %{_user}.getName()%#%{_user}.getDiscriminator()%!"
+        # populate members
+        (getConfigValue("root.discord.linkChannel") parsed as integer) is set
+        set {_guild} to {-discord::bot}.getGuildChannelById(getConfigValue("root.discord.linkChannel")).getGuild()
+        {_guild} is set
+        set {_members::*} to ...{_guild}.loadMembers().get()
+        loop {_members::*}:
+            set {-discord::userCache::%loop-value.getId()%} to loop-value.getUser()
+        log info "Finished caching §b%size of {_members::*}%§7 users from %{_guild}.getName()%"
+
+    run section {_setupJDA} async
+
+# jda functions
+
+function buildJdaMessage(msg:string, mentions:boolean=false) :: object:
+    set {_builder} to new MessageCreateBuilder()
+    {_builder}.setContent({_msg})
+    if {_mentions} is false:
+        set {_list} to new ArrayList()
+        {_list}.add(Message.MentionType.CHANNEL)
+        {_list}.add(Message.MentionType.EMOJI)
+        {_list}.add(Message.MentionType.SLASH_COMMAND)
+        {_builder}.setAllowedMentions({_list})
+    return {_builder}.build()
+
+function registerSlashCommand(name:string, desc:string, callback:section, options:objects={_}):
+    set {_command} to Commands.slash({_name}, {_desc})
+    if {_options::*} is set:
+        {_command}.addOptions([{_options::*}])
+    set {-discord::commandData::%{_name}%} to {_command}
+    set {-discord::callbacks::commands::%{_name}%} to {_callback}
+
+function registerModal(id:string, modal:object, callback:section):
+    set {-discord::modals::%{_id}%} to {_modal}
+    set {-discord::callbacks::modals::%{_id}%} to {_callback}
+
+function getDiscordUser(id:string, cacheOnly:boolean=false) :: object:
+    # get from skript cache
+    return {-discord::userCache::%{_id}%} if {-discord::userCache::%{_id}%} is set
+    # get from jda cache
+    set {_user} to {-discord::bot}.getUserById({_id})
+    if {_user} is set:
+        set {_id} to {_user}.getId()
+        set {-discord::userCache::%{_id}%} to {_user}
+        return {-discord::userCache::%{_id}%}
+    # fetch user
+    {_cacheOnly} is false
+    set {_user} to {-discord::bot}.retrieveUserById({_id}).submit().get()
+    if {_user} is set:
+        set {_id} to {_user}.getId()
+        set {-discord::userCache::%{_id}%} to {_user}
+        return {-discord::userCache::%{_id}%}
+
+function getDiscordGuild(id:string) :: object:
+    return {-discord::bot}.getGuildById({_id})
+
+function getDiscordMember(guild:object, id:string) :: object:
+    return {_guild}.retrieveMemberById({_id}).submit().get()
+
+# helper functions
+
+local function discordMessage(event:object):
+    {_event}.getChannel().getId() is getConfigValue("root.discord.linkChannel")
+    set {_member} to {_event}.getMember()
+    set {_user} to {_event}.getMember().getUser()
+    send (formatted "<%{-discord::blurple}%>💬 %discordMemberComp({_member})%</hover>:<reset> §f%{_event}.getMessage().getContentRaw()%") to (all players and console)
+
+function discordSend(msg:string):
+    (getConfigValue("root.discord.linkChannel") parsed as integer) is set
+    getConfigValue("root.discord.mcToDiscord") is true
+    set {_channel} to {-discord::bot}.getTextChannelById(getConfigValue("root.discord.linkChannel"))
+    {_channel}.sendMessage(buildJdaMessage({_msg})).queue()
+
+function discordMemberComp(member:object) :: string:
+    if {_member} isn't set:
+        return "§c<hover:show_text:'§7@???'>Unknown User"
+    set {_user} to {_member}.getUser()
+    return "<%{-discord::blurple}%><hover:show_text:'§f%{_user}.getGlobalName()%%nl%§7@%{_user}.getName()%'>%{_member}.getEffectiveName()%"
+
+function discordUserComp(user:object) :: string:
+    if {_user} isn't set:
+        return "§c<hover:show_text:'§7@???'>Unknown User"
+    return "<%{-discord::blurple}%><hover:show_text:'§7@%{_user}.getName()%'>%{_user}.getGlobalName()%"
+
+function setDiscordStatus(type:string="", status:string="", streamUrl:string=""):
+    if {_type} is "":
+        {-discord::bot}.getPresence().setActivity(null)
+        exit trigger
+    if {_type} is "playing":
+        {-discord::bot}.getPresence().setActivity(Activity.playing({_status}))
+    else if {_type} is "watching":
+        {-discord::bot}.getPresence().setActivity(Activity.watching({_status}))
+    else if {_type} is "listening":
+        {-discord::bot}.getPresence().setActivity(Activity.listening({_status}))
+    else if {_type} is "competing":
+        {-discord::bot}.getPresence().setActivity(Activity.competing({_status}))
+    else if {_type} is "streaming":
+        {-discord::bot}.getPresence().setActivity(Activity.streaming({_status}, {_streamUrl}))
+
+function updateDiscordPlayersStatus(amount:integer=0):
+    if {_amount} is 0:
+        setDiscordStatus()
+    else:
+        set {_s} to ("" if ({_amount} is 1) else "s")
+        setDiscordStatus("watching", "%{_amount}% player%{_s}% online")

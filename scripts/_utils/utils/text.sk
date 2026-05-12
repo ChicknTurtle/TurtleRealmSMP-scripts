@@ -25,3 +25,6 @@ function trimTextWithEllipsis(text:string, width:integer) :: string:
     set {_ellipsisWidth} to getTextWidth({_ellipsis})
     set {_trimmed} to trimText({_text}, {_width} - {_ellipsisWidth})
     return {_trimmed} + {_ellipsis}
+
+function plural(amount:integer) :: string:
+    return ("" if ({_amount} is 1) else "s")

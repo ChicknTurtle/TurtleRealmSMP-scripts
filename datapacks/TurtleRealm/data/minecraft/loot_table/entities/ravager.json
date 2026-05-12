@@ -11,7 +11,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:ravager_hide\"}"
+              "tag": "{PublicBukkitValues:{\"minecraft:customitems.id\":\"turtle:ravager_hide\"}}"
             },
             {
               "function": "minecraft:set_count",

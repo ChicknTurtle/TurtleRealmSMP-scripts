@@ -2,8 +2,6 @@ using reflection
 
 options:
     maxAmount: 6400
-    maxDistance: 30
-    maxDistanceSneaking: 15
 
 load custom items:
     # chorium case
@@ -12,13 +10,6 @@ load custom items:
     apply use cooldown component to (custom item "turtle:chorium_case"):
         seconds: 1 second
         group: "minecraft:ender_pearl"
-
-    set (update function of "turtle:chorium_case_filled") to (function "legacyChoriumCaseFilled" in script)
-    set (custom item "turtle:chorium_case_filled") to (firework star)
-
-local function legacyChoriumCaseFilled(item:item) :: item:
-    set (item id of {_item}) to "turtle:chorium_case"
-    return {_item}
 
 load recipes:
     register smithing transform recipe:
@@ -29,59 +20,29 @@ load recipes:
         addition: custom item "turtle:chorium_ingot"
 
 local function updateItem(item:item) :: item:
-    set {_amount} to (int tag "storedPearls" of (custom nbt of {_item})) ? 0
+    set {_nbt} to (custom nbt of {_item})
+    set {_amount} to (int tag "storedPearls" of {_nbt}) ? 0
     if {_amount} is 0:
         set (item model of {_item}) to "turtle:chorium_case"
         remove custom interact from {_item}
     else:
         set (item model of {_item}) to "turtle:chorium_case_filled"
         add custom interact to {_item}
-    add "§d%{_amount}%§5/{@maxAmount}" to {_l::*}
-    add "§7Capable of storing a large amount of ender pearls" to {_l::*}
-    add "§7Use to teleport at the cost of a pearl" to {_l::*}
+    add "<!i>§d%{_amount}%§5/{@maxAmount}" to {_l::*}
+    add "<!i>§7Capable of storing a large amount of ender pearls" to {_l::*}
     set (lore of {_item}) to {_l::*}
     return {_item}
 
-# show tp indicator
-every 5 ticks:
-    loop (all players where [(item id of input's tool) is "turtle:chorium_case"]):
-        set {_amount} to (int tag "storedPearls" of (custom nbt of (loop-player's tool))) ? 0
-        {_amount} > 0
-        set {_dist} to ({@maxDistanceSneaking} if (loop-player is pressing sneak key) else {@maxDistance})
-        set {_ray} to (raytrace from loop-player with max distance {_dist} while ignoring passable blocks)
-        set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of loop-player's head)
-        set {_portalhit::*} to ((blocks between (loop-player's head) and {_hit}) where [input is a nether portal])
-        {_portalhit::*} isn't set
-        make 1 of witch at {_hit} for loop-player
-
-# teleport
+# throw pearl
 on custom item interact with "turtle:chorium_case":
-    set {_amount} to (int tag "storedPearls" of (custom nbt of event-item)) ? 0
+    set {_nbt} to (custom nbt of event-item)
+    set {_amount} to ((int tag "storedPearls" of {_nbt}) ? 0)
     {_amount} > 0
-    event-world isn't "world_turtle_dungeon"
     set {_case} to (player's offhand tool) if (event-equipmentslot is off hand slot) else (player's tool)
-    set {_dist} to (({@maxDistanceSneaking} if (player is pressing sneak key) else {@maxDistance}))
-    set {_ray} to (raytrace from player with max distance {_dist} while ignoring passable blocks)
-    set {_hit} to (hit location of {_ray}) ? (location {_dist} blocks in front of player's head)
-    set {_portalhit} to (first element of ((blocks between (player's head) and {_hit}) where [input is a nether portal]))
-    set {_portalhit} to ({_portalhit} ~ vector(-0,-0.5,-0))
-    set {_hit} to ({_portalhit} ? {_hit})
-    set {_startLoc} to (player's location)
-    set (yaw of {_hit}) to (yaw of player)
-    set (pitch of {_hit}) to (pitch of player)
-    make player dismount
-    teleport player to {_hit} while retaining (vehicle,passengers,xyz velocity)
-    set (fall distance of player) to 0
-    set (boolean tag "ignore_fall_damage_from_current_explosion" of (full nbt of player)) to false
-    set {_v} to normalized (vector from {_startLoc} to {_hit})
-    set {_amount} to ceil(distance between {_startLoc} and {_hit})
-    set {_amount} to max({_amount}, 1)
-    set {_loc} to {_startLoc}
-    loop {_amount} times:
-        make 5 of portal at {_loc}
-        make 5 of witch at {_loc}
-        set {_loc} to ({_loc} ~ {_v})
-    play sound "minecraft:entity.player.teleport" in player category at player
+    make player shoot ender pearl at speed 1.5
+    set {_vec3} to player.getHandle().getKnownMovement()
+    add vector({_vec3}.x,{_vec3}.y,{_vec3}.z) to (velocity of last shot entity)
+    play sound "minecraft:entity.ender_pearl.throw" in (neutral category) with volume 0.5 with pitch (0.4/((random number from 0 to 1)*0.4+0.8)) at (player's location)
     # swing hand
     if event-equipmentslot is (off hand):
         make player swing their offhand
@@ -89,7 +50,7 @@ on custom item interact with "turtle:chorium_case":
         make player swing their hand
     # lower count
     (player's gamemode) isn't creative
-    set {_amount} to ((int tag "storedPearls" of custom nbt of {_case}) ? 1)
+    set {_amount} to ((int tag "storedPearls" of {_nbt}) ? 1)
     set {_newamount} to {_amount} - 1
     set (int tag "storedPearls" of (custom nbt of {_case})) to {_newamount}
     set {_case} to updateItem({_case})
@@ -191,12 +152,13 @@ on entity added to world:
             exit trigger
         # check pearls
         set {_pearls::*} to ((dropped items in radius 1.5 of event-entity) where [item of input is ender pearl])
-        set {_amount} to (int tag "storedPearls" of (custom nbt of (item of event-entity)))
+        set {_nbt} to (custom nbt of (item of event-entity))
+        set {_amount} to (int tag "storedPearls" of {_nbt}) ? 0
         loop (shuffled {_pearls::*}):
             set {_size} to (item amount of (item of loop-value))
             ({_amount} + {_size}) <= {@maxAmount}
             delete (entity within loop-value)
-            set (int tag "storedPearls" of (custom nbt of (item of event-entity))) to ({_amount} + {_size})
+            set (int tag "storedPearls" of {_nbt}) to ({_amount} + {_size})
             set (item of event-entity) to updateItem(item of event-entity)
             play sound "minecraft:item.bundle.insert" in players category at event-entity
             exit loop

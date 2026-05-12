@@ -8,7 +8,7 @@ brig command /turtle:heal:
         loop {_entities::*}:
             heal loop-value
             feed loop-value
-            set saturation of loop-value to 20
+            set saturation of loop-value to 6
         if size of {_entities::*} is 1:
             send "Healed %name of first element of {_entities::*}%"
         else:

@@ -21,8 +21,8 @@
             "predicate": {
               "predicates": {
                 "minecraft:custom_data": {
-                  "customItems": {
-                    "id": "turtle:custom_music_disc"
+                  "PublicBukkitValues": {
+                    "minecraft:customitems.id": "turtle:custom_music_disc"
                   }
                 }
               }

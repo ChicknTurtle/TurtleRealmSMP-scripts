@@ -17,19 +17,19 @@ on inventory pickup:
     checkHopperFilter(event-item, {_b}) is true
     cancel event
     chance of 0.0625
-    make 1 of dust using dustOption(rgb(255,0,0),4) at {_b}
+    draw (1 rgb(255,0,0) dust particle of size 4) at {_b}
 # hopper/dropper > whatever
 on inventory item move:
     checkHopperFilter(event-item, (future event-block)) is true
     cancel event
     chance of 0.5
-    make 1 of dust using dustOption(rgb(255,0,0),4) at (event-block)
+    draw (1 rgb(255,0,0) dust particle of size 4) at event-block
 
 # apply/remove filter
 on right click on hopper:
     (item id of event-item) is "turtle:filter"
     cancel event
-    make 10 of poof at event-block with extra 0.1
+    draw (10 poof particle with particle speed 0.1) at event-block
     if (string list tag "filter;ids" of (custom nbt of event-item)) is set:
         play sound "minecraft:entity.item_frame.add_item" in blocks category at event-block
     else:

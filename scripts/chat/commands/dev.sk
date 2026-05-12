@@ -3,7 +3,7 @@ import:
     org.bukkit.Registry
 
 on load:
-    set {-allDataComponents::*} to ...Registry.DATA_COMPONENT_TYPE.keyStream().toArray()
+    set {-allDataComponents::*} to (...(Registry.DATA_COMPONENT_TYPE.keyStream().toArray()))
 
 brig command /turtle:nbt:
     permission: op

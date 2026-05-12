@@ -1,0 +1,212 @@
+options:
+    expiration: 25 seconds
+
+function sendTpaRequest(p:player, target:player):
+    send component (merge components (minimessage from "<green>Sent a TPA request to ", playerComponent({_target}))) to {_p}
+    send component (merge components (minimessage from "<yellow>", playerComponent({_p}), minimessage from "<yellow> sent you a TPA request! Click <click:run_command:'/turtle:tpaccept'><green><underlined>here</underlined></click><yellow> or use /tpaccept to accept it")) to {_target}
+    set {-playerData::%{_target}%::tpaRequestsFrom::%{_p}%} to now
+    set {-playerData::%{_p}%::tpaRequestsTo::%{_target}%} to now
+    set {-playerData::%{_target}%::tpaLatest} to {_p}
+    set {-playerData::%{_p}%::tpaLatest} to {_target}
+    set {_sentAt} to now
+    wait {@expiration}
+    {-playerData::%{_target}%::tpaRequestsFrom::%{_p}%} is set
+    difference between {-playerData::%{_target}%::tpaRequestsFrom::%{_p}%} and {_sentAt} < 1 second
+    send component (merge components (minimessage from "<red>Your TPA request to ", playerComponent({_target}), minimessage from "<red> has expired")) to {_p}
+    delete {-playerData::%{_target}%::tpaRequestsFrom::%{_p}%}
+    delete {-playerData::%{_p}%::tpaRequestsTo::%{_target}%}
+    if {-playerData::%{_target}%::tpaLatest} is {_p}:
+        delete {-playerData::%{_target}%::tpaLatest}
+    if {-playerData::%{_p}%::tpaLatest} is {_target}:
+        delete {-playerData::%{_p}%::tpaLatest}
+
+function sendTpaHereRequest(p:player, target:player):
+    send component (merge components (minimessage from "<green>Sent a TPA-here request to ", playerComponent({_target}))) to {_p}
+    send component (merge components (minimessage from "<yellow>", playerComponent({_p}), minimessage from "<yellow> wants you to teleport to them! Click <click:run_command:'/turtle:tpaccept'><green><underlined>here</underlined></click><yellow> or use /tpaccept to accept it")) to {_target}
+    set {-playerData::%{_target}%::tpaHereRequestsFrom::%{_p}%} to now
+    set {-playerData::%{_p}%::tpaHereRequestsTo::%{_target}%} to now
+    set {-playerData::%{_target}%::tpaHereLatest} to {_p}
+    set {-playerData::%{_p}%::tpaHereLatest} to {_target}
+    set {_sentAt} to now
+    wait {@expiration}
+    {-playerData::%{_target}%::tpaHereRequestsFrom::%{_p}%} is set
+    difference between {-playerData::%{_target}%::tpaHereRequestsFrom::%{_p}%} and {_sentAt} < 1 second
+    send component (merge components (minimessage from "<red>Your TPA-here request to ", playerComponent({_target}), minimessage from "<red> has expired")) to {_p}
+    delete {-playerData::%{_target}%::tpaHereRequestsFrom::%{_p}%}
+    delete {-playerData::%{_p}%::tpaHereRequestsTo::%{_target}%}
+    if {-playerData::%{_target}%::tpaHereLatest} is {_p}:
+        delete {-playerData::%{_target}%::tpaHereLatest}
+    if {-playerData::%{_p}%::tpaHereLatest} is {_target}:
+        delete {-playerData::%{_p}%::tpaHereLatest}
+
+function acceptTpaRequest(p:player, from:player={_}):
+    if {_from} isn't set:
+        if any:
+            {-playerData::%{_p}%::tpaLatest} isn't set
+            {-playerData::%{_p}%::tpaRequestsFrom::%{-playerData::%{_p}%::tpaLatest}%} isn't set
+        then:
+            send component (minimessage from "<red>You don't have any pending TPA requests") to {_p}
+            exit trigger
+        set {_from} to {-playerData::%{_p}%::tpaLatest}
+    if {-playerData::%{_p}%::tpaRequestsFrom::%{_from}%} isn't set:
+        send component (merge components (minimessage from "<red>You don't have a pending TPA request from ", playerComponent({_from}))) to {_p}
+        exit trigger
+    teleport {_from} to {_p}
+    delete {-playerData::%{_p}%::tpaRequestsFrom::%{_from}%}
+    delete {-playerData::%{_from}%::tpaRequestsTo::%{_p}%}
+    if {-playerData::%{_p}%::tpaLatest} is {_from}:
+        delete {-playerData::%{_p}%::tpaLatest}
+    if {-playerData::%{_from}%::tpaLatest} is {_p}:
+        delete {-playerData::%{_from}%::tpaLatest}
+    send component (merge components (minimessage from "<green>Accepted TPA request from ", playerComponent({_from}), minimessage from "<green>!")) to {_p}
+    send component (merge components (playerComponent({_p}), minimessage from "<green> accepted your TPA request!")) to {_from}
+
+function acceptTpaHereRequest(p:player, from:player={_}):
+    if {_from} isn't set:
+        if any:
+            {-playerData::%{_p}%::tpaHereLatest} isn't set
+            {-playerData::%{_p}%::tpaHereRequestsFrom::%{-playerData::%{_p}%::tpaHereLatest}%} isn't set
+        then:
+            send component (minimessage from "<red>You don't have any pending TPA-here requests") to {_p}
+            exit trigger
+        set {_from} to {-playerData::%{_p}%::tpaHereLatest}
+    if {-playerData::%{_p}%::tpaHereRequestsFrom::%{_from}%} isn't set:
+        send component (merge components (minimessage from "<red>You don't have a pending TPA-here request from ", playerComponent({_from}))) to {_p}
+        exit trigger
+    teleport {_p} to {_from}
+    delete {-playerData::%{_p}%::tpaHereRequestsFrom::%{_from}%}
+    delete {-playerData::%{_from}%::tpaHereRequestsTo::%{_p}%}
+    if {-playerData::%{_p}%::tpaHereLatest} is {_from}:
+        delete {-playerData::%{_p}%::tpaHereLatest}
+    if {-playerData::%{_from}%::tpaHereLatest} is {_p}:
+        delete {-playerData::%{_from}%::tpaHereLatest}
+    send component (merge components (minimessage from "<green>Accepted TPA-here request from ", playerComponent({_from}), minimessage from "<green>!")) to {_p}
+    send component (merge components (playerComponent({_p}), minimessage from "<green> accepted your TPA-here request!")) to {_from}
+
+function cancelTpaRequest(p:player, target:player={_}):
+    if {_target} isn't set:
+        if any:
+            {-playerData::%{_p}%::tpaLatest} isn't set
+            {-playerData::%{_p}%::tpaRequestsTo::%{-playerData::%{_p}%::tpaLatest}%} isn't set
+        then:
+            send component (minimessage from "<red>You don't have any outgoing TPA requests to cancel") to {_p}
+            exit trigger
+        set {_target} to {-playerData::%{_p}%::tpaLatest}
+    if {-playerData::%{_p}%::tpaRequestsTo::%{_target}%} isn't set:
+        send component (merge components (minimessage from "<red>You don't have a pending TPA request to ", playerComponent({_target}))) to {_p}
+        exit trigger
+    delete {-playerData::%{_p}%::tpaRequestsTo::%{_target}%}
+    delete {-playerData::%{_target}%::tpaRequestsFrom::%{_p}%}
+    if {-playerData::%{_p}%::tpaLatest} is {_target}:
+        delete {-playerData::%{_p}%::tpaLatest}
+    if {-playerData::%{_target}%::tpaLatest} is {_p}:
+        delete {-playerData::%{_target}%::tpaLatest}
+    send component (merge components (minimessage from "<yellow>Cancelled your TPA request to ", playerComponent({_target}))) to {_p}
+    send component (merge components (playerComponent({_p}), minimessage from "<yellow> cancelled their TPA request to you")) to {_target}
+
+function cancelTpaHereRequest(p:player, target:player={_}):
+    if {_target} isn't set:
+        if any:
+            {-playerData::%{_p}%::tpaHereLatest} isn't set
+            {-playerData::%{_p}%::tpaHereRequestsTo::%{-playerData::%{_p}%::tpaHereLatest}%} isn't set
+        then:
+            send component (minimessage from "<red>You don't have any outgoing TPA-here requests to cancel") to {_p}
+            exit trigger
+        set {_target} to {-playerData::%{_p}%::tpaHereLatest}
+    if {-playerData::%{_p}%::tpaHereRequestsTo::%{_target}%} isn't set:
+        send component (merge components (minimessage from "<red>You don't have a pending TPA-here request to ", playerComponent({_target}))) to {_p}
+        exit trigger
+    delete {-playerData::%{_p}%::tpaHereRequestsTo::%{_target}%}
+    delete {-playerData::%{_target}%::tpaHereRequestsFrom::%{_p}%}
+    if {-playerData::%{_p}%::tpaHereLatest} is {_target}:
+        delete {-playerData::%{_p}%::tpaHereLatest}
+    if {-playerData::%{_target}%::tpaHereLatest} is {_p}:
+        delete {-playerData::%{_target}%::tpaHereLatest}
+    send component (merge components (minimessage from "<yellow>Cancelled your TPA-here request to ", playerComponent({_target}))) to {_p}
+    send component (merge components (playerComponent({_p}), minimessage from "<yellow> cancelled their TPA-here request to you")) to {_target}
+
+brig command tree /turtle:tpa:
+    player arg "player":
+        trigger:
+            if event-commandsender is console:
+                send component (minimessage from "<red>This can't be used from console")
+                exit trigger
+            sendTpaRequest(player, {_player})
+
+brig command tree /turtle:tpahere:
+    player arg "player":
+        trigger:
+            if event-commandsender is console:
+                send component (minimessage from "<red>This can't be used from console")
+                exit trigger
+            sendTpaHereRequest(player, {_player})
+
+brig command tree /turtle:tpaccept:
+    optional player arg "player":
+        trigger:
+            if event-commandsender is console:
+                send component (minimessage from "<red>This can't be used from console")
+                exit trigger
+            if {_player} is set:
+                if {-playerData::%player%::tpaHereRequestsFrom::%{_player}%} is set:
+                    acceptTpaHereRequest(player, {_player})
+                else:
+                    acceptTpaRequest(player, {_player})
+            else:
+                set {_latestTpa} to {-playerData::%player%::tpaLatest}
+                set {_latestTpaHere} to {-playerData::%player%::tpaHereLatest}
+                if all:
+                    {_latestTpa} is set
+                    {_latestTpaHere} isn't set
+                then:
+                    acceptTpaRequest(player)
+                else if all:
+                    {_latestTpaHere} is set
+                    {_latestTpa} isn't set
+                then:
+                    acceptTpaHereRequest(player)
+                else if all:
+                    {_latestTpa} is set
+                    {_latestTpaHere} is set
+                then:
+                    if difference between {-playerData::%player%::tpaRequestsFrom::%{_latestTpa}%} and now < difference between {-playerData::%player%::tpaHereRequestsFrom::%{_latestTpaHere}%} and now:
+                        acceptTpaRequest(player)
+                    else:
+                        acceptTpaHereRequest(player)
+                else:
+                    send component (minimessage from "<red>You don't have any pending TPA requests") to player
+
+brig command tree /turtle:tpacancel:
+    optional player arg "player":
+        trigger:
+            if event-commandsender is console:
+                send component (minimessage from "<red>This can't be used from console")
+                exit trigger
+            if {_player} is set:
+                if {-playerData::%player%::tpaHereRequestsTo::%{_player}%} is set:
+                    cancelTpaHereRequest(player, {_player})
+                else:
+                    cancelTpaRequest(player, {_player})
+            else:
+                set {_latestTpa} to {-playerData::%player%::tpaLatest}
+                set {_latestTpaHere} to {-playerData::%player%::tpaHereLatest}
+                if all:
+                    {_latestTpa} is set
+                    {_latestTpaHere} isn't set
+                then:
+                    cancelTpaRequest(player)
+                else if all:
+                    {_latestTpaHere} is set
+                    {_latestTpa} isn't set
+                then:
+                    cancelTpaHereRequest(player)
+                else if all:
+                    {_latestTpa} is set
+                    {_latestTpaHere} is set
+                then:
+                    if (difference between {-playerData::%player%::tpaRequestsTo::%{_latestTpa}%} and now) < (difference between {-playerData::%player%::tpaHereRequestsTo::%{_latestTpaHere}%} and now):
+                        cancelTpaRequest(player)
+                    else:
+                        cancelTpaHereRequest(player)
+                else:
+                    send component (minimessage from "<red>You don't have any outgoing TPA requests to cancel") to player

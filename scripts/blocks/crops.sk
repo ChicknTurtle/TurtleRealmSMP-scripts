@@ -4,3 +4,10 @@ on block trample:
     event-block is farmland
     (boots of event-entity) are enchanted with feather falling
     cancel event
+
+# Crops produce xp
+on break:
+    (age of event-block) is (max age of event-block)
+    event-block is wheat[], carrots[], potatoes[], or beetroots[]
+    spawn experience orb at event-block:
+        set (total experience of entity) to 1

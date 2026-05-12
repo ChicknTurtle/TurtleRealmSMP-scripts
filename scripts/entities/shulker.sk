@@ -1,4 +1,3 @@
-using damage source
 
 on entity add to world:
     event-entity is shulker
@@ -40,7 +39,9 @@ on damage by shulker bullet:
     (glowing of (direct entity)) is true
     if victim is a shulker:
         heal victim by damage
-        apply glowing without particles to victim for 5 ticks
+        set {_effect} to (potion effect of glowing for 5 ticks)
+        hide particles of {_effect}
+        apply {_effect} to victim
         cancel event
     else:
         set damage to ((damage+3)*2.5)

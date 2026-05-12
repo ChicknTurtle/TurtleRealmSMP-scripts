@@ -86,7 +86,7 @@ on damage of player:
 # Feeling Blue
 on consume of nether wart:
     wait 1 tick
-    player has potion nausea
+    player has nausea
     set {_nauseas::*} to ((potion effects of player) where [type of input is nausea])
     set {_nauseas::*} to {_nauseas::*} where [seconds of (potion duration of input) is 15]
     (size of {_nauseas::*}) > 0

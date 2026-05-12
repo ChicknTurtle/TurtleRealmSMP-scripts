@@ -16,6 +16,10 @@ plural expression:
         set {_box} to new BoundingBox({_x},{_y},{_z},({_x}+1),({_y}+1),({_z}+1))
         return ...(world of {_block}).getNearbyEntities({_box})
 
+function entitiesColliding(loc:location, size:vector) :: entities:
+    set {_box} to new BoundingBox((x of {_loc}), (y of {_loc}), (z of {_loc}), ((x of {_loc}) + (x of {_size})), ((y of {_loc}) + (y of {_size})), ((z of {_loc}) + (z of {_size})))
+    return ...(world of {_loc}).getNearbyEntities({_box})
+
 # Spawn item
 # Get the item used to spawn an entity
 expression:
@@ -36,3 +40,52 @@ condition:
         (int tag "InLove" of nbt of expr-1) is set
         expr-1 isn't a parrot, happy ghast, mule, or skeleton horse
         continue
+
+import:
+    net.minecraft.world.phys.Vec3
+    net.minecraft.world.entity.PositionMoveRotation
+    net.minecraft.world.entity.Relative
+    net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
+
+# Smoothly modify players' velocity, yaw, and pitch
+effect:
+    patterns:
+        (add|apply) (vel[ocit(y|ies)]|movement|momentum) %vector% to %players%
+        (add|apply) (rot[ation][s]|dir[ection][s]) [yaw] %number%[,| and] [pitch] %number% to %players%
+        (add|apply) (vel[ocity]|movement|momentum) %vector%[,| and] (rot[ation][s]|dir[ection][s]) [yaw] %number%[,| and] [pitch] %number% to %players%
+    trigger:
+        if (matched pattern) is 1:
+            set {_vel} to expr-1
+            set {_players::*} to exprs-2
+        else if (matched pattern) is 2:
+            set {_yaw} to expr-1
+            set {_pitch} to expr-2
+            set {_players::*} to exprs-3
+        else if (matched pattern) is 3:
+            set {_vel} to expr-1
+            set {_yaw} to expr-2
+            set {_pitch} to expr-3
+            set {_players::*} to exprs-4
+        
+        loop {_players::*} where [input is a player]:
+            add ({_yaw} ? 0) to (metadata value "queuedPacketYaw" of loop-value)
+            add ({_pitch} ? 0) to (metadata value "queuedPacketPitch" of loop-value)
+            add ({_vel} ? vector(0,0,0)) to (metadata value "queuedPacketVel" of loop-value)
+            (metadata value "lastPositionPacket" of loop-value) isn't now
+            set (metadata value "lastPositionPacket" of loop-value) to now
+
+            set {_yaw} to (metadata value "queuedPacketYaw" of loop-value)
+            set {_pitch} to (metadata value "queuedPacketPitch" of loop-value)
+            set {_vel} to (metadata value "queuedPacketVel" of loop-value)
+            delete (metadata value "queuedPacketYaw" of loop-value)
+            delete (metadata value "queuedPacketPitch" of loop-value)
+            delete (metadata value "queuedPacketVel" of loop-value)
+
+            set {_velVec3} to new Vec3((x of {_vel}),(y of {_vel}),(z of {_vel}))
+            set {_posMoveRot} to new PositionMoveRotation(Vec3.ZERO, {_velVec3}, {_yaw}, 0-{_pitch})
+            set {_flags} to Relative.ALL
+
+            set {_p} to loop-value.getHandle()
+            set {_tpId} to (random integer from -2147483648 to 2147483648)
+            set {_packet} to ClientboundPlayerPositionPacket.of({_tpId}, {_posMoveRot}, {_flags})
+            {_p}.connection.send({_packet})

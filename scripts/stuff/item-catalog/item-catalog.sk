@@ -70,31 +70,31 @@ local function loadItemCatalogRecipe(id:string, recipe:javaobject):
     set {-itemCatalog::recipeData::%{_id}%::result} to {_result}
     if {_recipe} is instance of ShapedRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Shaped Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (crafting table)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:crafting_table"
     else if {_recipe} is instance of ShapelessRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Shapeless Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (crafting table)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:crafting_table"
     else if {_recipe} is instance of FurnaceRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Furnace Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (furnace)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:furnace"
     else if {_recipe} is instance of BlastingRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Blasting Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (blast furnace)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:blast_furnace"
     else if {_recipe} is instance of SmokingRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Smoking Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (smoker)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:smoker"
     else if {_recipe} is instance of CampfireRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Campfire Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (campfire (itemtype))
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:campfire"
     else if {_recipe} is instance of StonecuttingRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Stonecutting Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (stonecutter)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:stonecutter"
     else if {_recipe} is instance of SmithingRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Smithing Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (smithing table)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:smithing_table"
     else if {_recipe} is instance of MerchantRecipe:
         set {-itemCatalog::recipeData::%{_id}%::type} to "Villager Trading"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (emerald)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:emerald"
 
 function loadItemCatalogProcessingRecipe(type:string, input:string):
     set {_id} to {_input}
@@ -115,25 +115,25 @@ function loadItemCatalogProcessingRecipe(type:string, input:string):
     set {-itemCatalog::recipeData::%{_id}%::processingType} to {_type}
     if {_type} is "washing":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Washing Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (water bucket)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:water_bucket"
     else if {_type} is "smoking":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Smoking Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (campfire (itemtype))
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:campfire"
     else if {_type} is "haunting":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Haunting Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (soul campfire)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:soul_campfire"
     else if {_type} is "blasting":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Blasting Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (lava bucket)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:lava_bucket"
     else if {_type} is "freezing":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Freezing Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (powder snow bucket)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:powder_snow_bucket"
     else if {_type} is "pressing":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Pressing Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (piston)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:piston"
     else if {_type} is "voiding":
         set {-itemCatalog::recipeData::%{_id}%::type} to "Voiding Recipe"
-        set {-itemCatalog::recipeData::%{_id}%::icon} to (black concrete)
+        set {-itemCatalog::recipeData::%{_id}%::icon} to "minecraft:black_concrete"
 
 local function loadItemCatalogItem(item:item):
     set {_iid} to (item id of {_item})
@@ -183,23 +183,24 @@ function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIn
     
     if {_id} starts with "minecraft:":
         set {_wiki} to knowledge book
-        set (name of {_wiki}) to "§r§7Minecraft wiki page"
-        set (lore of {_wiki}) to "§9%{_name}%"
+        set (name of {_wiki}) to "§r<!i>§7Minecraft wiki page"
+        set (lore of {_wiki}) to "<!i>§9%{_name}%"
         set {_items::8} to {_wiki}
     else:
         set {_wiki} to book
-        set (name of {_wiki}) to "§r§7No wiki for this item"
+        set (name of {_wiki}) to "§r<!i>§7No wiki for this item"
         set {_items::8} to {_wiki}
 
     loop (elements from {_start} to {_start}+6 of {_recipes::*}):
-        set {_items::%loop-iteration%} to {-itemCatalog::recipeData::%loop-value%::icon}
-        set (name of {_items::%loop-iteration%}) to "§7%{-itemCatalog::recipeData::%loop-value%::type}%"
-        set (lore of {_items::%loop-iteration%}) to "§8%{-itemCatalog::recipeData::%loop-value%::recipeName}%"
+        set {_items::%loop-iteration%} to paper
+        set (item model of {_items::%loop-iteration%}) to {-itemCatalog::recipeData::%loop-value%::icon}
+        set (name of {_items::%loop-iteration%}) to "<!i>§7%{-itemCatalog::recipeData::%loop-value%::type}%"
+        set (lore of {_items::%loop-iteration%}) to "<!i>§8%{-itemCatalog::recipeData::%loop-value%::recipeName}%"
         {_start} + (loop-iteration)-1 is {_pageIndex}
 
         set {_info} to getGuiBarrier()
         show entire tooltip of {_info}
-        set (name of {_info}) to "§r§8Recipe: %loop-value%"
+        set (name of {_info}) to "§r<!i>§8Recipe: %loop-value%"
         set {_items::53} to {_info}
 
         set {_recipe} to {-itemCatalog::recipeData::%loop-value%::recipe}
@@ -229,7 +230,7 @@ function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIn
             set {_items::33} to {_result}
             set {_choiceList::*} to ...{_recipe}.getChoiceList()
             loop {_choiceList::*}:
-                set {_choices::*} to ...loop-value-2.getChoices()
+                set {_choices::*} to (...((loop-value-2).getChoices()))
                 set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
                 {_item} is set
                 set {_item} to new ItemType({_item})
@@ -268,7 +269,7 @@ function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIn
             set {_image} to {-font::image::item_catalog_recipe_smithing}
             set {_items::33} to {_result}
             loop {_recipe}.getTemplate(), {_recipe}.getBase(), {_recipe}.getAddition():
-                set {_choices::*} to ...loop-value-2.getChoices()
+                set {_choices::*} to (...(loop-value-2).getChoices())
                 set {_item} to ((mod({_cycleIndex}, size of {_choices::*}) + 1)th element of {_choices::*})
                 {_item} is set
                 set {_item} to new ItemType({_item})
@@ -290,7 +291,7 @@ function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIn
             set {_image} to {-font::image::item_catalog_recipe_blank}
     set {_image} to {_image} ? {-font::image::item_catalog_recipe_blank}
     set {_guiDisplayName} to "%"Uses" if {_showUses} is true else "Recipes"%: %trimTextWithEllipsis({_name}, 122-getTextWidth({_pageDisplay}))% %{_pageDisplay}%"
-    set {_gui} to (chest inventory with 6 rows named "§f%{-font::font} + {-font::space::-10} + {_image} + {-font::space::-181} + {-font::image::item_catalog_tab%{_tab}%} + {-font::space::-181} + {-font::image::item_catalog_back} + {-font::space::-174}%§r%{_guiDisplayName}%")
+    set {_gui} to (chest inventory with 6 rows named formatted ("<!i>§f%{-font::font} + {-font::space::-10} + {_image} + {-font::space::-181} + {-font::image::item_catalog_tab%{_tab}%} + {-font::space::-181} + {-font::image::item_catalog_back} + {-font::space::-174}%§r%{_guiDisplayName}%"))
     loop {_items::*}:
         set (slot (loop-iteration)-1 of {_gui}) to loop-value
     open {_gui} to {_p}
@@ -306,17 +307,17 @@ function openItemCatalogItem(p:player, id:string, showUses:boolean=false, pageIn
 
 function openItemCatalog(p:player, scroll:integer=0, search:string=""):
     set {_items::*} to {-itemCatalog::itemOrder::*}
-    set {_name} to "§f%{-font::font} + {-font::space::-10} + {-font::image::item_catalog} + {-font::space::-174}%§rItem Catalog"
+    set {_name} to ("<!i>§f%{-font::font} + {-font::space::-10} + {-font::image::item_catalog} + {-font::space::-174}%§rItem Catalog")
     if {_search} isn't "":
         set {_search} to (lowercase {_search})
-        set {_name} to "%{_name}%: %{_search}%"
+        set {_name} to "<!i>%{_name}%: %{_search}%"
         if {-itemCatalog::searchCache::%{_search}%::*} is set:
             set {_items::*} to {-itemCatalog::searchCache::%{_search}%::*}
         else:
             filter {_items::*} to match:
                 (lowercase uncolored component item name of input) contains {_search}
             set {-itemCatalog::searchCache::%{_search}%::*} to {_items::*}
-    set {_gui} to (chest inventory with 6 rows named {_name})
+    set {_gui} to (chest inventory with 6 rows named formatted {_name})
     set (slots 0,1,9,10,18,19,27,28,36,37,45,46 of {_gui}) to getGuiBarrier()
     set {_scroll} to min(max(0,{_scroll}), ceil((size of {_items::*})/7)-6)
     loop {_items::*}:
@@ -408,4 +409,4 @@ on any inventory click:
             openItemCatalogItem(player, (item id of clicked slot), (whether event-clicktype is rmb))
 
 on unchecked sign change:
-    set {-playerData::%player%::guiData::signText::*} to event-textcomponents
+    set {-playerData::%player%::guiData::signText::*} to event-textcomps

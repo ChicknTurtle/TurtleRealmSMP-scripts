@@ -37,7 +37,7 @@ on right click:
         spawn shulker at {_e}:
             set color of event-entity to {_color}
             play sound "minecraft:item.bottle.fill_dragonbreath" in player category at (event-entity's location)
-            make 10 of poof at event-entity with extra 0.2
+            draw 10 poof particle with particle speed 0.2 at event-entity
     # chest
     else if event-block is chest:
         player's tool is shulker shell
@@ -53,7 +53,7 @@ on right click:
         set block only of event-block to {_shulker}
         set blockdata tag "facing" of (block at event-block) to "up"
         play sound "minecraft:item.bottle.fill_dragonbreath" in player category at event-block
-        make 10 of poof at event-block with extra 0.2
+        draw (10 poof particle with particle speed 0.2) at event-block
 
 # craft into colored shulkers
 on preparing craft:

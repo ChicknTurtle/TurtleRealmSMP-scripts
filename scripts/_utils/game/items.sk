@@ -1,0 +1,28 @@
+
+# Item with item model
+expression:
+    patterns:
+        %itemtype% with [item] model %string%
+    get:
+        set {_item} to expr-1
+        set (item model of {_item}) to expr-2
+        return {_item}
+
+# Item with item name
+expression:
+    patterns:
+        %itemtype% with [component] item name %string/textcomp%
+    get:
+        set {_item} to expr-1
+        set {_c} to (expr-2 if (expr-2 is a textcomp) else (text component from "%expr-2%"))
+        set (component item name of {_item}) to {_c}
+        return {_item}
+
+# Item with max stack size
+expression:
+    patterns:
+        %itemtype% with [max] stack size %integer%
+    get:
+        set {_item} to expr-1
+        set (max stack size of {_item}) to expr-2
+        return {_item}

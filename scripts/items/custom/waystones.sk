@@ -1,0 +1,229 @@
+
+register custom items:
+    # waystone
+    set {_item} to (lodestone (itemtype) with nbt from "{rarity:""epic""}")
+    set (pdc tag "dispenserCannotPlace" of {_item}) to true
+    set (component item name of {_item}) to (text component from "Waystone")
+    set (max stack size of {_item}) to 1
+    make {_item} fire resistant
+    set (enchantment glint of {_item}) to true
+    set (custom item "turtle:waystone") to {_item}
+    # warp shard
+    set {_item} to ((firework star) with nbt from "{rarity:""epic""}")
+    set (item model of {_item}) to "turtle:warp_shard"
+    set (component item name of {_item}) to (text component from "Warp Shard")
+    set (enchantment glint of {_item}) to true
+    set (custom item "turtle:warp_shard") to {_item}
+
+register recipes:
+    register shaped recipe:
+        id: "turtle:waystone"
+        result: custom item "turtle:waystone"
+        shape: " b ", "b#b", "ooo"
+        category: "misc"
+        ingredients:
+            set ingredient of "b" to stone bricks
+            set ingredient of "o" to obsidian
+            set ingredient of "#" to (custom item "turtle:warp_shard")
+    register shaped recipe:
+        id: "turtle:warp_shard"
+        result: custom item "turtle:warp_shard"
+        shape: "pap", "a#a", "pap"
+        category: "misc"
+        ingredients:
+            set ingredient of "a" to amethyst shard
+            set ingredient of "p" to ender pearl
+            set ingredient of "#" to echo shard
+
+function isWaystoneAt(block:block) :: boolean:
+    return whether ({waystones::%formatLocation(exact location of {_block})%::name} is set)
+
+function getWaystoneAt(block:block) :: string:
+    return formatLocation(exact location of {_block}) if (isWaystoneAt({_block}) is true)
+
+function destroyWaystone(block:block) :: boolean:
+    set {_id} to formatLocation(exact location of {_block})
+    return false if (isWaystoneAt({_block}) is false)
+    set (block at {_block}) to air if ({_block} is a lodestone)
+    delete ({waystones::%{_id}%::display} parsed as entity)
+    delete {waystones::%{_id}%::*}
+    return true
+
+# no player = natural, player = player placed
+function createWaystone(block:block, p:player={_}, force:boolean=false) :: string:
+    set {_id} to formatLocation(exact location of {_block})
+    exit trigger if (isWaystoneAt({_block}) is true)
+    if {_force} is false:
+        exit trigger if ((block at {_block}) isn't tagged with (block tag "minecraft:replaceable"))
+    set {waystones::%{_id}%::loc} to (exact location of {_block})
+    set {waystones::%{_id}%::icon} to "minecraft:lodestone"
+    if {_p} is set:
+        set {waystones::%{_id}%::defaultName} to "%name of {_p}%'s %translate component of (biome at {_block}).translationKey()% Waystone"
+        set {waystones::%{_id}%::name} to {waystones::%{_id}%::defaultName}
+    else:
+        # todo add random name generator
+        set {waystones::%{_id}%::name} to "%translate component of beach.translationKey()% Waystone"
+    set {waystones::%{_id}%::owner} to {_p}
+    spawn item display at (exact location of {_block}):
+        set (item of entity) to (ender pearl)
+        set (scale of entity) to vector(1,1,1)
+        set (display translation of entity) to vector(0.5+0.03125,1+0.03125,0.5+0.03125)
+        set (light override of entity) to 15
+        set (left rotation of entity) to quaternion(1, 1, 0, 0).normalize()
+        set {waystones::%{_id}%::display} to (uuid of entity)
+    set (block at {_block}) to lodestone
+    return {_id}
+
+function activateWaystone(block:block, p:player) :: string:
+    set {_id} to getWaystoneAt({_block})
+    {_id} is set
+    {PlayerData::%{_p}%::waystones::%{_id}%} isn't set
+    set {PlayerData::%{_p}%::waystones::%{_id}%} to {_id}
+    return {_id}
+
+function waystoneTp(e:entity, id:string):
+    set {_loc} to {waystones::%{_id}%::loc}
+    set (yaw of {_loc}) to (yaw of {_e})
+    set (pitch of {_loc}) to (pitch of {_e})
+    teleport {_e} to ({_loc} ~ vector(0.5,1,0.5)) retaining (passengers, vehicle (teleport flag), directional velocity)
+    close {_e}'s inventory
+    play sound "minecraft:block.portal.travel" in (players category) with volume 0.5 at {_loc}
+
+# gui
+
+function openWaystoneTravel(p:player, page:integer=1, current:string={_}):
+    set {_perPage} to 45
+    # calculate waystones
+    loop {PlayerData::%{_p}%::waystones::*}:
+        if {waystones::%loop-value%::name} isn't set:
+            delete {PlayerData::%{_p}%::waystones::%loop-value%}
+            continue
+        set {_waystones::%loop-value%} to loop-value
+    set {_pageCount} to ceil((size of {_waystones::*})/{_perPage})
+    sort {_waystones::*} by (uncolored {waystones::%input%::name})
+    set {_start} to ({_page} - 1) * {_perPage} + 1
+    set {_end} to {_page} * {_perPage}
+    set {_waystones::*} to elements from {_start} to {_end} of {_waystones::*}
+    # build waystone items
+    loop {_waystones::*}:
+        set {_items::%loop-iteration%} to (paper (itemtype) named "§r<!i>"+{waystones::%loop-value%::name})
+        set {_loc} to {waystones::%loop-value%::loc}
+        set {_world} to (world of {_loc}).getKey().value()
+        replace "_" with " " in {_world}
+        set {_owner} to {waystones::%loop-value%::owner}
+        if isFloodgatePlayer({_owner}) is true:
+            set {_ownerComp} to (minimessage from "<!i><white> <gray>Created by %name of {_owner}%")
+        else:
+            set {_ownerComp} to (minimessage from "<!i><white><head:%uuid of {_owner}%> <gray>Created by %name of {_owner}%")
+        set (component lore of {_items::%loop-iteration%}) to (minimessage from "<!i><white><sprite:items:item/compass_18> <gray>%x of {_loc}%, %y of {_loc}%, %z of {_loc}% in %proper case {_world}%"),{_ownerComp},(minimessage from "<!i><white><sprite:items:item/ender_pearl> <gray>Click to teleport")
+        add (minimessage from "<!i><white><sprite:items:item/painting> <gray>Press <gold><key:key.swapOffhand> <gray>to set waystone icon to your held item") to (component lore of {_items::%loop-iteration%}) if ({_p} is {_owner})
+        set (item model of {_items::%loop-iteration%}) to {waystones::%loop-value%::icon}
+        set (pdc tag "waystone_id" of {_items::%loop-iteration%}) to loop-value
+        if loop-value is {_current}:
+            set (enchantment glint of {_items::%loop-iteration%}) to true
+    # build gui
+    set {_gui} to (chest inventory with 6 rows named "Waystone Travel")
+    set (slots 46,47,48,49,50,51,52 of {_gui}) to ((black stained glass pane) without entire tooltip)
+    set {_back} to ((weakness tipped arrow) if ({_page} is 1) else (instant health tipped arrow))
+    set {_next} to ((weakness tipped arrow) if ({_page} is {_pageCount}) else (luck tipped arrow))
+    set (slot 45 of {_gui}) to ({_back} without entire tooltip)
+    set (slot 53 of {_gui}) to ({_next} without entire tooltip)
+    loop {_items::*}:
+        set (slot (loop-iteration)-1 of {_gui}) to loop-value
+    open {_gui} to {_p}
+    set {-playerData::%{_p}%::gui} to {_gui}
+    set {-playerData::%{_p}%::guiType} to "waystone_travel"
+    set {-playerData::%{_p}%::guiData::pageCount} to {_pageCount}
+    set {-playerData::%{_p}%::guiData::page} to {_page}
+    set {-playerData::%{_p}%::guiData::currentWaystone} to {_current}
+
+on any inventory click:
+    set {_topinv} to (top inventory)
+    {-playerData::%player%::gui} is {_topinv}
+    {-playerData::%player%::guiType} is "waystone_travel"
+    (clicked inventory) is {_topinv}
+    # back
+    if (index of clicked slot is 45):
+        {-playerData::%player%::guiData::page} > 1
+        openWaystoneTravel(player, {-playerData::%player%::guiData::page}-1, {-playerData::%player%::guiData::currentWaystone})
+    # next
+    else if (index of clicked slot is 53):
+        {-playerData::%player%::guiData::page} < {-playerData::%player%::guiData::pageCount}
+        openWaystoneTravel(player, {-playerData::%player%::guiData::page}+1, {-playerData::%player%::guiData::currentWaystone})
+    # travel
+    else if (clicked slot is a paper):
+        set {_id} to (pdc tag "waystone_id" of (clicked slot))
+        if {waystones::%{_id}%::name} isn't set:
+            send component (minimessage from "<red>This waystone doesn't seem to exist anymore") to player
+            play sound "minecraft:block.crafter.fail" in (ui) to player
+            close player's inventory
+            exit trigger
+        if event-inventoryaction is swap with hotbar:
+            player is {waystones::%{_id}%::owner}
+            set {_model} to ("minecraft:lodestone" if (player's tool is air) else (item model of player's tool))
+            set {waystones::%{_id}%::icon} to {_model}
+            openWaystoneTravel(player, {-playerData::%player%::guiData::page}, {-playerData::%player%::guiData::currentWaystone})
+        else:
+            {-playerData::%player%::guiData::currentWaystone} isn't {_id}
+            waystoneTp(player, {_id})
+
+# detect waystone placed
+
+on place of lodestone:
+    (item id of event-item) is "turtle:waystone"
+    set {_id} to createWaystone(event-block, player, true)
+    {_id} is set
+    send component (minimessage from "<sprite:blocks:block/lodestone_side> <white>Created Waystone: <aqua>%{waystones::%{_id}%::name}%") to player
+    play sound "minecraft:block.beacon.activate" in (blocks category) at event-block
+
+# activate / rename / travel
+
+on right click on lodestone:
+    player isn't sneaking
+    set {_id} to getWaystoneAt(event-block)
+    {_id} is set
+    # activate
+    if {PlayerData::%player%::waystones::%{_id}%} isn't set:
+        activateWaystone(event-block, player)
+        send component (minimessage from "<sprite:blocks:block/lodestone_side> <white>Activated Waystone: <aqua>%{waystones::%{_id}%::name}%") to player
+        play sound "minecraft:entity.player.levelup" in (blocks category) at event-block
+        draw (200 of enchanting particle) at event-block ~ vector(0,1,0)
+        cancel event
+        make player swing their hand
+        exit trigger
+    # rename
+    else if (player's tool is a name tag):
+        cancel event
+        if (custom name of (player's tool)) is set:
+            set {waystones::%{_id}%::name} to (custom name of (player's tool))
+            send component (minimessage from "<sprite:items:item/name_tag> <white>Renamed Waystone to: <aqua>%{waystones::%{_id}%::name}%") to player
+        else:
+            set {waystones::%{_id}%::name} to {waystones::%{_id}%::defaultName}
+            send component (minimessage from "<sprite:items:item/name_tag> <white>Reset Waystone name to: <aqua>%{waystones::%{_id}%::name}%") to player
+        play sound "minecraft:ui.cartography_table.take_result" in (blocks category) at event-block
+        make player swing their hand
+    # travel
+    else:
+        cancel event
+        openWaystoneTravel(player, 1, {_id})
+        make player swing their hand
+
+# detect waystone destroyed
+
+on break:
+    destroyWaystone(event-block) is true
+    if player's gamemode isn't creative:
+        drop (custom item "turtle:waystone") at event-block ~ vector(0.5,0.5,0.5)
+    play sound "minecraft:block.beacon.deactivate" in (blocks category) at event-block
+
+on explode:
+    loop exploded blocks:
+        destroyWaystone(loop-block) is true
+        drop (custom item "turtle:waystone") at loop-block ~ vector(0.5,0.5,0.5)
+        play sound "minecraft:block.beacon.deactivate" in (blocks category) at loop-block
+
+on block explode:
+    loop event-blocks:
+        destroyWaystone(loop-block) is true
+        drop (custom item "turtle:waystone") at loop-block ~ vector(0.5,0.5,0.5)
+        play sound "minecraft:block.beacon.deactivate" in (blocks category) at loop-block

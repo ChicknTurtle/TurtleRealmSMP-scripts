@@ -49,7 +49,7 @@ on player interact:
             cancel event
             set {_success} to true
             set (block only of event-block) to {_bark::%loop-value%}
-            make 10 of block using (type of event-block) at ((exact location of event-block) ~ event-vector)
+            draw (10 (type of event-block) block particle) at ((exact location of event-block) ~ event-vector)
             play sound "minecraft:block.bamboo_wood.break" in blocks category at event-block
     {_success} is true
     if event-equipmentslot is hand slot:

@@ -1,0 +1,78 @@
+
+brig command tree /turtle:config:
+    permission: op
+    trigger:
+        if command sender is console:
+            send "&cCannot open config gui in console."
+            exit trigger
+        openConfigPage(player)
+    literal arg "reload":
+        trigger:
+            reloadServerConfig()
+            send "§eReloaded server config."
+    string arg "path":
+        suggestions:
+            apply suggestion getAllConfigValuePaths(true)
+        trigger:
+            set {_realPath} to "root.%{_path}%"
+            set {_value} to getConfigValue({_realPath})
+            if {_value} isn't set:
+                send "§cConfig element '%{_path}%' doesn't exist."
+                exit trigger
+            set {_defaultText} to ("§r§7 (default)" if (getWhetherConfigValueIsDefault({_realPath}) is true) else "")
+            send "§fConfig element §b%{_path}%§f is set to: %{_value}%%{_defaultText}%"
+        literal arg "set":
+            greedy string arg "value":
+                suggestions:
+                    apply suggestions getConfigValueSuggestions("root.%{_path}%")
+                trigger:
+                    set {_realPath} to "root.%{_path}%"
+                    set {_element} to getConfigElement({_realPath})
+                    if {_element} isn't set:
+                        send "§cConfig element '%{_path}%' doesn't exist."
+                        exit trigger
+                    set {_settingType} to try {_element}.get("type").getAsString()
+                    if {_settingType} is "boolean":
+                        {_value} isn't "true" or "false"
+                        send "§cInvalid boolean value for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    else if {_settingType} is "slider":
+                        set {_valueFloat} to ({_value} parsed as number)
+                        if {_valueFloat} isn't set:
+                            send "§cInvalid number value for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                        set {_settingStart} to try {_element}.get("start").getAsFloat()
+                        if {_settingStart} is set:
+                            {_valueFloat} < {_settingStart}
+                            send "§cValue is under min of %{_settingStart}% for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                        set {_settingEnd} to try {_element}.get("end").getAsFloat()
+                        if {_settingEnd} is set:
+                            {_valueFloat} > {_settingEnd}
+                            send "§cValue is over max of %{_settingEnd}% for element §b%{_path}%§c: %{_value}%"
+                            exit trigger
+                    else if {_settingType} is "text":
+                        set {_settingMax} to try {_element}.get("max").getAsInt()
+                        {_settingMax} is set
+                        length of {_value} > {_settingMax}
+                        send "§cValue is over max length of %{_settingMax}% for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    else if {_settingType} is "options":
+                        set {_options::*} to ...(try {_element}.get("options").keySet())
+                        {_options::*} doesn't contain {_value}
+                        send "§cInvalid option for element §b%{_path}%§c: %{_value}%"
+                        exit trigger
+                    set {_realPath} to "root.%{_path}%"
+                    if setConfigValue({_realPath}, {_value}) is true:
+                        send "§fConfig element §b%{_path}%§f has been set to: %{_value}%"
+                    else:
+                        send "§cInvalid value for element §b%{_path}%§c: %{_value}%"
+        literal arg "reset":
+            trigger:
+                set {_realPath} to "root.%{_path}%"
+                set {_element} to getConfigElement({_realPath})
+                if {_element} isn't set:
+                    send "§cConfig element '%{_path}%' doesn't exist."
+                    exit trigger
+                delete {configValues::%{_realPath}%}
+                send "§fConfig element §b%{_path}%§f has been reset to default."

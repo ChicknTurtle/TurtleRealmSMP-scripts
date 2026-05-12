@@ -1,0 +1,14 @@
+
+on server resources reloaded:
+    customItems_loadItems()
+    wait 1 tick
+    customItems_loadRecipes()
+    wait 1 tick
+    customItems_processRecipes()
+
+function customItems_loadItems():
+    clear {-customItems::*}
+    log info "‍🔥 Loading custom items..."
+    call custom event "registerCustomItems"
+    set {_s} to "" if (size of (indexes of {-customItems::*}) is 1) else "s"
+    log info "Loaded §b%size of (indexes of {-customItems::*})% §rcustom item%{_s}%."

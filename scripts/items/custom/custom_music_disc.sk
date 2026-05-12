@@ -15,16 +15,16 @@ when ready to load recipes:
 
 function updateCustomMusicDisc(disc:item, song:object={_}) :: item:
     if {_song} isn't set:
-        clear lore of {_disc}
+        clear (lore of {_disc})
         return {_disc}
     if {_song}.title ? "" isn't "":
-        add "§7%{_song}.title%" to {_c::*}
+        add "<!i>§7%{_song}.title%" to {_c::*}
     if {_song}.author ? "" isn't "":
-        add "§7by %{_song}.author%" to {_c::*}
+        add "<!i>§7by %{_song}.author%" to {_c::*}
     if {_song}.originalAuthor ? "" isn't "":
-        add "§7Originally by %{_song}.originalAuthor%" to {_c::*}
-    set {_c::*} to {_c::*} ? "§7No song info"
-    set lore of {_disc} to {_c::*}
+        add "<!i>§7Originally by %{_song}.originalAuthor%" to {_c::*}
+    set {_c::*} to {_c::*} ? "<!i>§7No song info"
+    set (lore of {_disc}) to {_c::*}
     return {_disc}
 
 on anvil prepare:

@@ -1,46 +1,35 @@
 
-on load:
-    set {-features::joinleavemsgs::name} to "Join/leave messages"
-    set {-features::joinleavemsgs::desc} to "Better looking join and leave messages"
-    set {-features::joinleavemsgs::icon} to oak door
-
-    set {-features::deathmsgs::name} to "Death messages"
-    set {-features::deathmsgs::desc} to "Better looking death messages"
-    set {-features::deathmsgs::warn} to "Doesn't work for pets"
-    set {-features::deathmsgs::icon} to skeleton skull
-
-    set {-features::customchat::name} to "Custom chat"
-    set {-features::customchat::desc} to "Better looking and colorable chat messages\n[item] is replaced with your held item"
-    set {-features::customchat::icon} to oak sign
-
 on join:
-    {enabledFeatures::joinleavemsgs} is true
+    if getConfigValue("root.discord.joinLeaveMessages") is true:
+        discordSend("**+** %player%")
+    getConfigValue("root.chat.customChat.joinLeaveMessages") is true
     set {_c::1} to "§a+ §7| "
     set {_c::2} to playerComponent(player)
     set {_c::3} to " joined the game"
     clear join message
     send components (merge components {_c::*}) to (all players and console)
-    discordSend("**+** %player%")
 
 on leave:
-    {enabledFeatures::joinleavemsgs} is true
+    if getConfigValue("root.discord.joinLeaveMessages") is true:
+        discordSend("**-** %player%")
+    getConfigValue("root.chat.customChat.joinLeaveMessages") is true
     set {_c::1} to "§c- §7| "
     set {_c::2} to playerComponent(player)
     set {_c::3} to " left the game"
     clear leave message
     send components (merge components {_c::*}) to (all players and console)
-    discordSend("**-** %player%")
 
 on death of player:
     event.getShowDeathMessages() is true
-    {enabledFeatures::deathmsgs} is true
-    discordSend(":skull: %uncolored death message%")
+    if getConfigValue("root.discord.deathMessages") is true:
+        discordSend(":skull: %uncolored death message%")
+    getConfigValue("root.chat.customChat.deathMessages") is true
     set {_c} to (text component from "§c☠ §7")
     add (component death message) to {_c}
     set (component death message) to {_c}
 
 on async chat:
-    {enabledFeatures::customchat} is true
+    getConfigValue("root.chat.customChat.enabled") or getConfigValue("root.discord.playerChats") is true
     set {_msg} to (async chat message)
     # create format
     # {_msg} is used for discord
@@ -49,14 +38,18 @@ on async chat:
     set (color format of {_c::2}) to {-chatColors::%{PlayerData::%player%::chatColor}%} ? colorCodeToColor("7")
     set {_c::3} to (text component from " &r")
     set (color format of {_c::3}) to (color format of {_c::2})
-    set {_c::4} to (colored async chat message)
+    if getConfigValue("root.chat.customChat.colorableChat") is true:
+        set {_c::4} to (colored async chat message)
+    else:
+        set {_c::4} to (async chat message)
     set {_format} to (merge components {_c::*})
 
     set {_c::1} to playerComponent(player, false, colorCodeToColor("7"))
     set {_bedrockFormat} to (merge components {_c::*})
 
     # replace [item]
-    if "%{_format}%" contains "[item]":
+    if getConfigValue("root.chat.customChat.displayHeldItem") is true:
+        "%{_format}%" contains "[item]"
         (player's tool) isn't air
         set {_name} to (effective name of (player's tool))
         component replace first "[item]" with (item chat component of (player's tool)) in {_format}
@@ -64,8 +57,25 @@ on async chat:
         replace "[item]" with "**[%{_name}%]**" in {_msg}
 
     # send message
-    discordChat({_msg}, player)
+    if getConfigValue("root.discord.playerChats") is true:
+        discordChat({_msg}, player)
+    getConfigValue("root.chat.customChat.enabled") is true
     set async chat format to {_format}
-    set {_bedrockPlayers::*} to (all players where [(try {-fgApi}.isFloodgatePlayer(uuid of input)) is true])
+    set {_bedrockPlayers::*} to (all players where [isFloodgatePlayer(input) is true])
     remove {_bedrockPlayers::*} from async chat viewers
     send component {_bedrockFormat} to {_bedrockPlayers::*}
+
+function discordChat(msg:string, p:player):
+    # waypoint
+    if {_msg} contains "xaero-waypoint:":
+        set {_parts::*} to {_msg} split at ":"
+        loop {_parts::*}:
+            loop-value is "xaero-waypoint"
+            set {_name} to {_parts::%loop-iteration+1%}
+            stop loop
+        set {_name} to "Shared Waypoint" if ({_name} ? "") is ""
+        discordSend(":round_pushpin: %{_p}'s name% shared a waypoint called **%{_name}%**")
+        stop
+    # chat
+    set {_msg} to mcToMarkdown({_msg})
+    discordSend("%{_p}'s name%: %{_msg}%")

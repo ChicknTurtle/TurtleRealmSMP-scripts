@@ -1,17 +1,10 @@
 
-on load:
-    set {-features::musicdiscrecipes::name} to "Music disc recipes"
-    set {-features::musicdiscrecipes::desc} to "Craftable music discs using disc fragments"
-    set {-features::musicdiscrecipes::warn} to "Requires server reload when disabling"
-    set {-features::musicdiscrecipes::icon} to music disc cat with nbt from "{""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}"
-
 when ready to register custom items:
     set (custom item "turtle:music_disc_milky_ways") to (music disc cat with nbt from "{""minecraft:item_model"":""turtle:music_disc_milky_ways"",""minecraft:rarity"":""epic"",""minecraft:jukebox_playable"":""turtle:milky_ways""}")
     set (custom item "minecraft:cake") to (cake with nbt from "{""minecraft:jukebox_playable"":""turtle:portal_radio"",""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}")
 
 # disc recipes
 when ready to load recipes:
-    {enabledFeatures::musicdiscrecipes} is true
     remove recipe "minecraft:music_disc_5"
     register shaped recipe:
         id: "turtle:music_disc_cat"

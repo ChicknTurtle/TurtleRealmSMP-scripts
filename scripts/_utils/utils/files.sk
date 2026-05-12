@@ -1,6 +1,11 @@
 
 import:
     java.io.File as javaFile
+    java.io.FileInputStream
+    java.util.concurrent.CompletableFuture
+
+function newFile(path:object) :: object:
+    return new javaFile({_path})
 
 function getFileName(filename:string) :: string:
     set {_name::*} to {_filename} split at "."
@@ -10,6 +15,9 @@ function getFileExt(filename:string) :: string:
     if {_filename} doesn't contain ".":
         return ""
     return last element of ({_filename} split at ".")
+
+function fileToFuture(file:object) :: object:
+    return CompletableFuture.completedFuture(new FileInputStream({_file}))
 
 local function getFiles(dir:string) :: strings:
     set {_dir} to new javaFile({_dir})

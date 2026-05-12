@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:jungle_log",
+      "components": {
+        "minecraft:item_model": "turtle:banana"
+      }
+    },
+    "title": "OH BANANA",
+    "description": "Find a banana",
+    "frame": "task"
+  },
+  "parent": "turtle:adventure/tarzan",
+  "criteria": {
+    "banana": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:firework_star",
+            "components": {
+              "minecraft:custom_data": "{PublicBukkitValues:{\"minecraft:customitems.id\":\"turtle:banana\"}}"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+
+import:
+    io.papermc.paper.registry.RegistryAccess
+
+biome property condition tagged (as|with) [biome tag] %string/namespacedkey%:
+    check:
+        set {_key} to (tag key "%expr-2%" from biome registry)
+        RegistryAccess.registryAccess().getRegistry(biome registry).getTag({_key}).isTagged(expr-1) is true
+        continue

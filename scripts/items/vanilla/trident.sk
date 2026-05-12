@@ -1,4 +1,3 @@
-using damage source
 
 on riptide:
     set {-playerData::%player%::riptideitem} to event-item

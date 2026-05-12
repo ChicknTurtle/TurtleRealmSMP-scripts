@@ -20,7 +20,7 @@ when ready to load recipes:
             set ingredient of "b" to (iron block)
 
 local function updateItem(item:item) :: item:
-    add "§7Capable of transporting blocks like spawners and vaults" to {_l::*}
+    add "<!i>§7Capable of transporting blocks like spawners and vaults" to {_l::*}
     set {_holding} to (compound tag "holding" of (custom nbt of {_item}))
     if ("%{_holding}%" ? "{}") isn't "{}":
         set (item model of {_item}) to "turtle:heavy_plow_closed"
