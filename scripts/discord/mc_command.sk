@@ -1,0 +1,45 @@
+
+brig command tree /turtle:discord:
+    trigger:
+        set {_inviteUrl} to getConfigValue("root.discord.inviteUrl")
+        if {_inviteUrl} is "":
+            send "§cNo Discord invite url has been configured"
+            exit trigger
+        send formatted "§fJoin the Discord: <click:open_url:'https://discord.gg/%{_inviteUrl}%'><hover:show_text:'§fClick to join!'>§b§ndiscord.gg/%{_inviteUrl}%"
+    literal arg "link":
+        trigger:
+            player is set
+            if {discord::links::mc::%uuid of player%} is set:
+                run section {-discord::sections::getUser} async with {discord::links::mc::%uuid of player%} and store result in {_user} and wait
+                send formatted "§fYour account is linked to %discordUserComp({_user})%<reset>. Use §a<click:suggest_command:'/discord unlink'>/discord unlink<reset>§f if you wish to unlink your account"
+            else:
+                send "§fYour account isn't linked! Link it by running §b/link§f on Discord"
+        greedystring arg "code":
+            trigger:
+                player is set
+                if {discord::links::mc::%uuid of player%} is set:
+                    run section {-discord::sections::getUser} async with {discord::links::mc::%uuid of player%} and store result in {_user} and wait
+                    send formatted "§fYour account is already linked to %discordUserComp({_user})%<reset>! Use §a<click:suggest_command:'/discord unlink'>/discord unlink<reset>§f if you wish to unlink your account"
+                    exit trigger
+                if {-discord::pendingLinks::%{_code}%::player} isn't player:
+                    send "§fThe pending link for '%{_code}%' doesn't exist or has expired. §eMake sure you typed the code correctly!"
+                    exit trigger
+                if {-discord::pendingLinks::%{_code}%::expires} is in the past:
+                    send "§fThis pending link has expired! §eTry requesting again from Discord"
+                    delete {-discord::pendingLinks::%{_code}%::*}
+                    exit trigger
+                set {_user} to {-discord::pendingLinks::%{_code}%::user}
+                set {_userId} to {_user}.getId()
+                set {discord::links::mc::%uuid of player%} to {_userId}
+                set {discord::links::discord::%{_userId}%} to (uuid of player)
+                delete {-discord::pendingLinks::%{_code}%::*}
+                send formatted "§fLinked %discordUserComp({_user})%<reset>§f to your account! Use §a<click:suggest_command:'/discord unlink'>/discord unlink<reset>§f if you wish to unlink your account"
+    literal arg "unlink":
+        trigger:
+            if {discord::links::mc::%uuid of player%} is set:
+                run section {-discord::sections::getUser} async with {discord::links::mc::%uuid of player%} and store result in {_user} and wait
+                delete {discord::links::discord::%{discord::links::mc::%uuid of player%}%}
+                delete {discord::links::mc::%uuid of player%}
+                send formatted "§fYour account has been unlinked from %discordUserComp({_user})%<reset>. You can link it again by running §b/link§f on Discord"
+            else:
+                send "§fYour account isn't linked! Link it by running §b/link§f on Discord"

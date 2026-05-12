@@ -1,0 +1,110 @@
+
+function processBarrel(b:block):
+    set {_above} to (block above {_b})
+    set {_below} to (block below {_b})
+    set {_sides::*} to (block north of {_b}),(block east of {_b}),(block south of {_b}),(block west of {_b})
+
+    # find what processes this barrel can perform
+    # blasting
+    if any of ({_below} and {_sides::*}) is lava (itemtype):
+        set {_processes::blasting} to true
+    # haunting
+    if any:
+        {_below} is soul campfire
+        any of {_sides::*} is soul fire
+    then:
+        set {_processes::haunting} to true
+    # smoking
+    if any:
+        {_below} is campfire (itemtype)
+        any of {_sides::*} is fire
+    then:
+        set {_processes::smoking} to true
+    # freezing
+    if any of ({_below} and {_sides::*}) is blue ice:
+        set {_processes::freezing} to true
+    # washing
+    if any of ({_below} and {_sides::*}) is bubble column:
+        set {_processes::washing} to true
+    # pressing
+    if ({_above} is tagged with (block tag "minecraft:anvil")):
+        set {_processes::pressing} to true
+    
+    exit trigger if {_processes::*} isn't set
+    
+    # perform processes
+    set {_resultInv} to ((inventory of {_below}) if ({_below} is a hopper) else (inventory of {_b}))
+    loop (items in inventory of {_b}):
+        loop (indexes of {_processes::*}):
+            set {_iid} to (item id of loop-value-1)
+            # item has recipe for process type
+            (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}) is set
+            # calculate spawnitems from recipe results
+            delete {_spawnitems::*}
+            loop (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}):
+                chance of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::chance}
+                add {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::amount} of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::item} to {_spawnitems::*}
+            add (updated (use remainder of loop-value-1)) to {_spawnitems::*}
+            set {_spawnitems::*} to {_spawnitems::*} ? air
+            # add items if they fit
+            {_resultInv} has space for {_spawnitems::*}
+            remove 1 from (item amount of loop-value-1)
+            add {_spawnitems::*} to {_resultInv}
+            set {_success::%loop-value-2%} to true
+            exit 2 loops
+    
+    # particles & sounds
+    # blasting
+    if {_success::blasting} is true:
+        play sound "minecraft:item.firecharge.use" in (blocks category) at {_b}
+        draw (5 lava particle) at {_b}
+    # haunting
+    else if {_success::haunting} is true:
+        play sound "minecraft:item.firecharge.use" in (blocks category) with pitch 0.5 at {_b}
+        play sound "minecraft:particle.soul_escape" in (blocks category) at {_b}
+        draw (5 smoke particle with particle speed 0.1) at {_b}
+    # smoking
+    else if {_success::smoking} is true:
+        play sound "minecraft:item.firecharge.use" in (blocks category) with pitch 0.5 at {_b}
+        draw (5 smoke particle with particle speed 0.1) at {_b}
+    # freezing
+    else if {_success::freezing} is true:
+        play sound "minecraft:block.composter.ready" in (blocks category) at {_b}
+        draw (5 poof particle with particle speed 0.1) at {_b}
+    # washing
+    else if {_success::washing} is true:
+        play sound "minecraft:entity.generic.splash" in (blocks category) at {_b}
+        draw (5 poof particle with particle speed 0.1) at {_b}
+    # pressing
+    else if {_success::pressing} is true:
+        play sound "minecraft:block.anvil.land" in (blocks category) with pitch 0.8 at {_b}
+        draw (5 poof particle with particle speed 0.1) at {_b}
+
+on place of barrel:
+    {barrels::%event-block%} isn't set
+    set {barrels::%event-block%} to event-block
+
+on inventory open:
+    set {_holder} to try (holder of event-inventory).getBlock()
+    {_holder} is a barrel
+    {barrels::%{_holder}%} isn't set
+    set {barrels::%{_holder}%} to {_holder}
+
+# spread load across the 10s
+every 10 seconds:
+    set {_barrels::*} to (shuffled {barrels::*})
+    set {_size} to (size of {_barrels::*})
+    exit trigger if ({_size} is 0)
+    set {_start} to now
+    loop {_barrels::*}:
+        # wait
+        set {_targetTick} to floor(loop-iteration * 200 / {_size})
+        set {_elapsed} to (ticks of (time since {_start}))
+        set {_wait} to {_targetTick} - {_elapsed}
+        wait (1 tick * {_wait}) if ({_wait} >= 1)
+        # process
+        if (chunk at (exact location of loop-value) is loaded):
+            if loop-value isn't a barrel:
+                delete {barrels::%loop-value%}
+                continue
+            processBarrel(loop-value)

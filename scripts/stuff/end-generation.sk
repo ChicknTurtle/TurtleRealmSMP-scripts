@@ -22,7 +22,7 @@ on chunk generate:
         # Ender vault entrance
         loop (blocks in event-chunk where [input is sculk]):
             set block at loop-block to air
-            place (structure named "turtle:ender_vault_entrance") at ((loop-block's location) ~ vector(-4,-24,-4))
+            place (structure template named "turtle:ender_vault_entrance") at ((loop-block's location) ~ vector(-4,-24,-4))
         # Ender vault shulkers
         loop (blocks in event-chunk where [input is (medium amethyst bud) or (large amethyst bud)]):
             set {_block} to (type of block at loop-block)

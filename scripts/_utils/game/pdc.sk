@@ -1,0 +1,59 @@
+
+import:
+    org.bukkit.persistence.PersistentDataType
+
+local function getPDC(container:javaobject, key:namespacedkey) :: object:
+    loop PersistentDataType.STRING, PersistentDataType.BOOLEAN, PersistentDataType.LONG:
+        set {_value} to try {_container}.get({_key}, loop-value)
+        return {_value} if {_value} is set
+
+local function setPDC(container:javaobject, key:namespacedkey, value:object):
+    if {_value} isn't set:
+        {_container}.remove({_key})
+    else if {_value} is a text:
+        {_container}.set({_key}, PersistentDataType.STRING, {_value})
+    else if {_value} is a boolean:
+        {_container}.set({_key}, PersistentDataType.BOOLEAN, {_value})
+    else if {_value} is a number:
+        {_container}.set({_key}, PersistentDataType.LONG, {_value})
+
+expression:
+    patterns:
+        (pdc|data) (tag|value) %string/namespacedkey% of %itemtype/entity%
+    return type: object
+    get:
+        set {_key} to (expr-1 if (expr-1 is a namespacedkey) else (namespacedkey from expr-1))
+        if (try expr-2.getItemMeta()) is set:
+            set {_container} to expr-2.getItemMeta().getPersistentDataContainer()
+        else:
+            set {_container} to (try expr-2.getPersistentDataContainer())
+        return {_} if {_container} isn't set
+        return getPDC({_container}, {_key})
+    set:
+        set {_key} to (expr-1 if (expr-1 is a namespacedkey) else (namespacedkey from expr-1))
+        if (try expr-2.getItemMeta()) is set:
+            set {_meta} to expr-2.getItemMeta()
+            set {_container} to {_meta}.getPersistentDataContainer()
+            set {_isItem} to true
+        else:
+            set {_container} to (try expr-2.getPersistentDataContainer())
+        exit trigger if {_container} isn't set
+        setPDC({_container}, {_key}, change value)
+        if {_isItem} is true:
+            set {_item} to expr-2
+            {_item}.setItemMeta({_meta})
+            set (raw expression of expr-2) to {_item}
+    delete:
+        set {_key} to (expr-1 if (expr-1 is a namespacedkey) else (namespacedkey from expr-1))
+        if (try expr-2.getItemMeta()) is set:
+            set {_meta} to expr-2.getItemMeta()
+            set {_container} to {_meta}.getPersistentDataContainer()
+            set {_isItem} to true
+        else:
+            set {_container} to (try expr-2.getPersistentDataContainer())
+        exit trigger if {_container} isn't set
+        setPDC({_container}, {_key}, {_})
+        if {_isItem} is true:
+            set {_item} to expr-2
+            {_item}.setItemMeta({_meta})
+            set (raw expression of expr-2) to {_item}

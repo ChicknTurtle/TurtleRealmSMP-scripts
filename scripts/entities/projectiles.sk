@@ -1,0 +1,12 @@
+
+# projectile knockback
+on projectile collide:
+    set {_proj} to event-projectile
+    {_proj} is a snowball, an egg, a blue egg, a brown egg, or an ender pearl
+    event-entity is a player
+    set {_source} to custom damage source:
+        set damage type to thrown
+        set causing entity to (shooter of {_proj})
+        set direct entity to {_proj}
+        set damage location to (location of {_proj})
+    damage event-entity by 0.00000000000000001 using {_source}

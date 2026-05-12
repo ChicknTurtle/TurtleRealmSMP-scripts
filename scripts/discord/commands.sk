@@ -1,9 +1,18 @@
 
-# /list
-slash command list:
-    description: List all online players
-    bot: ChatLink
-    trigger:
+import:
+    java.util.ArrayList
+    net.dv8tion.jda.api.interactions.commands.build.OptionData
+    net.dv8tion.jda.api.interactions.commands.OptionType
+    net.dv8tion.jda.api.components.textinput.TextInput
+    net.dv8tion.jda.api.components.textinput.TextInputStyle
+    net.dv8tion.jda.api.components.label.Label
+    net.dv8tion.jda.api.modals.Modal
+
+# Register modals and commands
+
+function jdaRegisterCommands():
+    # list
+    create section with {_event} stored in {_callback}:
         set {_p::*} to (all players)
         set {_size} to (size of {_p::*})
         set {_s} to ("" if {_size} is 1 else "s")
@@ -15,23 +24,104 @@ slash command list:
                 add " (AFK for %minutes of {_afkTime}%m)" to {_response}
             loop-iteration isn't (size of {_p::*})
             add ", " to {_response}
-        reply with hidden {_response}
-
-# /exec
-slash command exec <string="command">:
-    description: Remotely run effect commands
-    bot: ChatLink
-    arguments:
-        code: Command to execute
-    trigger:
-        # permission
-        if {-env::discordExecIds::*} contains (discord id of event-user):
-            set {_command} to argument "command" as string
+        {_event}.reply("%{_response}%").setEphemeral(true).queue()
+    registerSlashCommand("list", "List all online players", {_callback})
+    
+    # exec
+    create section with {_event} stored in {_callback}:
+        if all:
+            getConfigValue("root.discord.execEnabled") is true
+            (split getConfigValue("root.discord.execUsers") at ",") contains {_event}.getUser().getId()
+        then:
+            set {_command} to {_event}.getOption("command").getAsString()
             log info "Executing command from discord: §3%{_command}%"
             if parse effect {_command} = true:
-                reply with hidden ":white_check_mark: Successfully executed `%{_command}%`"
+                {_event}.reply(":white_check_mark: Successfully executed `%{_command}%`").setEphemeral(true).queue()
             else:
-                reply with hidden ":warning: Failed to execute `%{_command}%`"
+                {_event}.reply(":warning: Failed to execute `%{_command}%`").setEphemeral(true).queue()
         else:
-            reply with hidden "You don't have permission to do this."
+            {_event}.reply("You don't have permission to do this.").setEphemeral(true).queue()
             exit trigger
+    set {_options::1} to new OptionData(OptionType.STRING, "command", "Skript effect command to execute", true)
+    registerSlashCommand("exec", "Remotely execute effect commands", {_callback}, {_options::*})
+
+    # link accounts modal
+    create section with {_event} stored in {_callback}:
+        set {_username} to {_event}.getValue("username").getAsString()
+        set {_username} to (first 32 characters of {_username})
+        set {_p} to player({_username})
+        if {_p} isn't set:
+            {_event}.reply("Player `%{_username}%` isn't online! Join the server and try again").setEphemeral(true).queue()
+            exit trigger
+        set {_user} to {_event}.getUser()
+        set {_code} to {_user}.getName()
+        set {-discord::pendingLinks::%{_code}%::user} to {_user}
+        set {-discord::pendingLinks::%{_code}%::player} to {_p}
+        set {-discord::pendingLinks::%{_code}%::expires} to now+120 seconds
+        {_event}.reply("Sent a link request to **%{_username}%**. Accept it in-game with%nl%```/discord link %{_code}%```").setEphemeral(true).queue()
+        send formatted "§fDiscord link request from %discordUserComp({_user})%<reset>§f! Run §a<click:suggest_command:'/discord link '>/discord link %{_code}%§f to accept it" to {_p}
+    set {_input} to TextInput.create("username", TextInputStyle.SHORT).setPlaceholder("Notch").setRequired(true).build()
+    set {_label} to Label.of("Username", {_input})
+    set {_modal} to Modal.create("link_accounts", "Link your account to Minecraft").addComponents({_label}).build()
+    registerModal("link_accounts", {_modal}, {_callback})
+    # link command
+    create section with {_event} stored in {_callback}:
+        if {discord::links::discord::%{_event}.getUser().getId()%} is set:
+            set {_p} to offlineplayer({discord::links::discord::%{_event}.getUser().getId()%})
+            {_event}.reply("Your account is already linked to `%name of {_p}%`! Use </unlink:%{-discord::commands::unlink}.getId()%> if you wish to unlink your account").setEphemeral(true).queue()
+            exit trigger
+        {_event}.replyModal({-discord::modals::link_accounts}).queue()
+    registerSlashCommand("link", "Link your account to Minecraft", {_callback})
+    
+    # unlink command
+    create section with {_event} stored in {_callback}:
+        set {_user} to {_event}.getUser()
+        if {discord::links::discord::%{_user}.getId()%} isn't set:
+            {_event}.reply("Your account isn't linked!").setEphemeral(true).queue()
+            exit trigger
+        set {_p} to offlineplayer({discord::links::discord::%{_user}.getId()%})
+        delete {discord::links::mc::%{discord::links::discord::%{_user}.getId()%}%}
+        delete {discord::links::discord::%{_user}.getId()%}
+        {_event}.reply("Your account has been unlinked from `%name of {_p}%`!").setEphemeral(true).queue()
+        {_p} is online
+        send formatted "§fYour account has been unlinked from %discordUserComp({_user})%<reset>. You can link it again by running §b/link§f on Discord" to {_p}
+    registerSlashCommand("unlink", "Unlink your account from Minecraft", {_callback})
+
+    # uploadnbs
+    create section with {_event} stored in {_callback}:
+        {_event}.deferReply(true).queue()
+        set {_user} to {_event}.getUser()
+        # linked user
+        set {_p} to {discord::links::discord::%{_user}.getId()%}
+        if {_p} isn't set:
+            {_event}.getHook().sendMessage("You must have your account linked to upload a song! Use </link:%{-discord::commands::link}.getId()%>").queue()
+            exit trigger
+        set {_p} to player({_p})
+        # check .nbs file
+        set {_fileAttachment} to {_event}.getOption("file").getAsAttachment()
+        if {_fileAttachment}.getFileExtension() isn't "nbs":
+            {_event}.getHook().sendMessage("The file you tried to upload isn't a valid song file. Valid song files end with .nbs%nl%You can find songs on [Note Block World](<https://noteblock.world/>).").queue()
+            exit trigger
+        # get filename
+        set {_filenameNoExt} to getFileName({_fileAttachment}.getFileName())
+        set {_filename} to (first 30 characters of {_filenameNoExt})
+        replace "_" with " " in {_filename}
+        set {_filename} to (try {_filename}.trim()) ? {_filename}
+        while {_filename} contains "  ":
+            replace "  " with " " in {_filename}
+            exit loop if (loop-iteration > 100)
+        # msgs
+        log info "%{_user}.getGlobalName()% (%{_user}.getName()%) is uploading '%{_filename}%.nbs'"
+        # check if song file is valid
+        set {_song} to validateNbsFile(try {_fileAttachment}.getProxy().download())
+        if {_song} is set:
+            set {_downloadedFile} to {_fileAttachment}.getProxy().downloadToFile(newFile("nbsSongs/%{_filename}%.nbs")).get()
+            log debug "Caching uploaded song '%{_filename}%'"
+            set {-nbsSongCache::%{_filename}%} to {_song}
+            if {_p} is set:
+                send formatted "§b🎶 §fYou uploaded the song §b<hover:show_text:'§bClick to apply to held disc'><click:run_command:'/turtle:nbs apply %{_filename}%'>%{_filename}%<reset>§f!" to {_p}
+            {_event}.getHook().sendMessage(":cd: Your song has been uploaded as `%{_filename}%`! :notes:%nl%Your file could be deleted or overwritten by another user, so don't lose your original file! See [Custom Music Disc](<https://github.com/ChicknTurtle/TurtleRealmSMP-scripts/wiki/Custom-Music-Disc>) to learn how to listen to your song in-game.").queue()
+        else:
+            {_event}.getHook().sendMessage("Your file `%{_fileAttachment}.getFileName()%` was not uploaded because it was found to be an invalid song file.%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>).").queue()
+    set {_options::1} to new OptionData(OptionType.ATTACHMENT, "file", "File to upload, must be a .nbs file", true)
+    registerSlashCommand("uploadnbs", "Upload a song file to use with a Custom Music Disc", {_callback}, {_options::*})

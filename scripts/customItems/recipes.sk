@@ -1,0 +1,251 @@
+
+import:
+    java.lang.Object
+    java.lang.Character
+    java.lang.reflect.Array
+    org.bukkit.Bukkit
+    org.bukkit.inventory.ShapedRecipe
+    org.bukkit.inventory.ShapelessRecipe
+    org.bukkit.inventory.RecipeChoice
+
+function customItems_loadRecipes():
+    log info "🛠️ Loading server recipes..."
+    set {_vanilla} to (size of all recipes)
+    call custom event "registerCustomRecipes"
+    unlock recipes (all recipes) for (all players)
+    update server recipes
+    set {_custom} to ((size of all recipes)-{_vanilla})
+    set {_s} to "" if ({_custom} is 1) else "s"
+    log info "Loaded §b%{_vanilla}% §rdefault and §b%{_custom}% §rcustom recipe%{_s}%."
+
+function customItems_processRecipes():
+    set {_start} to now
+    delete {-recipeData::*}
+    loop all recipes:
+        processRecipe(loop-value)
+        mod(loop-iteration, 500) is 0
+        wait 1 tick
+    log info "Finished processing recipes in %formatTimespan(time since {_start})%!"
+
+local function boundingBoxFromMatrix(matrix:object) :: objects:
+    set {_len} to Array.getLength({_matrix})
+    set {_size} to (2 if ({_len} is 4) else 3)
+    set {_minCol} to ∞
+    set {_maxCol} to 0
+    set {_minRow} to ∞
+    set {_maxRow} to 0
+    loop {_size} times:
+        set {_r} to (loop-iteration) - 1
+        loop {_size} times:
+            set {_c} to (loop-iteration-2) - 1
+            set {_value} to Array.get({_matrix}, {_r} * {_size} + {_c})
+            {_value} is set
+            {_value} isn't air
+            set {_minCol} to {_c} if ({_c} < {_minCol})
+            set {_maxCol} to {_c} if ({_c} > {_maxCol})
+            set {_minRow} to {_r} if ({_r} < {_minRow})
+            set {_maxRow} to {_r} if ({_r} > {_maxRow})
+    return {_minRow}, {_minCol}, {_maxRow}, {_maxCol}
+
+local function boundingBoxFromShape(shape:strings) :: objects:
+    set {_minCol} to ∞
+    set {_maxCol} to 0
+    set {_minRow} to ∞
+    set {_maxRow} to 0
+    loop (size of {_shape::*}) times:
+        set {_r} to loop-iteration
+        loop (length of {_shape::%loop-iteration%}) times:
+            set {_c} to (loop-iteration-2)
+            set {_cell} to character at {_c} of {_shape::%{_r}%}
+            if {_cell} is set:
+                if {_cell} isn't " ":
+                    set {_minCol} to {_c} if ({_c} < {_minCol})
+                    set {_maxCol} to {_c} if ({_c} > {_maxCol})
+                    set {_minRow} to {_r} if ({_r} < {_minRow})
+                    set {_maxRow} to {_r} if ({_r} > {_maxRow})
+    return {_minRow}, {_minCol}, {_maxRow}, {_maxCol}
+
+# 2d array > cropped array
+function cropCraftingMatrix(matrix:object) :: object:
+    set {_len} to Array.getLength({_matrix})
+    set {_size} to (2 if ({_len} is 4) else 3)
+    set {_bb::*} to boundingBoxFromMatrix({_matrix})
+    set {_minRow} to {_bb::1}
+    set {_minCol} to {_bb::2}
+    set {_maxRow} to {_bb::3}
+    set {_maxCol} to {_bb::4}
+    set {_cropW} to {_maxCol} - {_minCol} + 1
+    set {_cropH} to {_maxRow} - {_minRow} + 1
+    set {_out} to new Object[{_cropW} * {_cropH}]
+    loop {_cropH} times:
+        set {_r} to (loop-iteration) - 1 + {_minRow}
+        loop {_cropW} times:
+            set {_c} to (loop-iteration-2) - 1 + {_minCol}
+            set {_i} to ((loop-iteration-1) - 1) * {_cropW} + ((loop-iteration-2) - 1)
+            Array.set({_out}, {_i}, Array.get({_matrix}, {_r} * {_size} + {_c}))
+    return {_out}
+
+# 2d array of items > compressed binary string (unset or air = 0)
+function compressCraftingMatrix(matrix:object) :: string:
+    set {_len} to Array.getLength({_matrix})
+    set {_size} to (2 if ({_len} is 4) else 3)
+    set {_bb::*} to boundingBoxFromMatrix({_matrix})
+    set {_minRow} to {_bb::1}
+    set {_minCol} to {_bb::2}
+    set {_maxRow} to {_bb::3}
+    set {_maxCol} to {_bb::4}
+    loop ({_maxRow} - {_minRow} + 1) times:
+        set {_r} to (loop-iteration) - 1 + {_minRow}
+        loop ({_maxCol} - {_minCol} + 1) times:
+            set {_c} to (loop-iteration-2) - 1 + {_minCol}
+            set {_value} to Array.get({_matrix}, {_r} * {_size} + {_c})
+            if all:
+                {_value} is set
+                {_value} isn't air
+            then:
+                set {_out::%loop-iteration-1%} to ({_out::%loop-iteration-1%} ? "") + "1"
+            else:
+                set {_out::%loop-iteration-1%} to ({_out::%loop-iteration-1%} ? "") + "0"
+    return join {_out::*} with "|"
+
+function processRecipeChoice(choice:object, key:namespacedkey, ingredient:string) :: object:
+    # material/itemtype choice, store item ids
+    if {_choice} is instance of RecipeChoice.MaterialChoice:
+        loop ...{_choice}.getChoices():
+            set {_id} to (item id of (loop-value.asItemType().createItemStack()))
+            set {-recipeData::recipes::%{_key}%::ingredients::%{_ingredient}%::%{_id}%} to {_id}
+    # exact choice, store item ids if custom item, else store as exact choice
+    else if {_choice} is instance of RecipeChoice.ExactChoice:
+        loop ...{_choice}.getChoices():
+            if loop-value has custom item id:
+                set {_id} to (item id of loop-value)
+                set {-recipeData::recipes::%{_key}%::ingredients::%{_ingredient}%::%{_id}%} to {_id}
+            else:
+                set {-recipeData::recipes::%{_key}%::ingredients::%{_ingredient}%::%raw name of loop-value%.%nbt of loop-value%} to loop-value
+        set {_newChoice} to (material choice of (...{_choice}.getChoices()))
+        return {_newChoice} ? {_choice}
+    return {_choice}
+
+function processRecipe(recipeName:string):
+    set {_key} to (namespacedkey from {_recipeName})
+    set {_recipe} to Bukkit.getRecipe({_key})
+    # store result
+    set {-recipeData::recipes::%{_key}%::result} to {_recipe}.getResult()
+
+    # shaped recipe
+    if {_recipe} is instance of ShapedRecipe:
+        set {-recipeData::recipes::%{_key}%::type} to "shaped"
+        set {-recipeData::recipes::%{_key}%::shape::*} to (split (join (...{_recipe}.getShape()) with "") at "")
+        set {-recipeData::recipes::%{_key}%::size} to (size of {-recipeData::recipes::%{_key}%::shape::*})
+        set {_map} to {_recipe}.getChoiceMap()
+        set {_rowSize} to (length of (1st element of (...{_recipe}.getShape())))
+        set {-recipeData::recipes::%{_key}%::shapeCompressed} to ""
+        loop ...{_map}.keySet():
+            if mod((loop-iteration-1)-1, {_rowSize}) is 0:
+                (loop-iteration-1) isn't 1
+                add "|" to {-recipeData::recipes::%{_key}%::shapeCompressed}
+            set {_choice} to {_map}.get(loop-value)
+            if {_choice} is set:
+                add "1" to {-recipeData::recipes::%{_key}%::shapeCompressed}
+            else:
+                add "0" to {-recipeData::recipes::%{_key}%::shapeCompressed}
+            {_choice} is set
+            {_recipe}.setIngredient(loop-value, processRecipeChoice({_choice}, {_key}, "%loop-value%"))
+        set {-recipeData::recipesByShape::%{-recipeData::recipes::%{_key}%::shapeCompressed}%::%{_key}%} to {_key}
+
+    # shapeless recipe
+    else if {_recipe} is instance of ShapelessRecipe:
+        set {-recipeData::recipes::%{_key}%::type} to "shapeless"
+        set {_size} to {_recipe}.getChoiceList().size()
+        set {-recipeData::recipes::%{_key}%::size} to {_size}
+        set {-recipeData::recipesBySize::%{_size}%::%{_key}%} to {_key}
+        loop ...{_recipe}.getChoiceList():
+            {_recipe}.removeIngredient(loop-value)
+            {_recipe}.addIngredient(processRecipeChoice(loop-value, {_key}, "%loop-iteration%"))
+
+    # reregister recipe (with all exact choices changed to material choices)
+    Bukkit.removeRecipe({_key}, false)
+    Bukkit.addRecipe({_recipe}, false)
+
+function itemMatchesIngredient(item:object, key:namespacedkey, ingredient:object) :: boolean:
+    loop {-recipeData::recipes::%{_key}%::ingredients::%{_ingredient}%::*}:
+        if (loop-value) is a string (type):
+            (item id of {_item}) is (loop-value)
+            return true
+        else if (loop-value) is an item:
+            (type of {_item}) is (type of (loop-value))
+            (nbt of {_item}) is (nbt of (loop-value))
+            return true
+    return false
+
+function checkShapedMatch(matrix:object, key:namespacedkey) :: boolean:
+    set {_shape::*} to {-recipeData::recipes::%{_key}%::shape::*}
+    {_shape::*} is set
+    loop {_shape::*}:
+        set {_item} to {_matrix}[(loop-iteration)-1]
+        loop (indexes of {-recipeData::recipes::%{_key}%::ingredients::%loop-value-1%::*}):
+            itemMatchesIngredient({_item}, {_key}, loop-value-1) is false
+            return false
+    return true
+
+function checkShapelessMatch(items:objects, key:namespacedkey, slotIndex:number=1) :: boolean:
+    set {_slots::*} to (indexes of {-recipeData::recipes::%{_key}%::ingredients::*})
+    set {_slot} to {_slots::%{_slotIndex}%}
+    {_slot} is set
+    loop {_items::*}:
+        set {_itemIndex} to loop-index
+        itemMatchesIngredient(loop-value, {_key}, {_slot}) is true
+        delete {_items::%{_itemIndex}%}
+        return true if ({_slotIndex} >= (size of {_slots::*}))
+        return true if (checkShapelessMatch({_items::*}, {_key}, {_slotIndex} + 1) is true)
+        set {_items::%{_itemIndex}%} to loop-value
+    return false
+
+on preparing craft:
+    event-string is set
+    set {_key} to event-string
+    # firework fix
+    if {_key} is "minecraft:firework_rocket":
+        loop ...event-inventory.getMatrix():
+            if (loop-value is paper):
+                (item id of loop-value) isn't "minecraft:paper"
+                set (recipe result) to air
+                exit trigger
+            else if (loop-value is gunpowder):
+                (item id of loop-value) isn't "minecraft:gunpowder"
+                set (recipe result) to air
+                exit trigger
+            else if (loop-value is firework star):
+                (item id of loop-value) isn't "minecraft:firework_star"
+                set (recipe result) to air
+                exit trigger
+        exit trigger
+    exit trigger if ({-recipeData::recipes::%{_key}%::type} isn't set)
+    # find recipe data
+    set {_matrix} to event-inventory.getMatrix()
+    set {_matrixForCache} to ""
+    loop ...{_matrix}:
+        set {_matrixForCache} to "%{_matrixForCache}%%item id of (loop-value ? air)%,"
+        loop-value isn't set
+        Array.set({_matrix}, (loop-iteration)-1, air.getRandom())
+    if {-recipeData::craftingCache::%{_matrixForCache}%} is set:
+        set (recipe result) to {-recipeData::craftingCache::%{_matrixForCache}%}
+        exit trigger
+    set {_cropped} to cropCraftingMatrix({_matrix})
+    set {_size} to {-recipeData::recipes::%{_key}%::size}
+    set {_shapelessRecipes::*} to {-recipeData::recipesBySize::%{_size}%::*}
+    set {_shapeCompressed} to compressCraftingMatrix({_matrix})
+    set {_shapedRecipes::*} to {-recipeData::recipesByShape::%{_shapeCompressed}%::*}
+    # check shaped
+    loop {_shapedRecipes::*}:
+        checkShapedMatch({_cropped}, loop-value) is true
+        set (recipe result) to {-recipeData::recipes::%loop-value%::result}
+        set {-recipeData::craftingCache::%{_matrixForCache}%} to {-recipeData::recipes::%loop-value%::result}
+        exit trigger
+    # check shapeless
+    loop {_shapelessRecipes::*}:
+        checkShapelessMatch(...{_cropped}, loop-value) is true
+        set (recipe result) to {-recipeData::recipes::%loop-value%::result}
+        set {-recipeData::craftingCache::%{_matrixForCache}%} to {-recipeData::recipes::%loop-value%::result}
+        exit trigger
+    set (recipe result) to air

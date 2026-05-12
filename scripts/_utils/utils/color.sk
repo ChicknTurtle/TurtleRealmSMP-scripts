@@ -4,6 +4,46 @@ import:
     java.awt.Color as javaColor
     net.kyori.adventure.text.format.NamedTextColor
 
+function mixColors(a:color, b:color, t:number=0.5) :: color:
+    set {_ar} to red value of {_a}
+    set {_ag} to green value of {_a}
+    set {_ab} to blue value of {_a}
+    set {_br} to red value of {_b}
+    set {_bg} to green value of {_b}
+    set {_bb} to blue value of {_b}
+    # convert to HSV
+    set {_hsvA} to javaColor.RGBtoHSB({_ar}, {_ag}, {_ab}, null)
+    set {_hsvB} to javaColor.RGBtoHSB({_br}, {_bg}, {_bb}, null)
+    set {_h1} to {_hsvA}[0]
+    set {_s1} to {_hsvA}[1]
+    set {_v1} to {_hsvA}[2]
+    set {_h2} to {_hsvB}[0]
+    set {_s2} to {_hsvB}[1]
+    set {_v2} to {_hsvB}[2]
+    # circular hue
+    set {_diff} to {_h2} - {_h1}
+    if {_diff} > 0.5:
+        subtract 1 from {_diff}
+    if {_diff} < -0.5:
+        add 1 to {_diff}
+    set {_h} to mod({_h1} + {_diff} * {_t} + 1, 1)
+    # saturation and value
+    set {_s} to {_s1} + ({_s2} - {_s1}) * {_t}
+    set {_v} to {_v1} + ({_v2} - {_v1}) * {_t}
+    # return
+    set {_rgb} to javaColor.HSBtoRGB({_h}, {_s}, {_v})
+    return decimalToColor({_rgb})
+
+function mixColors(colors:colors) :: color:
+    set {_count} to (size of {_colors::*})
+    return rgb(0,0,0) if {_count} is 0
+    return (1st element of {_colors::*}) if {_count} is 1
+    set {_result} to (1st element of {_colors::*})
+    loop {_colors::*}:
+        continue if loop-iteration is 1
+        set {_result} to mixColors({_result}, loop-value, 1/loop-iteration)
+    return {_result}
+
 function hexToDecimal(hex:string) :: number:
     if first character of {_hex} is "#":
         set {_hex} to (substring of {_hex} from index 2 to index (length of {_hex}))

@@ -11,20 +11,20 @@ on entity start pathfinding:
     if any:
         {_workstation} is air
         world of event-entity isn't world of {_workstation}
-        distance between event-entity and {_workstation} > getConfigValue("root.world.villagers.forgetJobDistance")
+        distance between event-entity and {_workstation} > getConfigValue("root.world.mobs.villagers.forgetJobDistance")
     then:
         delete (compound tag "Brain;memories;minecraft:job_site" of (nbt of event-entity))
 
 on right click on villager:
     set {_trades::*} to merchant recipes of event-entity
     # infinite trading
-    if getConfigValue("root.world.villagers.infiniteTrading") is true:
+    if getConfigValue("root.world.mobs.villagers.infiniteTrading") is true:
         loop {_trades::*}:
             loop-value.setMaxUses(2147483647)
             loop-value.setUses(0)
             loop-value.setDemand(0)
     # shared curing
-    if getConfigValue("root.world.villagers.sharedCuring") is true:
+    if getConfigValue("root.world.mobs.villagers.sharedCuring") is true:
         set {_reputations} to event-entity.getReputations()
         # check if any player has cure discount
         (...{_reputations}.values() where [input.getReputation(ReputationType.MAJOR_POSITIVE) >= 20]) is set
@@ -34,13 +34,13 @@ on right click on villager:
         event-entity.setReputation(player's uuid, {_playerRep})
     # reroll trades
     if size of {_trades::*} > 0:
-        (item id of player's tool) is getConfigValue("root.world.villagers.rerollTradesItem")
+        (item id of player's tool) is getConfigValue("root.world.mobs.villagers.rerollTradesItem")
         if event-entity.getVillagerExperience() is 0:
             cancel event
             event-entity.resetOffers()
             play sound "entity.villager.trade" in neutral category from event-entity
             play sound "block.enchantment_table.use" with volume 0.5 and pitch 2
-            make 15 of enchant at (event-entity's head)
+            draw (15 enchanting particle) at (event-entity's head)
             make player swing their hand
             player's gamemode isn't creative
             remove 1 of player's tool from player's tool

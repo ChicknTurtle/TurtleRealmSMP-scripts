@@ -1,5 +1,6 @@
 
 # Made for use with the Minecart Improvements experiment
+# May not work properly if it isn't enabled
 
 options:
 
@@ -52,7 +53,7 @@ options:
     skidSound: true
 
     # Play small sounds?
-    # Currently just makes detector rails make small pops when triggered.
+    # Currently makes detector rails make small pops when triggered.
     # default = true
     smallSounds: true
 
@@ -63,27 +64,17 @@ options:
 
 import:
     org.bukkit.entity.Minecart
-    org.bukkit.event.vehicle.VehicleMoveEvent
     org.bukkit.event.vehicle.VehicleUpdateEvent
     org.bukkit.event.block.BlockPhysicsEvent
 
 on load:
     locally suppress constant condition warning
-    set {-features::minecart::name} to "Minecart"
-    set {-features::minecart::desc} to "Many minecart improvements, configurable in file"
-    set {-features::minecart::warn} to "Placed carts need to be replaced when disabling"
-    set {-features::minecart::icon} to minecart
-    set {-features::railrecipes::name} to "Rail recipes"
-    set {-features::railrecipes::desc} to "Add items to rails to craft other rail types"
-    set {-features::railrecipes::warn} to "Requires server reload when disabling"
-    set {-features::railrecipes::icon} to powered rail
 
 on vehicle create:
     event-vehicle is instance of Minecart
     set max minecart speed of event-vehicle to {@minimumSpeed}/20
 
 on VehicleUpdateEvent:
-    {enabledFeatures::minecart} is true
     set {_cart} to event.getVehicle()
     {_cart} is instance of Minecart
 
@@ -98,13 +89,13 @@ on VehicleUpdateEvent:
         set max minecart speed of {_cart} to {@minimumSpeed}/20
 
 on vehicle move:
-    {enabledFeatures::minecart} is true
     set {_cart} to event-vehicle
     {_cart} is instance of Minecart
 
     # Get max speed
-    if gamerule max_minecart_speed of world of {_cart} isn't {@maximumSpeed}:
-        set gamerule max_minecart_speed of world of {_cart} to {@maximumSpeed}
+    if (world of {_cart}).isEnabled(max_minecart_speed) is true:
+        (gamerule max_minecart_speed of (world of {_cart})) isn't {@maximumSpeed}
+        set (gamerule max_minecart_speed of (world of {_cart})) to {@maximumSpeed}
     set {_maxSpeed} to ({@maximumSpeed}/20)
 
     # Increase minecart speed
@@ -283,7 +274,6 @@ on BlockPhysicsEvent:
 
 # Sounds
 on redstone change:
-    {enabledFeatures::minecart} is true
     event-block is detector rail
     {@smallSounds} is true
     if redstone power of event-block is 0:
@@ -292,8 +282,7 @@ on redstone change:
         play sound "minecraft:block.copper_bulb.turn_off" at event-block
 
 # Recipes
-when ready to load recipes:
-    {enabledFeatures::railrecipes} is true
+register recipes:
     register shapeless recipe:
         id: "minecraft:activator_rail"
         result: 1 activator rail
@@ -337,7 +326,6 @@ when ready to load recipes:
 
 # Right click apply
 on right click:
-    {enabledFeatures::railrecipes} is true
     {@railApply} is true
     if event-block is rail:
         player's held item is redstone

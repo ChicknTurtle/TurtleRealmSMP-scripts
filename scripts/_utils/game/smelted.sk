@@ -3,13 +3,12 @@ import:
     net.minecraft.world.item.crafting.SingleRecipeInput
     net.minecraft.world.item.crafting.RecipeType
 
-# Smelted
-# Gets the smelted version of an item.
+# Get the smelted version of an item
 expression:
     patterns:
-        (smelt|cook)[ed] %item%
-        (smoke)[d] (smelt|cook)[ed] %item%
-        (blast)[ed] (smelt|cook)[ed] %item%
+        [furnace] (smelt|cook)[ed] %item%
+        (smoke)[d|r] (smelt|cook)[ed] %item%
+        (blast)[ed| furnace] (smelt|cook)[ed] %item%
     get:
         if expr-1 ? air is air:
             return expr-1
@@ -27,5 +26,5 @@ expression:
             return expr-1
         set {_holder} to {_smeltRecipe}.get()
         set {_recipe} to {_holder}.value()
-        set {_result} to {_recipe}.assemble({_recipeInput}, {_level}.registryAccess())
+        set {_result} to {_recipe}.assemble({_recipeInput})
         return (item amount of expr-1) of {_result}.asBukkitCopy()

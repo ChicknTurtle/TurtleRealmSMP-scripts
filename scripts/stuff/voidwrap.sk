@@ -15,11 +15,11 @@ local function warp(e:entity, world:text, coord:number):
     set {_pitch} to (pitch of {_loc})
     set {_dest} to location({_x}, {_coord}, {_z}, {_world}, {_yaw}, {_pitch})
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_loc}
-    make 15 of witch at {_loc} with force
+    force draw (15 witch particle) at {_loc}
     teleport {_e} to {_dest} while retaining (vehicle,passengers,xyz velocity)
     try {_e}.getHandle().placePortalTicket(new BlockPos(floor(x-coord of {_dest}),floor(y-coord of {_dest}),floor(z-coord of {_dest})))
     play sound "minecraft:entity.player.teleport" with volume 0.5 and pitch 2 at {_dest}
-    make 15 of witch at {_dest} with force
+    force draw (15 witch particle) at {_dest}
     while (chunk at {_dest} isn't loaded):
         wait 1 tick
         loop-iteration > 100

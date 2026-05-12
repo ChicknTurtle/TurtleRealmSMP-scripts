@@ -1,0 +1,8 @@
+
+when ready to register custom items:
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:banana"",""minecraft:item_name"":""Banana""}")
+    apply food component to {_item}:
+        nutrition: 4
+        saturation: 2.4
+    apply consumable component to {_item}
+    set (custom item "turtle:banana") to {_item}

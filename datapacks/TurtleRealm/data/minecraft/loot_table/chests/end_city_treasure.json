@@ -380,7 +380,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:chorium_upgrade_smithing_template\"}"
+              "tag": "{PublicBukkitValues:{\"minecraft:customitems.id\":\"turtle:chorium_upgrade_smithing_template\"}}"
             },
             {
               "function": "minecraft:set_count",

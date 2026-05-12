@@ -1,9 +1,9 @@
 
 import:
     org.geysermc.floodgate.api.FloodgateApi
+    java.util.UUID
 
 options:
-    resourcePackUrl: https://chicknturtle.ninja/downloads/§aTurtleRealmSMP.zip
     resourcePackPrompt: "§bRequired for custom textures, sounds and other features"
     resourcePackDeclineMsg: "§cYou have declined the server resource pack."
 
@@ -13,29 +13,40 @@ on load:
 
     set {-fgApi} to FloodgateApi.getInstance()
 
-function findResourcePackHash():
-    log info "Fetching resource pack hash from {@resourcePackUrl}§r..."
+function isFloodgatePlayer(p:player) :: boolean:
+    return (try {-fgApi}.isFloodgatePlayer(uuid of {_p}))
+
+function findResourcePackHash(url:string):
+    log info "Fetching resource pack hash from %{_url}%§r..."
     async run 0 ticks later:
-        set {-resourcePackHash} to hashFromUrl("{@resourcePackUrl}")
-        if {-resourcePackHash} isn't set:
-            log error "Failed to fetch resource pack hash from {@resourcePackUrl}§r. Resource pack will not be sent to players."
+        set {-resourcePackHash::%{_url}%} to hashFromUrl({_url})
+        if {-resourcePackHash::%{_url}%} isn't set:
+            log error "Failed to fetch resource pack hash from %{_url}%§r. Resource pack will not be sent to players."
         else:
-            log info "Found resource pack hash: %{-resourcePackHash}%"
-on skript load:
-    findResourcePackHash()
+            log info "Found resource pack hash: %{-resourcePackHash::%{_url}%}%"
+on load:
+    set {_resourcePackUrl} to getConfigValue("root.server.resourcePackURL")
+    {_resourcePackUrl} isn't ""
+    findResourcePackHash({_resourcePackUrl})
 
 # unlock recipes
 # send resource pack
 on join:
     unlock recipes (all recipes) for player
-    (try {-fgApi}.isFloodgatePlayer(uuid of player)) isn't true
-    sendResourcePack(player)
+    isFloodgatePlayer(player) isn't true
+    set {_resourcePackUrl} to getConfigValue("root.server.resourcePackURL")
+    {_resourcePackUrl} is set
+    {_resourcePackUrl} isn't ""
+    sendResourcePack(player, {_resourcePackUrl})
 
-import:
-    java.util.UUID
-local function sendResourcePack(p:player):
-    if {-resourcePackHash} is set:
-        send resource pack "{@resourcePackUrl}" with id str(UUID.nameUUIDFromBytes("TurtleRealmSMP-main".getBytes())) with hash {-resourcePackHash} with prompt {@resourcePackPrompt} to {_p}
+local function sendResourcePack(p:player, url:string):
+    loop 30 times:
+        exit trigger if {_p} isn't online
+        exit trigger if script isn't loaded
+        exit loop if {-resourcePackHash::%{_url}%} is set
+        wait 1 second
+    {-resourcePackHash::%{_url}%} is set
+    send resource pack {_url} with id str(UUID.nameUUIDFromBytes("ServerResourcePack-main".getBytes())) with hash {-resourcePackHash::%{_url}%} with prompt {@resourcePackPrompt} to {_p}
 
 on resource pack decline:
     send {@resourcePackDeclineMsg} to player
@@ -45,7 +56,4 @@ every second:
     set {-formattedMspt} to getFormattedMspt()
 
 on server list ping:
-    if getConfigValue("root.server.devMode") is true:
-        set motd to "§x§F§F§5§F§1§5▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§F§F§5§F§1§5░▒▓§r%nl% §8────────── §x§F§F§5§F§1§5ᴅᴇᴠ §8──────────"
-    else:
-        set motd to "§x§2§d§b§4§4§1▓▒░ §8─── §x§D§A§A§5§2§0« §x§0§0§F§F§7§F§lTurtle§x§0§0§D§F§F§F§lRealm §x§D§A§A§5§2§0» §8─── §x§2§d§b§4§4§1░▒▓§r%nl% §8────────── §x§2§d§b§4§4§1sᴍᴘ §8──────────"
+    set motd to minimessage from getConfigValue("root.server.motd")

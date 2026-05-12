@@ -1,12 +1,7 @@
 
-on load:
-    set {-features::flintandsteel::name} to "Flint and Steel"
-    set {-features::flintandsteel::desc} to "Flint and Steel can directly ignite mobs"
-    set {-features::flintandsteel::icon} to flint and steel
-
 # flint and steel
 on right click with flint and steel:
-    {enabledFeatures::flintandsteel} is true
+    getConfigValue("root.world.items.flintAndSteelIgniting") is true
     (item id of player's tool) is "minecraft:flint_and_steel"
     set {_e} to clicked entity
     {_e} is set

@@ -1,0 +1,21 @@
+
+import:
+    net.minecraft.core.BlockPos
+    net.minecraft.core.Direction
+    net.minecraft.world.phys.Vec3
+    net.minecraft.world.phys.BlockHitResult
+    net.minecraft.world.level.block.TargetBlock
+
+# entity: can be any entity, if it's an arrow the target block will trigger for longer
+# b: the target block
+# pos: hit position as a vector from 0,0,0
+# face: hit blockface
+function triggerTargetBlock(e:entity, b:block, pos:vector, face:blockface):
+    set {_vec3} to new Vec3((x of {_pos}),(y of {_pos}),(z of {_pos}))
+    set {_dir} to "%facing of vector ({_face}.getDirection())%"
+    set {_dir} to ("up" if {_dir} is "above" else {_dir})
+    set {_dir} to ("down" if {_dir} is "below" else {_dir})
+    set {_side} to Direction.byName({_dir})
+    set {_blockPos} to new BlockPos(floor(x-coord of {_b}),floor(y-coord of {_b}),floor(z-coord of {_b}))
+    set {_blockHitResult} to new BlockHitResult({_vec3},{_side},{_blockPos},false)
+    TargetBlock.updateRedstoneOutput({_b}.getHandle(), (blockstate of {_b}).getHandle(), {_blockHitResult}, {_e}.getHandle())

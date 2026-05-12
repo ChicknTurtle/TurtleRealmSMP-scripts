@@ -1,0 +1,143 @@
+
+import:
+    java.io.FileReader
+    com.google.gson.Gson
+    com.google.gson.JsonObject
+
+on skript start:
+    reloadServerConfig(true)
+
+function reloadServerConfig(initial:boolean=false):
+    log info "%"L" if ({_initial} is true) else "Rel"%oading server config file..."
+    set {_gson} to new Gson()
+    set {-serverConfigJson} to {_gson}.fromJson(new FileReader("plugins/Skript/server_data/config.json"), JsonObject.class)
+    delete {-configValues::defaultCache::*}
+
+function getConfigPaths(nodesJson:object, prefix:string, valuesOnly:boolean) :: strings:
+    loop ...{_nodesJson}.keySet():
+        if {_prefix} doesn't end with ".":
+            {_prefix} isn't ""
+            set {_prefix} to "%{_prefix}%."
+        set {_fullPath} to "%{_prefix}%%loop-value%"
+        set {_childJson} to {_nodesJson}.get(loop-value)
+        set {_childNodes} to {_childJson}.get("nodes")
+        set {_hasChildren} to (true if ({_childNodes} is set) else false)
+        if any:
+            {_valuesOnly} isn't true
+            {_hasChildren} isn't true
+        then:
+            add {_fullPath} to {_paths::*}
+        if {_hasChildren} is true:
+            add getConfigPaths({_childNodes}, {_fullPath}, {_valuesOnly}) to {_paths::*}
+    return {_paths::*}
+
+function getAllConfigValuePaths(noRoot:boolean=false) :: strings:
+    set {_prefix} to "" if {_noRoot} is true else "root"
+    return getConfigPaths({-serverConfigJson}.get("root").get("nodes"), {_prefix}, true)
+
+function getConfigValueSuggestions(path:string) :: strings:
+    set {_element} to getConfigElement({_path})
+    set {_settingType} to try {_element}.get("type").getAsString()
+    if {_settingType} is "boolean":
+        return "true", "false"
+    else if {_settingType} is "slider":
+        set {_settingStart} to try {_element}.get("start").getAsFloat()
+        set {_settingDefault} to try {_element}.get("default").getAsFloat()
+        set {_settingEnd} to try {_element}.get("end").getAsFloat()
+        return {_settingStart}, {_settingDefault}, {_settingEnd}
+    else if {_settingType} is "text":
+        set {_settingDefault} to try {_element}.get("default").getAsString()
+        return {_settingDefault}
+    else if {_settingType} is "options":
+        set {_options::*} to ...(try {_element}.get("options").keySet())
+        return {_options::*}
+
+function setConfigValue(path:string, value:object) :: boolean:
+    set {_element} to getConfigElement({_path})
+    if {_element} isn't set:
+        return false
+    set {_type} to try {_element}.get("type").getAsString()
+    if {_type} isn't set:
+        return false
+    if {_type} is "boolean":
+        if {_value} is boolean:
+            set {_final} to {_value}
+        else if "%{_value}%" is "true":
+            set {_final} to true
+        else if "%{_value}%" is "false":
+            set {_final} to false
+        else:
+            return false
+    else if {_type} is "slider":
+        if {_value} is number:
+            set {_final} to {_value}
+        else:
+            set {_num} to ("%{_value}%" parsed as number)
+            if {_num} isn't set:
+                return false
+            set {_final} to {_num}
+        set {_min} to try {_element}.get("start").getAsFloat()
+        if {_min} is set:
+            {_final} < {_min}
+            return false
+        set {_max} to try {_element}.get("end").getAsFloat()
+        if {_max} is set:
+            {_final} > {_max}
+            return false
+    else if {_type} is "text":
+        set {_final} to "%{_value}%"
+        set {_maxLen} to try {_element}.get("max").getAsInt()
+        if {_maxLen} is set:
+            length of {_final} > {_maxLen}
+            return false
+    else if {_type} is "options":
+        set {_final} to "%{_value}%"
+        set {_options::*} to ...(try {_element}.get("options").keySet())
+        if {_options::*} doesn't contain {_final}:
+            return false
+    else:
+        return false
+    set {configValues::%{_path}%} to {_final}
+    return true
+
+function getDefaultConfigValue(path:string) :: object:
+    set {_element} to getConfigElement({_path})
+    set {_settingType} to try {_element}.get("type").getAsString()
+    set {_settingDefaultPrimitive} to try {_element}.get("default")
+    if {_settingDefaultPrimitive} is set:
+        if {_settingDefaultPrimitive}.isBoolean():
+            return {_settingDefaultPrimitive}.getAsBoolean()
+        else if {_settingDefaultPrimitive}.isNumber():
+            return {_settingDefaultPrimitive}.getAsFloat()
+        else:
+            return {_settingDefaultPrimitive}.getAsString()
+    else if {_settingType} is "slider":
+        set {_settingStart} to try {_element}.get("start").getAsFloat()
+        return {_settingStart}
+    else if {_settingType} is "options":
+        set {_options::*} to ...(try {_element}.get("options").keySet())
+        return (first element of {_options::*})
+
+function getConfigValue(path:string) :: object:
+    if {configValues::%{_path}%} is set:
+        return {configValues::%{_path}%}
+    if {-configValues::defaultCache::%{_path}%} is set:
+        return {-configValues::defaultCache::%{_path}%}
+    set {_default} to getDefaultConfigValue({_path})
+    if {_default} isn't set:
+        log warning "Tried to access a non-existent config value!: %{_path}%"
+        return {_}
+    set {-configValues::defaultCache::%{_path}%} to {_default}
+    return {_default}
+
+function getWhetherConfigValueIsDefault(path:string) :: boolean:
+    return whether {configValues::%{_path}%} isn't set
+
+function getConfigElement(path:string) :: object:
+    set {_path::*} to ({_path} split at ".")
+    set {_pageJson} to {-serverConfigJson}
+    loop {_path::*}:
+        set {_pageJson} to {_pageJson}.get(loop-value)
+        loop-iteration isn't size of {_path::*}
+        set {_pageJson} to {_pageJson}.get("nodes")
+    return {_pageJson}

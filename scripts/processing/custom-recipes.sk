@@ -30,7 +30,7 @@ when ready to load recipes:
     # washing - wool
     loop ("light_gray","gray","black","brown","red","orange","yellow","lime","green","cyan","light_blue","blue","purple","magenta","pink"):
         addSimpleCustomRecipe("washing", "minecraft:%loop-value%_wool",getSimpleResult(white wool))
-    # washing - stained glass (pane)
+    # washing - stained glass [pane]
     loop ("white","light_gray","gray","black","brown","red","orange","yellow","lime","green","cyan","light_blue","blue","purple","magenta","pink"):
         addSimpleCustomRecipe("washing", "minecraft:%loop-value%_stained_glass",getSimpleResult(glass))
         addSimpleCustomRecipe("washing", "minecraft:%loop-value%_stained_glass_pane",getSimpleResult(glass_pane))
@@ -77,6 +77,7 @@ when ready to load recipes:
     addSimpleCustomRecipe("freezing", "minecraft:magma_cream",getSimpleResult(slime_ball,1,0.75))
     addSimpleCustomRecipe("freezing", "minecraft:magma_block",getSimpleResult(tuff))
     addSimpleCustomRecipe("freezing", "minecraft:blaze_rod",getSimpleResult(breeze_rod))
+    addSimpleCustomRecipe("freezing", "minecraft:milk_bucket",getSimpleResult((custom item "turtle:cheese")))
 
     # pressing - custom
     addSimpleCustomRecipe("pressing", "minecraft:obsidian",(getSimpleResult((custom item "turtle:powdered_obsidian")),getSimpleResult(obsidian,1,0.85)))
@@ -168,8 +169,16 @@ when ready to load recipes:
     # voiding
     addSimpleCustomRecipe("voiding", "minecraft:apple", getSimpleResult(chorus_fruit))
     addSimpleCustomRecipe("voiding", "minecraft:cobblestone", getSimpleResult(end_stone))
+    addSimpleCustomRecipe("voiding", "minecraft:mossy_cobblestone", getSimpleResult(end_stone))
     addSimpleCustomRecipe("voiding", "minecraft:stone_bricks", getSimpleResult(end_stone_bricks))
     addSimpleCustomRecipe("voiding", "minecraft:mossy_stone_bricks", getSimpleResult(end_stone_bricks))
+    addSimpleCustomRecipe("voiding", "minecraft:cracked_stone_bricks", getSimpleResult(end_stone_bricks))
+    addSimpleCustomRecipe("voiding", "minecraft:stone_brick_stairs", getSimpleResult(end_stone_brick_stairs))
+    addSimpleCustomRecipe("voiding", "minecraft:mossy_stone_brick_stairs", getSimpleResult(end_stone_brick_stairs))
+    addSimpleCustomRecipe("voiding", "minecraft:stone_brick_slab", getSimpleResult(end_stone_brick_slab))
+    addSimpleCustomRecipe("voiding", "minecraft:mossy_stone_brick_slab", getSimpleResult(end_stone_brick_slab))
+    addSimpleCustomRecipe("voiding", "minecraft:stone_brick_wall", getSimpleResult(end_stone_brick_wall))
+    addSimpleCustomRecipe("voiding", "minecraft:mossy_stone_brick_wall", getSimpleResult(end_stone_brick_wall))
     addSimpleCustomRecipe("voiding", "minecraft:egg", getSimpleResult(ender_pearl))
     addSimpleCustomRecipe("voiding", "minecraft:brown_egg", getSimpleResult(ender_pearl))
     addSimpleCustomRecipe("voiding", "minecraft:blue_egg", getSimpleResult(ender_pearl))

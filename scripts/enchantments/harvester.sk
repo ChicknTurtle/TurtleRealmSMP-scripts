@@ -28,7 +28,6 @@ on break:
     if age of event-block is max age of event-block:
         cancel item drops
         set {_drops::*} to drops of event-block using player's tool
-        set event-block to air
         loop {_drops::*}:
             loop-value is {_seeds}
             subtract 1 from item amount of loop-value
@@ -37,6 +36,6 @@ on break:
             set age of event-block to 0
             exit loop
         player's gamemode isn't creative
-        drop {_drops::*} at event-block
+        drop {_drops::*} at event-block ~ vector(0.5,0.5,0.5)
     else:
         cancel event

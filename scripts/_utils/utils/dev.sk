@@ -1,0 +1,30 @@
+
+effect:
+    patterns:
+        (wait|halt) [for] %timespan% [and] [then] [parse [effect]] <(.+)> [from %commandsender%]
+    trigger:
+        delay effect
+        wait expr-1
+        parse effect regex-1 from expr-2
+
+# Debug pop
+effect:
+    patterns:
+        [make|play] [a] [:silent] (debug|pop|debug pop) [effect] [:colored %-color%] [at] %locations%
+    trigger:
+        set {_color} to expr-1 ? white
+        loop exprs-2:
+            draw (1 {_color} trail particle moving to loop-value over 1 tick) at loop-value
+            parse tags doesn't contain "silent"
+            play sound "minecraft:block.note_block.xylophone" at loop-value
+
+function printNestedList(list:objects, path:text="", indent:integer=0):
+    set {_prefix} to ("-" repeated {_indent}+1 times)
+    loop indexes of {_list%{_path}%::*}:
+        set {_key} to loop-value
+        set {_fullPath} to "%{_path}%::%{_key}%"
+        if {_list%{_fullPath}%} is set:
+            broadcast "§8%{_prefix}%§b%{_key}% §d%{_list%{_fullPath}%}% §5(%skript type of {_list%{_fullPath}%}%)"
+        if (indexes of {_list%{_fullPath}%::*}) is set:
+            broadcast "§8%{_prefix}%§3%{_key}%"
+            printNestedList(keyed {_list::*}, {_fullPath}, {_indent} + 1)

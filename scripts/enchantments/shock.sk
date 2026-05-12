@@ -1,14 +1,12 @@
-using damage source
 
 options:
     damage: 4
     wetDamage: 8
-    chance: 100%
     radius: 3
     wetRadius: 6
-    trail: electric_spark
-    particle: dust using dustOption(rgb(255,255,0),1)
-    particle2: white smoke
+    trail: 5 electric spark particle with particle speed 0.1
+    particle: 2 rgb(255,255,0) dust particle with particle speed 0
+    particle2: 1 white smoke particle with particle speed 0
     particleAmount: 10
 
 function shock(arrow:entity,shooter:entity,wet:boolean):
@@ -28,12 +26,11 @@ function shock(arrow:entity,shooter:entity,wet:boolean):
             loop {@particleAmount} times:
                 set {_nv} to {_v} * loop-number-2/{@particleAmount}
                 set {_loc} to location of {_arrow} ~ {_nv}
-                make 2 of {@particle} at {_loc} with extra 0
+                draw ({@particle}) at {_loc}
     loop entities in radius {_r} of ({_arrow}'s location ~ vector(0,-0.5,0)):
         loop-entity is a living entity
         loop-entity is alive
         loop-entity's gamemode isn't creative
-        chance of {@chance}
         set {_loc} to {_arrow} ~ vector(0,{_arrow}.getHeight()/2,0)
         set {_loc2} to loop-entity ~ vector(0,loop-entity.getHeight()/2,0)
         set {_v} to vector from {_loc} to {_loc2}
@@ -46,14 +43,14 @@ function shock(arrow:entity,shooter:entity,wet:boolean):
         loop {@particleAmount} times:
             set {_nv} to {_v} * loop-number/{@particleAmount}
             set {_loc} to location of {_arrow} ~ {_nv}
-            make 2 of {@particle} at {_loc} with extra 0
-            make 1 of {@particle2} at {_loc} with extra 0
+            draw ({@particle}) at {_loc}
+            draw ({@particle2}) at {_loc}
 
 on entity shoot bow:
     set {_e} to enchantment from key "turtle:shock"
     shot bow is enchanted with {_e}
     while projectile entity is alive:
-        make 5 of {@trail} at projectile entity with extra 0.1
+        draw ({@trail}) at projectile entity
         if projectile entity is wet:
             stop loop
         if projectile entity is on ground:

@@ -1,0 +1,128 @@
+
+register custom items:
+    # chicken nugget
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:chicken_nugget"",""minecraft:item_name"":""Chicken Nugget""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 3
+        saturation: 3.5
+    set (custom item "turtle:chicken_nugget") to {_item}
+    # golden chicken nugget
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:golden_chicken_nugget"",""minecraft:item_name"":""Golden Chicken Nugget""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 6
+        saturation: 14.4
+    set (custom item "turtle:golden_chicken_nugget") to {_item}
+    # cheese
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:cheese"",""minecraft:item_name"":""Cheese""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 5
+        saturation: 6
+    set (custom item "turtle:cheese") to {_item}
+    # grilled cheese
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:grilled_cheese"",""minecraft:item_name"":""Grilled Cheese""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 8
+        saturation: 14.4
+    set (custom item "turtle:grilled_cheese") to {_item}
+    # fried egg
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:fried_egg"",""minecraft:item_name"":""Fried Egg""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 6
+        saturation: 9.6
+    set (custom item "turtle:fried_egg") to {_item}
+    # apple pie
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:apple_pie"",""minecraft:item_name"":""Apple Pie""}")
+    apply consumable component to {_item}
+    apply food component to {_item}:
+        nutrition: 8
+        saturation: 4.8
+    set (custom item "turtle:apple_pie") to {_item}
+    # dough
+    set {_item} to (firework star with nbt from "{""minecraft:item_model"":""turtle:dough"",""minecraft:item_name"":""Dough""}")
+    set {_effect} to (potion effect of hunger for 15 seconds)
+    apply consumable component to {_item}:
+        on_consume_effect: apply_effects({_effect}, 0.2)
+    apply food component to {_item}:
+        nutrition: 1
+        saturation: 0.6
+    set (custom item "turtle:dough") to {_item}
+
+register recipes:
+    # chicken nugget
+    register shapeless recipe:
+        id: "turtle:chicken_nugget"
+        result: 4 of custom item "turtle:chicken_nugget"
+        category: "misc"
+        ingredients:
+            add cooked chicken to ingredients
+            add bread to ingredients
+    # golden chicken nugget
+    register shaped recipe:
+        id: "turtle:golden_chicken_nugget"
+        result: custom item "turtle:golden_chicken_nugget"
+        category: "misc"
+        shape: "ggg","gng","ggg"
+        ingredients:
+            set ingredient of "g" to gold nugget
+            set ingredient of "n" to (custom item "turtle:chicken_nugget")
+    # grilled cheese
+    register shaped recipe:
+        id: "turtle:grilled_cheese"
+        result: custom item "turtle:grilled_cheese"
+        category: "misc"
+        shape: "b","c","b"
+        ingredients:
+            set ingredient of "b" to bread
+            set ingredient of "c" to (custom item "turtle:cheese")
+    # fried egg
+    register furnace recipe:
+        id: "turtle:fried_egg"
+        result: custom item "turtle:fried_egg"
+        input: material choice of (egg, blue egg, brown egg)
+        experience: 0.35
+        category: "food"
+    register smoking recipe:
+        id: "turtle:fried_egg_from_smoking"
+        result: custom item "turtle:fried_egg"
+        input: material choice of (egg, blue egg, brown egg)
+        experience: 0.35
+        category: "food"
+    register campfire recipe:
+        id: "turtle:fried_egg_from_campfire_cooking"
+        result: custom item "turtle:fried_egg"
+        input: material choice of (egg, blue egg, brown egg)
+    # apple pie
+    register shapeless recipe:
+        id: "turtle:apple_pie"
+        result: custom item "turtle:apple_pie"
+        category: "misc"
+        ingredients:
+            add apple to ingredients
+            add sugar to ingredients
+            add (custom item "turtle:dough") to ingredients
+    # dough
+    register shapeless recipe:
+        id: "turtle:dough"
+        result: custom item "turtle:dough"
+        category: "misc"
+        ingredients:
+            add water bucket to ingredients
+            add wheat to ingredients
+            add (material choice of (egg, blue egg, brown egg)) to ingredients
+    register furnace recipe:
+        id: "turtle:bread_from_dough"
+        result: bread
+        input: custom item "turtle:dough"
+        experience: 0.35
+        category: "food"
+    register smoking recipe:
+        id: "turtle:bread_from_dough_from_smoking"
+        result: bread
+        input: custom item "turtle:dough"
+        experience: 0.35
+        category: "food"

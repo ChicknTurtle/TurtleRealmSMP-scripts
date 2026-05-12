@@ -1,9 +1,9 @@
 
-on drop:
+on player drop:
     player isn't sneaking
     player is alive
     set {_e} to enchantment from key "turtle:soulbound"
     event-item is enchanted with {_e}
     cancel event
-    send actionbar "§cSneak to drop a soulbound item"
+    send actionbar "§cSneak to drop a soulbound item" to player
     play sound "minecraft:block.note_block.hat" in (ui) with volume 0.25 to player

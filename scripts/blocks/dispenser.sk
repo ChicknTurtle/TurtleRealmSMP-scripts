@@ -4,18 +4,26 @@ import:
     org.bukkit.entity.Animals
     org.bukkit.entity.ChestedHorse
 
-on load:
-    set {-features::dispensers::name} to "Dispensers"
-    set {-features::dispensers::desc} to "Adds more functionality to dispensers, such\nas placing blocks, breeding mobs, and\ncompatibility with Bonemealing feature"
-    set {-features::dispensers::icon} to dispenser
-
 local function dispenserBonemeal(event:object):
     {_event}.setCancelled(true)
     remove 1 bone meal from (slot {_event}.getSlot() of inventory of {_event}.getBlock())
     dispenserEvent({_event}.getBlock())
 
+function getMilkingSound(e:entity) :: string:
+    if {_e} is an adult cow:
+        return "minecraft:entity.cow.milk"
+    else if {_e} is an adult mooshroom:
+        return "minecraft:entity.mooshroom.milk"
+    else if {_e} is an adult goat:
+        return "minecraft:entity.goat.screaming.milk" if ({_e} is screaming) else "minecraft:entity.goat.milk"
+
 on BlockPreDispenseEvent:
-    {enabledFeatures::dispensers} is true
+    if all:
+        getConfigValue("root.world.technology.betterBonemeal") isn't true
+        getConfigValue("root.world.technology.dispensers.placeBlocks") isn't true
+        getConfigValue("root.world.technology.dispensers.breedAnimals") isn't true
+    then:
+        exit trigger
     set {_dispenser} to event.getBlock()
     {_dispenser} is a dispenser
     set {_item} to event.getItemStack()
@@ -23,7 +31,7 @@ on BlockPreDispenseEvent:
     set {_fronter_block} to (block 2 blocks in front of {_dispenser})
     # bonemealing
     if {_item} is bone meal:
-        {enabledFeatures::bonemealing} is true
+        getConfigValue("root.world.technology.betterBonemeal") is true
         # vertical growth block
         if (sugar cane) contains (type of {_front_block}):
             bonemealVerticalGrowthBlock({_front_block}) is true
@@ -53,51 +61,70 @@ on BlockPreDispenseEvent:
             dispenserBonemeal(event)
         exit trigger
     # breeding
-    set {_e::*} to (entities touching {_front_block}) where [input is instance of Animals]
-    set {_e::*} to {_e::*} where [input.isBreedItem({_item}) is true]
-    if size of {_e::*} > 0:
+    if getConfigValue("root.world.technology.dispensers.breedAnimals") is true:
+        set {_e::*} to (entities touching {_front_block}) where [input is instance of Animals]
+        set {_e::*} to {_e::*} where [input.isBreedItem({_item}) is true]
+        size of {_e::*} > 0
         # cancel if any valid mobs are there, even if they can't breed right now
         cancel event
         set {_e::*} to {_e::*} where [input can breed]
         set {_e::*} to {_e::*} where [love time of input is 0 seconds]
-        set {_e} to first element of {_e::*}
+        set {_e} to (1st element of {_e::*})
         if {_e} is set:
             dispenserEvent({_dispenser})
         else:
             dispenserEventFail({_dispenser})
             exit trigger
         # set love mode, remove item
-        remove 1 of {_item} from (slot event.getSlot() of inventory of {_dispenser})
+        remove (1 of {_item}) from (slot event.getSlot() of inventory of {_dispenser})
         set love time of {_e} to 30 seconds
-        play entity effect love_hearts on {_e}
+        play love hearts effect on {_e}
         exit trigger
-    # placing blocks
-    set {_blockdata} to (item blockdata of {_item})
-    if {_blockdata} is set:
-        # blacklist items that already have custom dispense behavior
-        if any:
-            {_item} is powder snow bucket
-            {_item} is tagged with (block tag "shulker_boxes")
-            {_item} is tnt
-        then:
-            exit trigger
-        if (entities touching {_front_block}) where [try input.getHandle().canEquipWithDispenser({_item}.asNMSCopy())] is set:
-            exit trigger
-        set {_chestedHorses::*} to (entities touching {_front_block}) where [input is instance of ChestedHorse]
-        if {_chestedHorses::*} is set:
-            {_chestedHorses::*} where [input.isTamed() is true] is set
-            {_chestedHorses::*} where [input.isCarryingChest() is false] is set
-            exit trigger
-        if {_item} is glowstone:
-            {_front_block} is respawn anchor
-            exit trigger
+    # milking
+    if getConfigValue("root.world.technology.dispensers.milkMobs") is true:
+        {_item} is a bucket
+        set {_e::*} to (entities touching {_front_block}) where [getMilkingSound(input) is set]
+        size of {_e::*} > 0
+        set {_e} to (1st element of {_e::*})
         cancel event
-        set {_loc} to location of {_front_block}
-        set (yaw of {_loc}) to (yaw of {_dispenser}) + 180
-        set (pitch of {_loc}) to (pitch of {_dispenser}) * -1
-        if placing {_item} at {_loc} succeeded:
+        if (inventory of {_dispenser}) has space for (1 of milk bucket):
             dispenserEvent({_dispenser})
-            remove 1 of {_item} from (slot event.getSlot() of inventory of {_dispenser})
         else:
             dispenserEventFail({_dispenser})
+            exit trigger
+        remove (1 of {_item}) from (slot event.getSlot() of inventory of {_dispenser})
+        add (1 of milk bucket) to (inventory of {_dispenser})
+        play sound getMilkingSound({_e}) in (neutral category) at {_e}
         exit trigger
+    # placing blocks
+    if getConfigValue("root.world.technology.dispensers.placeBlocks") is true:
+        (pdc tag "dispenserCannotPlace" of {_item}) isn't true
+        set {_blockdata} to (item blockdata of {_item})
+        if {_blockdata} is set:
+            # blacklist items that already have custom dispense behavior
+            if any:
+                {_item} is powder snow bucket
+                {_item} is tagged with (block tag "shulker_boxes")
+                {_item} is tnt
+            then:
+                exit trigger
+            if (entities touching {_front_block}) where [try input.getHandle().canEquipWithDispenser({_item}.asNMSCopy())] is set:
+                exit trigger
+            set {_chestedHorses::*} to (entities touching {_front_block}) where [input is instance of ChestedHorse]
+            if {_chestedHorses::*} is set:
+                {_chestedHorses::*} where [input.isTamed() is true] is set
+                {_chestedHorses::*} where [input.isCarryingChest() is false] is set
+                exit trigger
+            if {_item} is glowstone:
+                {_front_block} is respawn anchor
+                exit trigger
+            cancel event
+            set {_loc} to location of {_front_block}
+            set (yaw of {_loc}) to (yaw of {_dispenser}) + 180
+            set (pitch of {_loc}) to (pitch of {_dispenser}) * -1
+            if placing {_item} at {_loc} succeeded:
+                dispenserEvent({_dispenser})
+                remove 1 of {_item} from (slot event.getSlot() of inventory of {_dispenser})
+            else:
+                dispenserEventFail({_dispenser})
+            exit trigger

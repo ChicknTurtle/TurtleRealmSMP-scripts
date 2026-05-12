@@ -45,7 +45,7 @@ on player interact on entity:
     wait 2 ticks
     (item id of (player's tool)) is "turtle:mob_bundle"
     set {_fill} to (((spawn item of event-entity) ? barrier) with nbt from "{components:{max_stack_size:1,custom_data:{from_mob_bundle:1b}}}")
-    set (name of {_fill}) to "§r%effective entity name of event-entity%"
+    set (name of {_fill}) to "§r<!i>%effective entity name of event-entity%"
     set {_nbt} to getEntityNbtToStore(event-entity)
     set (compound tag "entityData" of (custom nbt of {_fill})) to {_nbt}
     set (string tag "entityType" of (custom nbt of {_fill})) to str(minecraft entity type of event-entity)
@@ -106,9 +106,11 @@ on inventory click:
     click type is right mouse button
     if (item id of event-item) is "turtle:mob_bundle":
         player's cursor slot is air
-        boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of event-item))) is true
+        set {_bundleItem} to (first element of (bundle contents of event-item))
+        (boolean tag "from_mob_bundle" of (custom nbt of {_bundleItem})) is true
         cancel event
     if (item id of player's cursor slot) is "turtle:mob_bundle":
         event-item is air
-        boolean tag "from_mob_bundle" of (custom nbt of (first element of (bundle contents of (player's cursor slot)))) is true
+        set {_bundleItem} to (first element of (bundle contents of (player's cursor slot)))
+        (boolean tag "from_mob_bundle" of (custom nbt of {_bundleItem})) is true
         cancel event

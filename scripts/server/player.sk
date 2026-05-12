@@ -1,15 +1,11 @@
 
-on load:
-    set {-features::dropskull::name} to "Drop skull"
-    set {-features::dropskull::desc} to "When slain by another player, your head will be dropped"
-    set {-features::dropskull::icon} to player head
-    set {-features::protectdeathloot::name} to "Protect death loot"
-    set {-features::protectdeathloot::desc} to "Whether player death drops should be protected\nSee 'Protected items' to fully disable protected items"
-    set {-features::protectdeathloot::icon} to chest
-
 on join:
     set {-playerData::%player%::lastOnGround} to 1
     set {-playerData::%player%::afkSince} to now
+    updateDiscordPlayersStatus((size of (all players except player))+1)
+
+on leave:
+    updateDiscordPlayersStatus(size of (all players except player))
 
 on skript stop:
     kick all players
@@ -44,7 +40,7 @@ every tick:
     set {_tablistHealth} to getConfigValue("root.players.tablistHealth")
     set {_tps} to ({-formattedTps} ? "§f. . .")
     set {_mspt} to ({-formattedMspt} ? "§f. . .")
-    set {_servername} to ((minimessage from "<gradient:#FF5F15:#ff9940>TurtleRealmSMP Dev") if (getConfigValue("root.server.devMode") is true) else (minimessage from "<gradient:#00FF7F:#C9FF5C>TurtleRealm<gradient:#00DFFF:#00B7FF>SMP"))
+    set {_servername} to (minimessage from getConfigValue("root.server.serverNameColored"))
 
     loop all players:
         # last on ground

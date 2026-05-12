@@ -51,7 +51,7 @@ on custom item interact with "turtle:filter":
     else:
         set slot 8 of {_inv} to {@whitelistItem}
     # create info item
-    set slot 17 of {_inv} to (((black stained glass pane) with custom nbt from "{gui:filterEditor}") without entire tooltip)
+    set (slot 17 of {_inv}) to (((black stained glass pane) with custom nbt from "{gui:filterEditor}") without entire tooltip)
     set (compound tag "filter" of (custom nbt of slot 17 of {_inv})) to (compound tag "filter" of (custom nbt of event-item))
     set (uuid tag "player" of (custom nbt of slot 17 of {_inv})) to (uuid of player)
     set (boolean tag "offhand" of (custom nbt of slot 17 of {_inv})) to (false if (event-equipmentslot is main hand) else true)
@@ -64,7 +64,7 @@ on custom item interact with "turtle:filter":
     open {_inv} to player
 
 on inventory click:
-    (string tag "gui" of custom nbt of (slot 17 of top inventory)) is "filterEditor"
+    (string tag "gui" of custom nbt of (slot 17 of (top inventory))) is "filterEditor"
     if any:
         event-clicktype is double click
         event-clicktype is left mouse with shift
@@ -72,11 +72,11 @@ on inventory click:
     then:
         cancel event
         exit trigger
-    set {_filter} to (compound tag "filter" of (custom nbt of (slot 17 of top inventory)))
+    set {_filter} to (compound tag "filter" of (custom nbt of (slot 17 of (top inventory))))
     set {_blacklist} to (boolean tag "blacklist" of {_filter})
     set {_filters::*} to (string list tag "ids" of {_filter})
-    set {_player} to (uuid tag "player" of (custom nbt of (slot 17 of top inventory))) parsed as entity
-    set {_isOffhand} to (boolean tag "offhand" of (custom nbt of (slot 17 of top inventory)))
+    set {_player} to (uuid tag "player" of (custom nbt of (slot 17 of (top inventory)))) parsed as entity
+    set {_isOffhand} to (boolean tag "offhand" of (custom nbt of (slot 17 of (top inventory))))
     if {_isOffhand} is true:
         set {_filterItem} to (player's offhand tool)
     else:
@@ -116,7 +116,7 @@ on inventory click:
             set (clicked slot) to {_item}
         set (string list tag "ids" of {_filter}) to {_filters::*}
     # update info item and filter item
-    set (compound tag "filter" of (custom nbt of (slot 17 of top inventory))) to {_filter}
+    set (compound tag "filter" of (custom nbt of (slot 17 of (top inventory)))) to {_filter}
     set (compound tag "filter" of (custom nbt of {_filterItem})) to {_filter}
     if {_isOffhand} is true:
         set (compound tag "filter" of (custom nbt of player's offhand tool)) to (compound tag "filter" of custom nbt of {_filterItem})

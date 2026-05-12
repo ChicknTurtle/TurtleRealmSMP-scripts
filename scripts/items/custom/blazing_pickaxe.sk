@@ -59,6 +59,6 @@ on break:
     # smelt drops
     clear drops
     loop drops of event-block using player's tool as player:
-        drop ((smelted loop-value) ? loop-value) at (event-block's location) ~ vector(0.5,0.5,0.5)
+        drop ((smelted loop-value) ? loop-value) at (exact location of event-block) ~ vector(1,1,1)
         if ((smelted loop-value) ? loop-value) isn't loop-value:
-            draw 5 of flame at event-block with extra 0.05
+            draw (5 flame particle with particle speed 0.05) at event-block

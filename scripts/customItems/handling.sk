@@ -1,0 +1,73 @@
+
+# custom interact behavior
+on consume with priority lowest:
+    set {_item} to event-item
+    (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) is true
+    cancel event
+    set event-item to {_item}
+    try player.setCooldown(event-item, floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of event-item)))
+    set {_eventValues::player} to event-player
+    set {_eventValues::item} to event-item
+    set {_eventValues::world} to event-world
+    set {_eventValues::string} to (item id of event-item)
+    set {_eventValues::equipmentslot} to event.getHand()
+    call custom event "customItemInteract" using event-values {_eventValues::*}
+
+# anvil logic
+on anvil prepare:
+    set {_first} to (slot 0 of event-inventory)
+    set {_second} to (slot 1 of event-inventory)
+    # trying to merge
+    if (type of {_first}) is (type of {_second}):
+        ((item id of {_first}) ? "<none>") isn't ((item id of {_second}) ? "<none>")
+        # cancel if not a custom repair
+        (string list tag "customItems;repairItems" of (custom nbt of {_first})) doesn't contain (item id of {_second})
+        set event-slot to air
+    # trying to repair
+    else if (repairable items of {_first}) contains {_second}:
+        set {_repairItems::*} to (string list tag "customItems;repairItems" of custom nbt of {_first}) ? (item id of (repairable items of {_first}))
+        {_repairItems::*} is set
+        {_repairItems::*} doesn't contain (item id of {_second})
+        set event-slot to air
+    # trying to apply book
+    else if {_second} is enchanted book:
+        set {_allowedEnchants::*} to (allowed enchants of {_first})
+        loop (stored enchantments of {_second}):
+            {_allowedEnchants::*} contains (type of loop-value)
+            (enchantment level of loop-value) > ((level of (type of loop-value) of event-slot) ? 0)
+            add loop-value to {_enchants::*}
+        {_enchants::*} is set
+        if event-slot is air:
+            set event-slot to {_first}
+            set (name of event-slot) to colored (anvil text input of event-inventory)
+        enchant event-slot with {_enchants::*}
+    update event-slot
+
+# updating items
+
+# update dropped items
+on entity add to world:
+    event-entity is a dropped item
+    update item (item of event-entity)
+
+# player joining
+on join:
+    loop (integers from 0 to 40):
+        update (slot (loop-value) of player)
+
+# /give, clicking slots, etc
+on inventory slot change:
+    player's gamemode isn't creative
+    event.getSlot() isn't 45
+    event-slot isn't air
+    update event-slot
+
+# chest loot generating
+on loot generate:
+    loop loot:
+        add (updated item loop-value) to {_newloot::*}
+    set loot to {_newloot::*}
+
+# brewing
+on brew completed:
+    set brewing results to (brewing results mapped with [updated input])

@@ -100,6 +100,6 @@ expression:
             set {_mob_name} to {_real_name}
         
         if {_custom_name} is set:
-            return "%{_custom_name}%§r (%{_mob_name}%)"
+            return formatted "%{_custom_name}%<reset> (%{_mob_name}%)"
         else:
-            return "%{_mob_name}%"
+            return formatted "%{_mob_name}%"

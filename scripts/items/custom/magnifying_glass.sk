@@ -33,7 +33,7 @@ on right click:
     set {_b} to (clicked block)
     if {_e} is set:
         # name
-        set {_name} to (effective entity name of {_e})
+        set {_name} to (minimessage from "%effective entity name of {_e}%")
         add "§7🔎 §f%{_name}%§r" to {_info::*}
         # health
         if {_e} is a living entity:

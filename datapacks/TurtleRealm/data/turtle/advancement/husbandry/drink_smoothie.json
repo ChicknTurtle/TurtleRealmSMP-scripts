@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:potion",
+      "components": {
+        "minecraft:item_model": "turtle:smoothie"
+      }
+    },
+    "title": "Delicious!",
+    "description": "Drink a freshly crafted smoothie",
+    "frame": "task"
+  },
+  "parent": "minecraft:husbandry/plant_seed",
+  "criteria": {
+    "smoothie": {
+      "conditions": {
+        "item": {
+          "items": "minecraft:firework_star",
+          "predicates": {
+            "minecraft:custom_data": {
+              "PublicBukkitValues": {
+                "minecraft:customitems.id": "turtle:smoothie"
+              }
+            }
+          }
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  }
+}

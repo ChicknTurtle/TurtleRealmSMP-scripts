@@ -1,18 +1,9 @@
 
-on load:
-    set {-features::bonemealing::name} to "Bonemealing"
-    set {-features::bonemealing::desc} to "Allows using bone meal on blocks you normally can't.\nWorks for: sugar cane, cactus, nether wart, pumpkins,\nmelons, chorus flower, and small flowers\n(excluding wither rose and torchflower)"
-    set {-features::bonemealing::icon} to bone meal
-
 # bonemeal effects
 
 local function bonemealEffect(block:block):
     play sound "minecraft:item.bone_meal.use" in block category at {_block}
-    make 15 of happy_villager at {_block} with offset vector(0.25,0.25,0.25)
-
-local function bonemealEffect2(block:block):
-    play sound "minecraft:item.bone_meal.use" in block category at {_block}
-    make 15 of happy_villager at ({_block} ~ vector(0,-0.2,0)) with offset vector(0.25,0.1,0.25)
+    draw (15 happy villager particle with distribution vector(0.25,0.25,0.25)) at {_block}
 
 local function playerBonemeal(p:player):
     make {_p} swing their hand
@@ -84,7 +75,7 @@ function bonemealFlowerBlock(block:block) :: boolean:
 # dispenser functionality in dispenser.sk
 
 on right click:
-    {enabledFeatures::bonemealing} is true
+    getConfigValue("root.world.technology.betterBonemeal") is true
     player's tool is bone meal
     # cactus block
     if (cactus (itemtype)) contains (type of event-block):
@@ -107,6 +98,6 @@ on right click:
         bonemealSingleTickBlock(event-block) is true
         playerBonemeal(player)
     # flower block
-    else if (tag values of block tag "small_flowers" where [(wither rose, torchflower) doesn't contain input]) contains (type of event-block):
+    else if (tag values of block tag "small_flowers" where [(wither rose, torchflower, golden dandelion) doesn't contain input]) contains (type of event-block):
         bonemealFlowerBlock(event-block) is true
         playerBonemeal(player)

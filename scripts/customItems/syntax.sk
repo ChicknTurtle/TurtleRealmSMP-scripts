@@ -1,0 +1,170 @@
+using reflection
+
+# Get/set/delete a custom item
+expression:
+    return type: itemtype
+    patterns:
+        [the] (custom item|ci) [with id|named] %string/namespacedkey%
+    get:
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        if {-customItems::%{_id}%::item} isn't set:
+            return (itemtype from key {_id})
+        return {-customItems::%{_id}%::item}
+    set:
+        set {_item} to (change value)
+        {_item} isn't air
+        {_item} is instance of itemtype
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        set (item id of {_item}) to {_id}
+        set {-customItems::%{_id}%::item} to (updated {_item})
+    delete:
+        set {_id} to (expr-1 if (expr-1 is namespacedkey) else (namespaced key from expr-1))
+        {_id} is set
+        delete {-customItems::%{_id}%::*}
+
+# Register a custom item (alias)
+effect:
+    patterns:
+        register [custom] item %itemtype% as %string/namespacedkey%
+        register %itemtype% as [custom] item %string/namespacedkey%
+    trigger:
+        set (custom item expr-2) to expr-1
+
+# Get all custom items
+plural expression:
+    return type: itemtype
+    loop of: item
+    patterns:
+        all [[of] the] [registered|defined|loaded] custom items
+    get:
+        return (indexes of {-customItems::*}) mapped with [{-customItems::%input%::item}]
+
+# Get/set/delete the custom id of an item
+itemtype property item id:
+    return type: string
+    get:
+        set {_item} to expr-1
+        return (pdc tag "customItems.id" of {_item}) ? (raw name of {_item})
+    set:
+        set {_item} to expr-1
+        set (pdc tag "customItems.id" of {_item}) to "%change value%"
+        set (raw expression of expr-1) to {_item}
+    delete:
+        set {_item} to expr-1
+        delete (pdc tag "customItems.id" of {_item})
+        set (raw expression of expr-1) to {_item}
+
+# Check whether an item has a custom id set
+condition:
+    patterns:
+        %itemtypes% (has|have) [a] custom [item] id [set]
+        %itemtypes% (doesn't|does not|do not|don't) have [a] custom [item] id [set]
+    check:
+        set {_result} to false
+        loop exprs-1:
+            set {_result} to true if ((pdc tag "customItems.id" of loop-value) is set)
+            exit loop
+        toggle {_result} if (matched pattern is 2)
+        return {_result}
+
+# Get/set/delete the update function of a custom item
+string property update function:
+    return type: function
+    get:
+        return {-customItems::%expr-1%::updateFunction}
+    set:
+        change value is a function
+        set {-customItems::%expr-1%::updateFunction} to change value
+    delete:
+        delete {-customItems::%expr-1%::updateFunction}
+
+# Update an item based on its custom id
+expression:
+    patterns:
+        updated [[custom] item] %itemtype%
+    get:
+        set {_item} to expr-1
+        if {_item} ? air is air:
+            return {_item}
+        set {_original} to {_item}
+        # update nbt
+        set {_id} to (item id of {_item})
+        set {_rawitem} to (custom item {_id}) ? {_item}
+        if (int tag "minecraft:damage" of (nbt of {_item})) is 0:
+            (int tag "minecraft:max_damage" of (vanilla nbt of {_rawitem})) isn't set
+            delete (int tag "minecraft:damage" of (nbt of {_item}))
+        set {_newitem} to (item amount of {_item}) of (type of {_rawitem})
+        add nbt of {_item} to nbt of {_newitem}
+        add nbt of {_rawitem} to nbt of {_newitem}
+        # call update function
+        if {-customItems::%{_id}%::updateFunction} is set:
+            set {_newitem} to (result of {-customItems::%{_id}%::updateFunction} with args {_newitem}) ? {_newitem}
+        # call event
+        set {_eventValues::item} to {_item}
+        set {_eventValues::string} to {_id}
+        set {_event} to (custom event "customItemUpdate" using event-values {_eventValues::*})
+        call {_event}
+        if {_event} is cancelled:
+            return {_original}
+        return {_newitem}
+effect:
+    patterns:
+        update [[custom] item] %itemtype%
+    trigger:
+        set (raw expression of expr-1) to (updated expr-1)
+
+# Add custom interact nbt to an item
+effect:
+    patterns:
+        add custom interact[ion] [nbt] to %itemtype%
+        set custom interact[ion] of %itemtype% to (true|on|enabled)
+    trigger:
+        set {_item} to expr-1
+        set (compound tag "minecraft:consumable" of (nbt of {_item})) to (nbt compound from "{consume_seconds:0.05,animation:""none"",sound:{sound_id:""""},has_consume_particles:false,on_consume_effects:[{type:""minecraft:play_sound"",sound:{sound_id:""""}}]}")
+        apply food component to {_item}:
+            nutrition: 0
+            saturation: 0
+            can_always_eat: true
+        set (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item})) to true
+        set raw expression of expr-1 to {_item}
+
+# Remove custom interact nbt from an item
+effect:
+    patterns:
+        remove custom interact[ion] [nbt] from %itemtype%
+        set custom interact[ion] of %itemtype% to (false|off|disabled)
+    trigger:
+        set {_item} to expr-1
+        delete (compound tag "minecraft:consumable" of (nbt of {_item}))
+        delete (compound tag "minecraft:food" of (nbt of {_item}))
+        delete (boolean tag "customItems;hasCustomInteract" of (custom nbt of {_item}))
+        set raw expression of expr-1 to {_item}
+
+# Custom repair items
+plural expression:
+    patterns:
+        custom repair[able] (item|material)s of %itemtype%
+        %itemtype%'s custom repair[able] (item|material)s
+    return type: itemtypes
+    get:
+        return (string list tag "customItems;repairItems" of (custom nbt of (expr-1))) mapped with [custom item input]
+    set:
+        set {_item} to expr-1
+        set (repairable items of {_item}) to (change values)
+        set (string list tag "customItems;repairItems" of (custom nbt of {_item})) to (item id of change values)
+        set (raw expression of expr-1) to {_item}
+
+# Custom allowed enchants
+plural expression:
+    patterns:
+        (allowed|valid) enchant[ment]s of %itemtype%
+        %itemtype%'s (allowed|valid) enchant[ment]s
+    return type: enchantments
+    get:
+        return (string list tag "customItems;allowedEnchantments" of (custom nbt of (expr-1))) mapped with [enchantment from key input]
+    set:
+        set {_item} to expr-1
+        set (string list tag "customItems;allowedEnchantments" of (custom nbt of {_item})) to ((change values) mapped with ["%namespaced key of input%"])
+        set (raw expression of expr-1) to {_item}

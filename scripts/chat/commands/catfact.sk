@@ -9,4 +9,4 @@ brig command /turtle:catfact:
             set {_catfact} to JsonParser.parseString({_json}).getAsJsonObject().get("fact").getAsString()
             if {_catfact} ends with ".":
                 set {_catfact} to (subtext of {_catfact} from character 1 to ((length of {_catfact})-1))
-            send " &d🐈 Cat Fact: &f%{_catfact}% :3"
+            send " §d🐈 Cat Fact: §f%{_catfact}% :3"

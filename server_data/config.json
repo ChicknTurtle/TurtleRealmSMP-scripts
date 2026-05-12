@@ -1,0 +1,444 @@
+{
+  "root": {
+    "name": "Config",
+    "title": "Server Configuration",
+    "desc": "Server configuration for the server scripts\nChanging pages or clicking the save button saves the current page,\npushing escape exits without saving the current page.",
+    "item": "minecraft:turtle_spawn_egg",
+    "nodes": {
+      "test": {
+        "name": "Test",
+        "nodes": {
+          "testBoolean": {
+            "type": "boolean"
+          },
+          "testBoolean2": {
+            "name": "Cool Boolean",
+            "desc": "Cooler than testBoolean",
+            "type": "boolean",
+            "default": true
+          },
+          "testSlider": {
+            "type": "slider",
+            "start": 0,
+            "end": 10
+          },
+          "testSlider2": {
+            "name": "Cool Slider",
+            "desc": "Cooler than testSlider",
+            "type": "slider",
+            "start": -100,
+            "end": 0,
+            "default": -69,
+            "step": 1
+          },
+          "testText": {
+            "type": "text"
+          },
+          "testText2": {
+            "name": "Cool Text",
+            "desc": "Cooler than testText",
+            "type": "text",
+            "max": 64,
+            "lines": 4,
+            "default": "some default text...\nand some more..."
+          },
+          "testText3": {
+            "name": "Looooooong text",
+            "type": "text",
+            "max": 512,
+            "lines": 56,
+            "default": "1\n2\n3\n4"
+          },
+          "testOptions": {
+            "type": "options",
+            "options": {
+              "option1": "Option 1",
+              "option2": "Option 2",
+              "option3": "Option 3"
+            }
+          },
+          "testOptions2": {
+            "name": "Cool Options",
+            "desc": "Cooler than testOptions",
+            "type": "options",
+            "options": {
+              "option1": "Cool Option",
+              "option2": "Cooler Option",
+              "option3": "Coolest Option"
+            }
+          }
+        }
+      },
+      "server": {
+        "name": "Server",
+        "desc": "General server configuration",
+        "item": "minecraft:test_block",
+        "nodes": {
+          "serverName": {
+            "name": "Server name",
+            "desc": "Name of the server",
+            "type": "text",
+            "max": 1024,
+            "default": "Minecraft Server"
+          },
+          "serverNameColored": {
+            "name": "Server name color",
+            "desc": "Name of the server with color in minimessage format",
+            "type": "text",
+            "max": 1024,
+            "default": "<green>Minecraft Server"
+          },
+          "motd": {
+            "name": "MOTD",
+            "desc": "Message of the day shown in the server list",
+            "type": "text",
+            "max": 1024,
+            "lines": 12,
+            "default": "A cool server"
+          },
+          "resourcePackURL": {
+            "name": "Resource pack URL",
+            "desc": "Direct URL to the server resource pack zip\nRequires a script reload to update and find file hash",
+            "type": "text",
+            "max": 1024,
+            "default": ""
+          },
+          "logDebug": {
+            "name": "Log debug",
+            "desc": "Whether debug messages should be visible in console",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "world": {
+        "name": "World",
+        "desc": "World settings",
+        "item": "minecraft:grass_block",
+        "nodes": {
+          "mobs": {
+            "name": "Mobs",
+            "item": "minecraft:zombie_spawn_egg",
+            "nodes": {
+              "pets": {
+                "name": "Pets",
+                "item": "minecraft:cat_spawn_egg",
+                "nodes": {
+                  "protectFromOwner": {
+                    "name": "Protect from owner",
+                    "desc": "Pets cannot be damaged by their owner except while sneaking.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "forgetTarget": {
+                    "name": "Forget target",
+                    "desc": "Sitting down a pet will make it forget its target.",
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              },
+              "villagers": {
+                "name": "Villagers",
+                "item": "minecraft:villager_spawn_egg",
+                "nodes": {
+                  "infiniteTrading": {
+                    "name": "Infinite trading",
+                    "desc": "Villager trades have infinite stock and no raising demand.\nWhen disabled, previously interacted with villagers will\nstill have (virtually) infinite trades.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "sharedCuring": {
+                    "name": "Shared curing",
+                    "desc": "Make it so villagers only have to be cured once for all players to recieve the discount.\nWhen disabled, only the last player to interact with the villager will have the cure discount.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "rerollTradesItem": {
+                    "name": "Reroll trades item",
+                    "desc": "Use this item to reroll a villager's trades.\nSupports custom item ids. Blank or invalid item to disable.",
+                    "type": "text",
+                    "default": "minecraft:glowstone_dust"
+                  },
+                  "forgetJobDistance": {
+                    "name": "Forget far-away workstations",
+                    "desc": "Force villagers to forget job sites that are this many blocks away.\n0 to disable.",
+                    "type": "slider",
+                    "start": 0,
+                    "end": 512,
+                    "default": 256,
+                    "step": 16
+                  }
+                }
+              },
+              "dismounting": {
+                "name": "Dismounting",
+                "desc": "Interact with a mob while sneaking to make it dismount a boat or minecart.",
+                "type": "boolean",
+                "default": true
+              }
+            }
+          },
+          "items": {
+            "name": "Items",
+            "item": "minecraft:diamond",
+            "nodes": {
+              "shearDiffusing": {
+                "name": "Shear diffusing",
+                "desc": "Allow shears to diffuse TNT and TNT minecarts.",
+                "type": "boolean",
+                "default": true
+              },
+              "flintAndSteelIgniting": {
+                "name": "Flint and steel igniting",
+                "desc": "Allow flint and steel to directly ignite mobs.",
+                "type": "boolean",
+                "default": true
+              }
+            }
+          },
+          "enchanting": {
+            "name": "Enchanting",
+            "item": "minecraft:enchanting_table",
+            "nodes": {
+              "anvil": {
+                "name": "Anvil",
+                "item": "minecraft:anvil",
+                "nodes": {
+                  "noCostStacking": {
+                    "name": "No cost stacking",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "coloredRename": {
+                    "name": "Colored rename",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "freeRenames": {
+                    "name": "Free renames",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "anvilRepairing": {
+                    "name": "Anvil repairing",
+                    "desc": "Repair anvils with iron blocks",
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          },
+          "technology": {
+            "name": "Technology",
+            "item": "minecraft:comparator",
+            "nodes": {
+              "betterBonemeal": {
+                "name": "Better bonemeal",
+                "desc": "Allow bonemeal to be used on the following blocks: sugar cane, cactus, nether wart, pumpkins, melons, chorus flower, and small flowers (excluding wither roses and torchflowers).",
+                "type": "boolean",
+                "default": true
+              },
+              "dyeMore": {
+                "name": "Dye more",
+                "desc": "Allow dye to be applied to wool, wool carpets, shulker boxes, and live shulkers.",
+                "type": "boolean",
+                "default": true
+              },
+              "dispensers": {
+                "name": "Dispensers",
+                "item": "minecraft:dispenser",
+                "nodes": {
+                  "placeBlocks": {
+                    "name": "Place blocks",
+                    "desc": "Allow dispensers to place any block.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "breedAnimals": {
+                    "name": "Breed animals",
+                    "desc": "Allow dispensers to breed animals.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "milkMobs": {
+                    "name": "Milk mobs",
+                    "desc": "Allow dispensers to milk cows, mooshrooms, and goats with buckets.\nDoesn't support milking stew from mooshrooms.",
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          },
+          "disableNetherPortals": {
+            "name": "Disable nether portals",
+            "desc": "Prevent traveling to the nether through nether portals.",
+            "type": "boolean",
+            "default": false
+          },
+          "disableEndPortals": {
+            "name": "Disable end portals",
+            "desc": "Prevent traveling to the end through end portals.",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "players": {
+        "name": "Players",
+        "desc": "Player configuration",
+        "item": "minecraft:player_head",
+        "nodes": {
+          "tablistHealth": {
+            "name": "Show health in tablist",
+            "desc": "Players' health will show in tablist as a colored heart",
+            "type": "boolean",
+            "default": true
+          },
+          "protectDeathLoot": {
+            "name": "Protect death loot",
+            "desc": "Player death loot will glow and be protected from all sources.\nChanging this setting will not affect previously dropped items.",
+            "type": "boolean",
+            "default": true
+          },
+          "elytraBouncing": {
+            "name": "Elytra bouncing",
+            "desc": "Prevent jumping off the ground while gliding with elytra to stop you from gliding.",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "chat": {
+        "name": "Chat",
+        "desc": "Chat settings",
+        "item": {
+          "id": "minecraft:test_block",
+          "nbt": "{\"minecraft:block_state\":{mode:\"log\"}}"
+        },
+        "nodes": {
+          "customChat": {
+            "name": "Custom Chat",
+            "nodes": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Enable custom chat and other functionality in this tab",
+                "type": "boolean",
+                "default": true
+              },
+              "colorableChat": {
+                "name": "Colorable chat",
+                "desc": "Whether legacy color codes using '&' will be formatted in chat",
+                "type": "boolean",
+                "default": true
+              },
+              "displayHeldItem": {
+                "name": "Display held item",
+                "desc": "Whether '[item]' should be replaced with the player's held item",
+                "type": "boolean",
+                "default": true
+              },
+              "joinLeaveMessages": {
+                "name": "Join/leave messages",
+                "desc": "Enable custom format for join and leave messages",
+                "type": "boolean",
+                "default": true
+              },
+              "deathMessages": {
+                "name": "Death messages",
+                "desc": "Enable custom format for death messages\nDoesn't work for pets",
+                "type": "boolean",
+                "default": true
+              },
+              "advancements": {
+                "name": "Advancements",
+                "desc": "Enable custom format for advancement messages",
+                "type": "boolean",
+                "default": true
+              }
+            }
+          },
+          "commands": {
+            "name": "Commands",
+            "nodes": {}
+          }
+        }
+      },
+      "discord": {
+        "name": "Discord",
+        "desc": "",
+        "nodes": {
+          "linkChannel": {
+            "name": "Link channel",
+            "desc": "ID of the discord channel that is used for chat link. Set to a non-integer or empty string to disable",
+            "type": "text",
+            "default": ""
+          },
+          "execEnabled": {
+            "name": "/exec enabled",
+            "desc": "Whether the Discord command /exec is enabled. It allows you to remotely execute Skript code. Configure allowed users with discord.execUsers",
+            "type": "boolean",
+            "default": true
+          },
+          "execUsers": {
+            "name": "/exec users",
+            "desc": "Comma separated list of IDs of the users who can use /exec on discord. Requires discord.execEnabled to be true",
+            "type": "text",
+            "default": ""
+          },
+          "inviteUrl": {
+            "name": "Invite url",
+            "desc": "ID part of the invite url to the discord, used in /discord",
+            "type": "text",
+            "default": ""
+          },
+          "mcToDiscord": {
+            "name": "Minecraft > Discord",
+            "desc": "Whether messages are sent from Minecraft to Discord",
+            "type": "boolean",
+            "default": true
+          },
+          "discordToMc": {
+            "name": "Discord > Minecraft",
+            "desc": "Whether messages are sent from Discord to Minecraft",
+            "type": "boolean",
+            "default": true
+          },
+          "playerChats": {
+            "name": "Player chats",
+            "desc": "Whether player chat messages are sent to the discord channel",
+            "type": "boolean",
+            "default": true
+          },
+          "joinLeaveMessages": {
+            "name": "Join/leave messages",
+            "desc": "Whether player join and leave messages are sent to the discord channel",
+            "type": "boolean",
+            "default": true
+          },
+          "deathMessages": {
+            "name": "Death messages",
+            "desc": "Whether player death messages are sent to the discord channel",
+            "type": "boolean",
+            "default": true
+          },
+          "advancementMessages": {
+            "name": "Advancement messages",
+            "desc": "Whether advancement messages are sent to the discord channel",
+            "type": "boolean",
+            "default": true
+          },
+          "botToken": {
+            "name": "Bot token",
+            "type": "text",
+            "max": 200,
+            "default": "",
+            "hidden": true
+          }
+        }
+      }
+    }
+  }
+}

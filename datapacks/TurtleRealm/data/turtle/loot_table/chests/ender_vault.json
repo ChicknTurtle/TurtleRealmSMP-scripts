@@ -10,7 +10,7 @@
           "functions": [
             {
               "function": "minecraft:set_custom_data",
-              "tag": "{customId:\"turtle:shulker_soul\"}"
+              "tag": "{PublicBukkitValues:{\"minecraft:customitems.id\":\"turtle:shulker_soul\"}}"
             },
             {
               "function": "minecraft:set_count",

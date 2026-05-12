@@ -2,10 +2,10 @@
 local function playerInfo(p:player) :: string:
     if (time played of {_p}) is set:
         add "Playtime: §6%hours of time played of {_p}%h" to {_lines::*}
-    if {discordLinks::%uuid of {_p}%} is set:
-        set {_user} to user with id {discordLinks::%uuid of {_p}%}
+    if {discord::links::mc::%uuid of {_p}%} is set:
+        set {_user} to getDiscordUser({discord::links::mc::%uuid of {_p}%}, true)
         if {_user} is set:
-            add "Discord: §9%{_user}% §7(@%discord name of {_user}%)" to {_lines::*}
+            add "Discord: §9%{_user}.getGlobalName()% §7(@%{_user}.getName()%)" to {_lines::*}
         else:
             add "Discord: §cUnknown User%nl%§7@???" to {_lines::*}
     else:

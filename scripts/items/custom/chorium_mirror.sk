@@ -57,17 +57,14 @@ local function mirrorTp(p:player,loc:location):
     teleport {_p} to {_loc} while retaining (vehicle,passengers,yaw and pitch velocity)
     play sound "minecraft:entity.illusioner.mirror_move" in player category at {_beforeloc}
     play sound "minecraft:block.portal.travel" in player category with volume 0.25 at {_p}
-    make 100 of end rod at {_beforeloc} with extra 0.25
-    make 100 of portal at {_p}
+    draw (100 end rod particle with particle speed 0.25) at {_beforeloc}
+    draw (100 portal particle) at {_p}
     # apply cooldown after tp so it is visible on client
     {_p}.setCooldown((custom item "turtle:chorium_mirror"), floor(20*(float tag "minecraft:use_cooldown;seconds" of nbt of (custom item "turtle:chorium_mirror"))))
 
 on custom item interact with "turtle:chorium_mirror":
     set {_mirror} to (player's offhand tool) if (event-equipmentslot is off hand slot) else (player's tool)
-    if any:
-        durability of {_mirror} <= 1
-        event-world is "world_turtle_dungeon"
-    then:
+    if durability of {_mirror} <= 1:
         play sound "minecraft:item.ominous_bottle.dispose" in (player category) at player
         exit trigger
     set {_mirrorLoc} to (compound tag "mirrorLoc" of (custom nbt of {_mirror}))
@@ -80,7 +77,7 @@ on custom item interact with "turtle:chorium_mirror":
         set (compound tag "mirrorLoc" of (custom nbt of {_mirror})) to {_mirrorLoc}
         set (boolean tag "hasMirrorLoc" of (custom nbt of {_mirror})) to true
         play sound "minecraft:entity.illusioner.prepare_mirror" in (player category) at player
-        make 25 of end rod at player with extra 0.1
+        draw (25 end rod particle with particle speed 0.1) at player
     else:
         # tp
         set {_loc} to getMirrorLoc({_mirrorLoc})

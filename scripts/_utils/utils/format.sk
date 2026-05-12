@@ -25,4 +25,7 @@ function formatTimespan(time:timespan) :: string:
     set {_h} to floor({_s} / 3600)
     set {_m} to floor(mod({_s}, 3600) / 60)
     set {_s} to mod({_s}, 60)
-    return ("%{_h}%h " if {_h} isn't 0 else "") + ("%{_m}%m " if {_m} isn't 0 else "") + "%{_s}%s"
+    add "%{_h}%h" to {_parts::*} if {_h} isn't 0
+    add "%{_m}%m" to {_parts::*} if {_m} isn't 0
+    add "%{_s}%s" to {_parts::*} if {_s} isn't 0
+    return (join {_parts::*} with " ") ? "0s"
