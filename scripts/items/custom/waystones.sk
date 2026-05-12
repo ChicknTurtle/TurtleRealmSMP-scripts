@@ -14,6 +14,19 @@ register custom items:
     set (component item name of {_item}) to (text component from "Warp Shard")
     set (enchantment glint of {_item}) to true
     set (custom item "turtle:warp_shard") to {_item}
+    # warp stone
+    set {_item} to ((firework star) with nbt from "{rarity:""epic""}")
+    set (item model of {_item}) to "turtle:warp_stone"
+    set (component item name of {_item}) to (text component from "Warp Stone")
+    set (max stack size of {_item}) to 1
+    set (enchantment glint of {_item}) to true
+    add custom interact to {_item}
+    set (float tag "minecraft:consumable;consume_seconds" of (nbt of {_item})) to 1.5
+    set (string tag "minecraft:consumable;animation" of (nbt of {_item})) to "bow"
+    apply use cooldown component to {_item}:
+        seconds: 1 tick
+        group: "turtle:warp_stone"
+    set (custom item "turtle:warp_stone") to {_item}
 
 register recipes:
     register shaped recipe:
@@ -34,6 +47,14 @@ register recipes:
             set ingredient of "a" to amethyst shard
             set ingredient of "p" to ender pearl
             set ingredient of "#" to echo shard
+    register shaped recipe:
+        id: "turtle:warp_stone"
+        result: custom item "turtle:warp_stone"
+        shape: " # ", "#d#", " # "
+        category: "misc"
+        ingredients:
+            set ingredient of "#" to (custom item "turtle:warp_shard")
+            set ingredient of "d" to diamond
 
 function isWaystoneAt(block:block) :: boolean:
     return whether ({waystones::%formatLocation(exact location of {_block})%::name} is set)
@@ -85,9 +106,15 @@ function waystoneTp(e:entity, id:string):
     set {_loc} to {waystones::%{_id}%::loc}
     set (yaw of {_loc}) to (yaw of {_e})
     set (pitch of {_loc}) to (pitch of {_e})
-    teleport {_e} to ({_loc} ~ vector(0.5,1,0.5)) retaining (passengers, vehicle (teleport flag), directional velocity)
     close {_e}'s inventory
-    play sound "minecraft:block.portal.travel" in (players category) with volume 0.5 at {_loc}
+    set {_beforeloc} to (location of {_e})
+    set {_toloc} to ({_loc} ~ vector(0.5,1,0.5))
+    teleport {_e} to {_toloc} retaining (passengers, vehicle (teleport flag), directional velocity)
+    force draw (100 end rod particle with particle speed 0.25) at {_beforeloc}
+    force draw (100 portal particle) at {_toloc}
+    play sound "minecraft:entity.illusioner.mirror_move" in (players category) at {_beforeloc}
+    play sound "minecraft:block.portal.travel" in (players category) with volume 0.25 at {_toloc}
+    set (item cooldown of (custom item "turtle:warp_stone") for {_e}) to 10 seconds
 
 # gui
 
@@ -227,3 +254,8 @@ on block explode:
         destroyWaystone(loop-block) is true
         drop (custom item "turtle:waystone") at loop-block ~ vector(0.5,0.5,0.5)
         play sound "minecraft:block.beacon.deactivate" in (blocks category) at loop-block
+
+# warp stone
+
+on custom item interact with "turtle:warp_stone":
+    openWaystoneTravel(player)
