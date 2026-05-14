@@ -2,7 +2,7 @@
 local function shouldCancelExplode(b:block) :: boolean:
     if any:
         (tag values of block tag "shulker_boxes") contains {_b}
-        raw name of {_b} is "minecraft:spawner"
+        (raw name of {_b}) is "minecraft:spawner"
     then:
         return true
     return false
