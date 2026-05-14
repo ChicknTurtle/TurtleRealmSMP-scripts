@@ -245,15 +245,13 @@ on break:
 
 on explode:
     loop exploded blocks:
-        destroyWaystone(loop-block) is true
-        drop (custom item "turtle:waystone") at loop-block ~ vector(0.5,0.5,0.5)
-        play sound "minecraft:block.beacon.deactivate" in (blocks category) at loop-block
+        isWaystoneAt(loop-block) is true
+        remove loop-block from exploded blocks
 
 on block explode:
     loop event-blocks:
-        destroyWaystone(loop-block) is true
-        drop (custom item "turtle:waystone") at loop-block ~ vector(0.5,0.5,0.5)
-        play sound "minecraft:block.beacon.deactivate" in (blocks category) at loop-block
+        isWaystoneAt(loop-block) is true
+        remove loop-block from event-blocks
 
 # warp stone
 
