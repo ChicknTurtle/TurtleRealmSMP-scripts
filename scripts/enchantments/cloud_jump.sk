@@ -47,8 +47,7 @@ on player press of jump key:
     player isn't in bubble column
     player isn't flying
     {-playerData::%player%::lastOnGround} >= 1
-    set {_e} to enchantment from key "turtle:cloud_jump"
-    player's leggings are enchanted with {_e}
+    player's leggings are enchanted with turtle:cloud_jump
     {-playerData::%player%::canCloudJump} isn't false
     cloudJumpBoost(player)
     set {-playerData::%player%::canCloudJump} to false

@@ -82,13 +82,12 @@ on death of player:
     if event.getKeepInventory() is true:
         drop {_customDrops::*} at victim
         exit trigger
-    set {_e} to enchantment from key "turtle:soulbound"
     set {_drops::*} to (...event.getDrops()) and {_customDrops::*}
     event.getDrops().clear()
     set {_protectDeathLoot} to getConfigValue("root.players.protectDeathLoot")
     loop {_drops::*}:
         # soulbound
-        if loop-value is enchanted with {_e}:
+        if loop-value is enchanted with turtle:soulbound:
             event.getItemsToKeep().add(loop-value)
         # protected items
         else:
