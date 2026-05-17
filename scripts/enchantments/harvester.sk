@@ -1,7 +1,6 @@
 
 on break:
-    set {_e} to enchantment from key "turtle:harvester"
-    player's tool is enchanted with {_e}
+    player's tool is enchanted with turtle:harvester
     player isn't sneaking
     # sugarcane
     if event-block is sugar cane:

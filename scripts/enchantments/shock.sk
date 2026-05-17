@@ -47,8 +47,7 @@ function shock(arrow:entity,shooter:entity,wet:boolean):
             draw ({@particle2}) at {_loc}
 
 on entity shoot bow:
-    set {_e} to enchantment from key "turtle:shock"
-    shot bow is enchanted with {_e}
+    shot bow is enchanted with turtle:shock
     while projectile entity is alive:
         draw ({@trail}) at projectile entity
         if projectile entity is wet:

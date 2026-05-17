@@ -1,0 +1,5 @@
+
+on damage:
+    attacker's tool is enchanted with turtle:squeaking_curse
+    set damage to 0
+    play sound "turtle:item.mace.smash_squeaky" with pitch (random number from 0.9 to 1.1) at victim
