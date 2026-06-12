@@ -7,6 +7,7 @@
     "nodes": {
       "test": {
         "name": "Test",
+        "hidden": true,
         "nodes": {
           "testBoolean": {
             "type": "boolean"
@@ -372,7 +373,7 @@
         "nodes": {
           "linkChannel": {
             "name": "Link channel",
-            "desc": "ID of the discord channel that is used for chat link. Set to a non-integer or empty string to disable",
+            "desc": "ID of the Discord channel that is used for chat link. Set to a non-integer or empty string to disable",
             "type": "text",
             "default": ""
           },
@@ -384,13 +385,13 @@
           },
           "execUsers": {
             "name": "/exec users",
-            "desc": "Comma separated list of IDs of the users who can use /exec on discord. Requires discord.execEnabled to be true",
+            "desc": "Comma separated list of IDs of the users who can use /exec on Discord. Requires discord.execEnabled to be true",
             "type": "text",
             "default": ""
           },
           "inviteUrl": {
             "name": "Invite url",
-            "desc": "ID part of the invite url to the discord, used in /discord",
+            "desc": "ID part of the invite url to the Discord, used in /discord",
             "type": "text",
             "default": ""
           },
@@ -408,25 +409,25 @@
           },
           "playerChats": {
             "name": "Player chats",
-            "desc": "Whether player chat messages are sent to the discord channel",
+            "desc": "Whether player chat messages are sent to the Discord channel",
             "type": "boolean",
             "default": true
           },
           "joinLeaveMessages": {
             "name": "Join/leave messages",
-            "desc": "Whether player join and leave messages are sent to the discord channel",
+            "desc": "Whether player join and leave messages are sent to the Discord channel",
             "type": "boolean",
             "default": true
           },
           "deathMessages": {
             "name": "Death messages",
-            "desc": "Whether player death messages are sent to the discord channel",
+            "desc": "Whether player death messages are sent to the Discord channel",
             "type": "boolean",
             "default": true
           },
           "advancementMessages": {
             "name": "Advancement messages",
-            "desc": "Whether advancement messages are sent to the discord channel",
+            "desc": "Whether advancement messages are sent to the Discord channel",
             "type": "boolean",
             "default": true
           },
@@ -436,6 +437,40 @@
             "max": 200,
             "default": "",
             "hidden": true
+          }
+        }
+      },
+      "nbs": {
+        "name": "Custom Songs",
+        "desc": "Settings for the nbs song system",
+        "item": {
+          "id": "minecraft:music_disc_creator",
+          "nbt": "{\"minecraft:item_model\":\"turtle:custom_music_disc\",\"minecraft:custom_name\":\"gabi is awesome\"}"
+        },
+        "nodes": {
+          "songFolder": {
+            "name": "Song folder",
+            "desc": "Folder relative to the server root where song files are uploaded to and read from",
+            "type": "text",
+            "default": "nbsSongs"
+          },
+          "uploadingRequireOp": {
+            "name": "Only OPs can upload",
+            "desc": "Only allow server operators to upload songs",
+            "type": "boolean",
+            "default": false
+          },
+          "uploadingRequireLink": {
+            "name": "Only linked users can upload",
+            "desc": "Only allow users who have linked their Discord account to upload songs",
+            "type": "boolean",
+            "default": true
+          },
+          "clearOldSongs": {
+            "name": "Clear old songs",
+            "desc": "Delete songs that haven't been played for 30 days when the server starts",
+            "type": "boolean",
+            "default": false
           }
         }
       }

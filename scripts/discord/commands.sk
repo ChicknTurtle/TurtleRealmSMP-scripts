@@ -91,12 +91,19 @@ function jdaRegisterCommands():
     create section with {_event} stored in {_callback}:
         {_event}.deferReply(true).queue()
         set {_user} to {_event}.getUser()
-        # linked user
+        # player checks
         set {_p} to {discord::links::discord::%{_user}.getId()%}
-        if {_p} isn't set:
+        if {_p} is set:
+            set {_player} to player({_p})
+            getConfigValue("root.nbs.uploadingRequireOp") is true
+            set {_offlineP} to offlineplayer({_p}, false)
+            {_offlineP} isn't op
+            {_event}.getHook().sendMessage("You must be a server operator to upload a song!").queue()
+            exit trigger
+        else:
+            getConfigValue("root.nbs.uploadingRequireLink") or getConfigValue("root.nbs.uploadingRequireOp") is true
             {_event}.getHook().sendMessage("You must have your account linked to upload a song! Use </link:%{-discord::commands::link}.getId()%>").queue()
             exit trigger
-        set {_p} to player({_p})
         # check .nbs file
         set {_fileAttachment} to {_event}.getOption("file").getAsAttachment()
         if {_fileAttachment}.getFileExtension() isn't "nbs":
@@ -115,11 +122,11 @@ function jdaRegisterCommands():
         # check if song file is valid
         set {_song} to validateNbsFile(try {_fileAttachment}.getProxy().download())
         if {_song} is set:
-            set {_downloadedFile} to {_fileAttachment}.getProxy().downloadToFile(newFile("nbsSongs/%{_filename}%.nbs")).get()
+            set {_downloadedFile} to {_fileAttachment}.getProxy().downloadToFile(newFile("%getConfigValue("root.nbs.songFolder")%/%{_filename}%.nbs")).get()
             log debug "Caching uploaded song '%{_filename}%'"
             set {-nbsSongCache::%{_filename}%} to {_song}
-            if {_p} is set:
-                send formatted "§b🎶 §fYou uploaded the song §b<hover:show_text:'§bClick to apply to held disc'><click:run_command:'/turtle:nbs apply %{_filename}%'>%{_filename}%<reset>§f!" to {_p}
+            if {_player} is set:
+                send formatted "§b🎶 §fYou uploaded the song §b<hover:show_text:'§bClick to apply to held disc'><click:run_command:'/turtle:nbs apply %{_filename}%'>%{_filename}%<reset>§f!" to {_player}
             {_event}.getHook().sendMessage(":cd: Your song has been uploaded as `%{_filename}%`! :notes:%nl%Your file could be deleted or overwritten by another user, so don't lose your original file! See [Custom Music Disc](<https://github.com/ChicknTurtle/TurtleRealmSMP-scripts/wiki/Custom-Music-Disc>) to learn how to listen to your song in-game.").queue()
         else:
             {_event}.getHook().sendMessage("Your file `%{_fileAttachment}.getFileName()%` was not uploaded because it was found to be an invalid song file.%nl%You can find valid song files on [Note Block World](<https://noteblock.world/>).").queue()
