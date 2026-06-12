@@ -35,17 +35,34 @@ function processBarrel(b:block):
     # perform processes
     set {_resultInv} to ((inventory of {_below}) if ({_below} is a hopper) else (inventory of {_b}))
     loop (items in inventory of {_b}):
+        set {_remainder} to (updated (use remainder of loop-value))
+        set {_smelted} to (updated (smelted loop-value))
+        delete {_smelted} if ((item id of {_smelted}) is (item id of loop-value))
+        set {_smoked} to (updated (smoke smelted loop-value))
+        delete {_smoked} if ((item id of {_smoked}) is (item id of loop-value))
         loop (indexes of {_processes::*}):
             set {_iid} to (item id of loop-value-1)
-            # item has recipe for process type
-            (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}) is set
-            # calculate spawnitems from recipe results
             delete {_spawnitems::*}
-            loop (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}):
-                chance of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::chance}
-                add {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::amount} of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::item} to {_spawnitems::*}
-            add (updated (use remainder of loop-value-1)) to {_spawnitems::*}
-            set {_spawnitems::*} to {_spawnitems::*} ? air
+            # calculate spawnitems from custom recipe results
+            if (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}) is set:
+                loop (indexes of {-customRecipes::%loop-value-2%::%{_iid}%::*}):
+                    chance of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::chance}
+                    add {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::amount} of {-customRecipes::%loop-value-2%::%{_iid}%::%loop-value-3%::item} to {_spawnitems::*}
+                add {_remainder} to {_spawnitems::*}
+                set {_spawnitems::*} to {_spawnitems::*} ? air
+            # check smelting items
+            else:
+                if all:
+                    loop-value-2 is "blasting"
+                    {_smelted} is set
+                then:
+                    add (1 of {_smelted}) to {_spawnitems::*}
+                else if all:
+                    loop-value-2 is "smoking"
+                    {_smoked} is set
+                then:
+                    add (1 of {_smoked}) to {_spawnitems::*}
+                continue if ({_spawnitems::*} isn't set)
             # add items if they fit
             {_resultInv} has space for {_spawnitems::*}
             remove 1 from (item amount of loop-value-1)

@@ -12,7 +12,7 @@ function getBlockKey(block:block) :: string:
     return "block:%floor(x-coord of {_block})%,%floor(y-coord of {_block})%,%floor(z-coord of {_block})%,%world of {_block}%"
 
 function getAllNbsFiles() :: objects:
-    set {_file} to new File("nbsSongs")
+    set {_file} to new File(getConfigValue("root.nbs.songFolder"))
     {_file}.exists() is true
     set {_files::*} to (...{_file}.listFiles() where [input.getName() ends with ".nbs"])
     sort {_files::*} by input.lastModified()
@@ -42,7 +42,7 @@ on load:
         # load song from file
         else:
             set {-loadingNbsSongs::%{_songName}%} to true
-            set {_file} to new File("nbsSongs/%{_songName}%.nbs")
+            set {_file} to new File("%getConfigValue("root.nbs.songFolder")%/%{_songName}%.nbs")
             {_file}.exists() is true
             log debug "Loading and caching song '%{_songName}%'"
             {_file}.setLastModified(System.currentTimeMillis())
@@ -52,7 +52,7 @@ on load:
     
     # clear old nbs files
     create new section stored in {-sections::clearOldNbsFiles}:
-        set {_dir} to new File("nbsSongs")
+        set {_dir} to new File(getConfigValue("root.nbs.songFolder"))
         # 30 days ago
         set {_cutoff} to System.currentTimeMillis() - 30*24*60*60*1000
         loop ...{_dir}.listFiles():
@@ -65,7 +65,9 @@ on load:
             log info "Cleared %{_deleted}% old nbs file(s)"
         return {_deleted} ? 0
     
-    run section {-sections::clearOldNbsFiles} async
+    wait 1 tick
+    if getConfigValue("root.nbs.clearOldSongs") is true:
+        run section {-sections::clearOldNbsFiles} async
 
 function playNbsSongAtBlock(song:object, block:block) :: boolean:
     set {_songPlayer} to new PositionSongPlayer({_song}, SoundCategory.RECORDS)
