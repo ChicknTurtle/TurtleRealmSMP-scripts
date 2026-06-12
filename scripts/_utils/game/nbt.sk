@@ -1,6 +1,6 @@
 
 function getEntityNbtToStore(e:entity) :: nbtcompound:
     set {_nbt} to (nbt copy of {_e})
-    loop ("Pos","Rotation","Motion","FallDistance","UUID","SleepingX","SleepingY","SleepingZ","TileX","TileY","TileZ"):
+    loop ("Pos","Rotation","Motion","fall_distance","UUID","SleepingX","SleepingY","SleepingZ","TileX","TileY","TileZ"):
         delete tag loop-value of {_nbt}
     return {_nbt}
