@@ -1,6 +1,6 @@
 
 import:
-    net.minecraft.world.level.block.Block
+    net.minecraft.world.level.block.Block as nmsBlock
     net.minecraft.core.BlockPos
 
 # Send game events to players
@@ -30,7 +30,7 @@ effect:
             set {_blockPos} to new BlockPos({_x},{_y},{_z})
             set {_nmsWorld} to (world of {_b}).getHandle()
             set {_blockState} to {_nmsWorld}.getBlockState({_blockPos})
-            set {_stateId} to Block.getId({_blockState})
+            set {_stateId} to nmsBlock.getId({_blockState})
             {_nmsWorld}.levelEvent(2001, {_blockPos}, {_stateId})
 
 function getBlockGameEventDir(facing:direction) :: integer:
