@@ -5,6 +5,7 @@ import:
     net.minecraft.world.phys.Vec3
     net.minecraft.world.phys.BlockHitResult
     net.minecraft.world.item.context.DirectionalPlaceContext
+    net.minecraft.world.level.ChunkPos
 
 # Block only
 # Change a block's type while keeping all blockdata and nbt
@@ -16,13 +17,13 @@ expression:
     get:
         return expr-1
     set:
-        loop blockdata tags of expr-1:
-            set {_blockdata::%loop-value%} to blockdata tag loop-value of expr-1
-        set {_nbt} to nbt copy of expr-1
-        set nbt-block at expr-1 to change value with nbt {_nbt}
-        loop blockdata tags of (block at expr-1):
+        loop (blockdata tags of expr-1):
+            set {_blockdata::%loop-value%} to (blockdata tag loop-value of expr-1)
+        set {_nbt} to (nbt copy of expr-1)
+        set nbt-block at expr-1 to (change value) with nbt {_nbt}
+        loop (blockdata tags of (block at expr-1)):
             {_blockdata::%loop-value%} is set
-            set blockdata tag loop-value of (block at expr-1) to {_blockdata::%loop-value%}
+            set (blockdata tag loop-value of (block at expr-1)) to {_blockdata::%loop-value%}
 
 local function naturallyPlaceItem(item:itemtype, loc:location) :: boolean:
     set {_dir} to (facing of loc {_loc})
@@ -62,4 +63,30 @@ condition:
         set {_loc} to expr-2
         if naturallyPlaceItem({_item}, {_loc}) is false:
             exit
+        continue
+
+# Get players viewing a block or chunk
+expression:
+    patterns:
+        [all] players (who|that) can see [block|chunk] %location/block/chunk%
+    return type: players
+    get:
+        if expr-1 is a block or location:
+            set {_chunk} to (chunk at expr-1)
+        else if expr-1 is a chunk:
+            set {_chunk} to expr-1
+        else:
+            return {_}
+        set {_nmsWorld} to (world of {_chunk}).getHandle()
+        set {_chunkMap} to {_nmsWorld}.getChunkSource().chunkMap
+        set {_chunkPos} to new ChunkPos(chunk x of {_chunk}, chunk z of {_chunk})
+        set {_players} to {_chunkMap}.getPlayers({_chunkPos}, false)
+        return ...{_players} mapped using [input.getBukkitEntity()]
+
+# Check whether player can see a block or chunk
+condition:
+    patterns:
+        %player% can see (block|chunk) [at] %location/block/chunk%
+    check:
+        exit if (players who can see expr-2) doesn't contain expr-1
         continue

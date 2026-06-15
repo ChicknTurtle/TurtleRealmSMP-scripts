@@ -1,6 +1,5 @@
 
 when ready to register custom items:
-    set (custom item "turtle:music_disc_milky_ways") to (music disc cat with nbt from "{""minecraft:item_model"":""turtle:music_disc_milky_ways"",""minecraft:rarity"":""epic"",""minecraft:jukebox_playable"":""turtle:milky_ways""}")
     set (custom item "minecraft:cake") to (cake with nbt from "{""minecraft:jukebox_playable"":""turtle:portal_radio"",""minecraft:tooltip_display"":{hidden_components:[""jukebox_playable""]}}")
 
 # disc recipes

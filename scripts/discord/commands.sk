@@ -97,9 +97,9 @@ function jdaRegisterCommands():
             set {_player} to player({_p})
             getConfigValue("root.nbs.uploadingRequireOp") is true
             set {_offlineP} to offlineplayer({_p}, false)
-            {_offlineP} isn't op
-            {_event}.getHook().sendMessage("You must be a server operator to upload a song!").queue()
-            exit trigger
+            if {_offlineP} isn't op:
+                {_event}.getHook().sendMessage("You must be a server operator to upload a song!").queue()
+                exit trigger
         else:
             getConfigValue("root.nbs.uploadingRequireLink") or getConfigValue("root.nbs.uploadingRequireOp") is true
             {_event}.getHook().sendMessage("You must have your account linked to upload a song! Use </link:%{-discord::commands::link}.getId()%>").queue()

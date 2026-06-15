@@ -1,5 +1,10 @@
 
-on server resources reloaded:
+import:
+    com.shanebeestudios.skbee.api.recipe.RecipeUtil
+
+on server resources reloaded with priority lowest:
+    # Stop SkBee from reregistering custom recipes, we do it instead
+    RecipeUtil.CUSTOM_RECIPES.clear()
     customItems_loadItems()
     wait 1 tick
     customItems_loadRecipes()

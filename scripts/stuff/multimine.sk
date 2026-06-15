@@ -1,0 +1,95 @@
+
+# affected by:
+# https://bugs.mojang.com/browse/MC/issues/MC-302748
+# https://bugs.mojang.com/browse/MC/issues/MC-255057
+
+function getRandomIdFor(b:block) :: integer:
+    set {_x} to floor(x of {_b})
+    set {_y} to floor(y of {_b})
+    set {_z} to floor(z of {_b})
+    set {_seed} to ({_x} * 73856093) + ({_y} * 19349663) + ({_z} * 83492791)
+    return mod({_seed}, 2147483647)
+
+function showBlockDamage(b:block, amount:number):
+    set {_p::*} to (players who can see {_b})
+    make ({_p::*} where [isFloodgatePlayer(input) is false]) see damage of {_b} as {_amount} by getRandomIdFor({_b})
+
+function addBlockDamage(b:block, amount:number, p:player={_}):
+    (hardness of {_b}) isn't -1
+    set {-multimine::blocks::%{_b}%::block} to {_b}
+    set {-multimine::blocks::%{_b}%::damage} to ({-multimine::blocks::%{_b}%::damage} + {_amount}) ? {_amount}
+    if {_amount} > 0:
+        set {-multimine::blocks::%{_b}%::lastDamage} to now
+    # break block
+    if {-multimine::blocks::%{_b}%::damage} >= (hardness of {_b}):
+        if {_p} is set:
+            show block break effect for {_b}
+            make {_p} break {_b}
+        else:
+            break {_b} naturally with effects
+        delete {-multimine::blocks::%{_b}%::*}
+        showBlockDamage({_b}, 0)
+        exit trigger
+    # cancel if fully repaired
+    else if {-multimine::blocks::%{_b}%::damage} <= 0:
+        delete {-multimine::blocks::%{_b}%::*}
+        showBlockDamage({_b}, 0)
+        exit trigger
+    # update break progress
+    set {_prog} to {-multimine::blocks::%{_b}%::damage}/(hardness of {_b})
+    showBlockDamage({_b}, {_prog})
+
+on block damage:
+    if getConfigValue("root.players.multimine.enabled") isn't true:
+        reset (block break speed attribute of player)
+        exit trigger
+    gamemode of player isn't creative
+    # check current speed
+    reset (block break speed attribute of player)
+    set {_speed} to (break speed of event-block for player)
+    set (block break speed attribute of player) to 0
+    if any:
+        (hardness of event-block) is 0
+        {_speed} >= 1
+    then:
+        addBlockDamage(event-block, 100000, player)
+        exit trigger
+    set {-multimine::blocks::%event-block%::mining::%player%} to true
+    while {-multimine::blocks::%event-block%::mining::%player%} is true:
+        if any:
+            (break speed of event-block for player) >= 1
+            {-multimine::players::%player%::mineCooldown} <= now
+        then:
+            # check current speed
+            reset (block break speed attribute of player)
+            set {_h} to (hardness of event-block)
+            set {_speed} to (break speed of event-block for player) * {_h}
+            set (block break speed attribute of player) to 0
+            # damage
+            addBlockDamage(event-block, {_speed}, player)
+        wait 1 tick
+
+on block damage abort:
+    delete {-multimine::blocks::%event-block%::mining::%player%}
+
+on break:
+    delete {-multimine::blocks::%event-block%::*}
+    getConfigValue("root.players.multimine.enabled") is true
+    showBlockDamage(event-block, 0)
+    set {-multimine::players::%player%::mineCooldown} to now + 5 ticks
+
+every tick:
+    getConfigValue("root.players.multimine.enabled") is true
+    set {_timeUntilRepair} to getConfigValue("root.players.multimine.timeUntilRepair")
+    set {_timeUntilRepair} to ((2 ticks) if ({_timeUntilRepair} is 0) else (1 second * {_timeUntilRepair}))
+    set {_repairAmount} to (-1/(getConfigValue("root.players.multimine.repairSpeed")*20))
+    loop (indexes of {-multimine::blocks::*}):
+        if (time since {-multimine::blocks::%loop-value%::lastDamage}) >= {_timeUntilRepair}:
+            set {_b} to {-multimine::blocks::%loop-value%::block}
+            addBlockDamage({_b}, {_repairAmount}*(hardness of {_b}))
+
+on join:
+    set {-multimine::players::%player%::mineCooldown} to now
+
+on leave:
+    delete {-multimine::players::%player%::*}
