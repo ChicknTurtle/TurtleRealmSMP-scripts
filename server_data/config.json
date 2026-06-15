@@ -83,19 +83,19 @@
             "default": "Minecraft Server"
           },
           "serverNameColored": {
-            "name": "Server name color",
-            "desc": "Name of the server with color in minimessage format",
+            "name": "Server name colored",
+            "desc": "Name of the server with color in minimessage format, shown in the player list",
             "type": "text",
             "max": 1024,
             "default": "<green>Minecraft Server"
           },
           "motd": {
             "name": "MOTD",
-            "desc": "Message of the day shown in the server list",
+            "desc": "Message of the day shown on the server list, in minimessage format",
             "type": "text",
             "max": 1024,
             "lines": 12,
-            "default": "A cool server"
+            "default": "A Minecraft Server"
           },
           "resourcePackURL": {
             "name": "Resource pack URL",
@@ -127,13 +127,13 @@
                 "nodes": {
                   "protectFromOwner": {
                     "name": "Protect from owner",
-                    "desc": "Pets cannot be damaged by their owner except while sneaking.",
+                    "desc": "Pets cannot be damaged by their owner except while sneaking",
                     "type": "boolean",
                     "default": true
                   },
                   "forgetTarget": {
                     "name": "Forget target",
-                    "desc": "Sitting down a pet will make it forget its target.",
+                    "desc": "Sitting down a pet will make it forget its target",
                     "type": "boolean",
                     "default": true
                   }
@@ -145,25 +145,25 @@
                 "nodes": {
                   "infiniteTrading": {
                     "name": "Infinite trading",
-                    "desc": "Villager trades have infinite stock and no raising demand.\nWhen disabled, previously interacted with villagers will\nstill have (virtually) infinite trades.",
+                    "desc": "Villager trades have infinite stock and no raising demand.\nWhen disabled, previously interacted with villagers will\nstill have (virtually) infinite trades",
                     "type": "boolean",
                     "default": true
                   },
                   "sharedCuring": {
                     "name": "Shared curing",
-                    "desc": "Make it so villagers only have to be cured once for all players to recieve the discount.\nWhen disabled, only the last player to interact with the villager will have the cure discount.",
+                    "desc": "Make it so villagers only have to be cured once for all players to recieve the discount.\nWhen disabled, only the last player to interact with the villager will have the cure discount",
                     "type": "boolean",
                     "default": true
                   },
                   "rerollTradesItem": {
                     "name": "Reroll trades item",
-                    "desc": "Use this item to reroll a villager's trades.\nSupports custom item ids. Blank or invalid item to disable.",
+                    "desc": "Use this item to reroll a villager's trades.\nSupports custom item ids. Blank or invalid item to disable",
                     "type": "text",
                     "default": "minecraft:glowstone_dust"
                   },
                   "forgetJobDistance": {
                     "name": "Forget far-away workstations",
-                    "desc": "Force villagers to forget job sites that are this many blocks away.\n0 to disable.",
+                    "desc": "Force villagers to forget job sites that are this many blocks away.\n0 to disable",
                     "type": "slider",
                     "start": 0,
                     "end": 512,
@@ -174,7 +174,7 @@
               },
               "dismounting": {
                 "name": "Dismounting",
-                "desc": "Interact with a mob while sneaking to make it dismount a boat or minecart.",
+                "desc": "Interact with a mob while sneaking to make it dismount a boat or minecart",
                 "type": "boolean",
                 "default": true
               }
@@ -186,13 +186,13 @@
             "nodes": {
               "shearDiffusing": {
                 "name": "Shear diffusing",
-                "desc": "Allow shears to diffuse TNT and TNT minecarts.",
+                "desc": "Allow shears to diffuse TNT and TNT minecarts",
                 "type": "boolean",
                 "default": true
               },
               "flintAndSteelIgniting": {
                 "name": "Flint and steel igniting",
-                "desc": "Allow flint and steel to directly ignite mobs.",
+                "desc": "Allow flint and steel to directly ignite mobs",
                 "type": "boolean",
                 "default": true
               }
@@ -237,13 +237,13 @@
             "nodes": {
               "betterBonemeal": {
                 "name": "Better bonemeal",
-                "desc": "Allow bonemeal to be used on the following blocks: sugar cane, cactus, nether wart, pumpkins, melons, chorus flower, and small flowers (excluding wither roses and torchflowers).",
+                "desc": "Allow bonemeal to be used on the following blocks: sugar cane, cactus, nether wart, pumpkins, melons, chorus flower, and small flowers (excluding wither roses and torchflowers)",
                 "type": "boolean",
                 "default": true
               },
               "dyeMore": {
                 "name": "Dye more",
-                "desc": "Allow dye to be applied to wool, wool carpets, shulker boxes, and live shulkers.",
+                "desc": "Allow dye to be applied to wool, wool carpets, shulker boxes, and live shulkers",
                 "type": "boolean",
                 "default": true
               },
@@ -253,19 +253,19 @@
                 "nodes": {
                   "placeBlocks": {
                     "name": "Place blocks",
-                    "desc": "Allow dispensers to place any block.",
+                    "desc": "Allow dispensers to place any block",
                     "type": "boolean",
                     "default": true
                   },
                   "breedAnimals": {
                     "name": "Breed animals",
-                    "desc": "Allow dispensers to breed animals.",
+                    "desc": "Allow dispensers to breed animals",
                     "type": "boolean",
                     "default": true
                   },
                   "milkMobs": {
                     "name": "Milk mobs",
-                    "desc": "Allow dispensers to milk cows, mooshrooms, and goats with buckets.\nDoesn't support milking stew from mooshrooms.",
+                    "desc": "Allow dispensers to milk cows, mooshrooms, and goats with buckets.\nDoesn't support milking stew from mooshrooms",
                     "type": "boolean",
                     "default": true
                   }
@@ -275,13 +275,13 @@
           },
           "disableNetherPortals": {
             "name": "Disable nether portals",
-            "desc": "Prevent traveling to the nether through nether portals.",
+            "desc": "Prevent traveling to the nether through nether portals",
             "type": "boolean",
             "default": false
           },
           "disableEndPortals": {
             "name": "Disable end portals",
-            "desc": "Prevent traveling to the end through end portals.",
+            "desc": "Prevent traveling to the end through end portals",
             "type": "boolean",
             "default": false
           }
@@ -300,15 +300,46 @@
           },
           "protectDeathLoot": {
             "name": "Protect death loot",
-            "desc": "Player death loot will glow and be protected from all sources.\nChanging this setting will not affect previously dropped items.",
+            "desc": "Player death loot will glow and be protected from all sources.\nChanging this setting will not affect previously dropped items",
             "type": "boolean",
             "default": true
           },
           "elytraBouncing": {
             "name": "Elytra bouncing",
-            "desc": "Prevent jumping off the ground while gliding with elytra to stop you from gliding.",
+            "desc": "Prevent jumping off the ground while gliding with elytra stopping you from gliding",
             "type": "boolean",
             "default": true
+          },
+          "multimine": {
+            "name": "Multimine",
+            "desc": "Custom block mining system",
+            "item": "minecraft:diamond_pickaxe",
+            "nodes": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Enable multimine system",
+                "type": "boolean",
+                "default": true
+              },
+              "timeUntilRepair": {
+                "name": "Time until repair",
+                "desc": "Seconds since a block was last mined before its break progress begins repairing",
+                "type": "slider",
+                "start": 0,
+                "end": 15,
+                "default": 0,
+                "step": 1
+              },
+              "repairSpeed": {
+                "name": "Repair speed",
+                "desc": "Seconds to fully repair a block once repairing begins",
+                "type": "slider",
+                "start": 0,
+                "end": 15,
+                "default": 3,
+                "step": 1
+              }
+            }
           }
         }
       },
