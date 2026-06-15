@@ -1,11 +1,6 @@
 {
   "display": {
-    "icon": {
-      "id": "minecraft:music_disc_cat",
-      "components": {
-        "minecraft:item_model": "turtle:music_disc_milky_ways"
-      }
-    },
+    "icon": "minecraft:music_disc_lava_chicken",
     "title": "Record Setter",
     "description": "Listen to every music disc",
     "frame": "challenge"
@@ -266,25 +261,6 @@
             "condition": "minecraft:match_tool",
             "predicate": {
               "items": "minecraft:music_disc_tears"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:item_used_on_block"
-    },
-    "turtle:music_disc_milky_ways": {
-      "conditions": {
-        "location": [
-          {
-            "condition": "minecraft:match_tool",
-            "predicate": {
-              "predicates": {
-                "minecraft:custom_data": {
-                  "PublicBukkitValues": {
-                    "minecraft:customitems.id": "turtle:music_disc_milky_ways"
-                  }
-                }
-              }
             }
           }
         ]
