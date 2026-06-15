@@ -54,7 +54,6 @@ release channel: stable
 # If 'check for new version' is enabled, this determines how stable the updates must be.
 # 'stable' means that only stable releases of Skript will be considered updates.
 # 'prerelease' means that development releases will also be checked for.
-# Initial value of this depends on the Skript version you first installed; it was 'none'.
 # Initial value of this depends on the Skript version you first installed; it was 'stable'.
 
 enable effect commands: true
@@ -80,10 +79,10 @@ allow ops to use effect commands: true
 log effect commands: true
 # Whether Skript should log the usage of effect commands.
 # They will be logged as [INFORMATION] in this format: '<player> issued effect command: <command>'
-# If true, those files will be zipped to save disk space.
-# Whether Skript should compress backup files (configs and variables).
-compress backups: true
 
+compress backups: true
+# Whether Skript should compress backup files (configs and variables).
+# If true, those files will be zipped to save disk space.
 
 load default aliases: true
 # Whether Skript should use the default, Skript-provided aliases for items.
@@ -189,13 +188,14 @@ soft api exceptions: false
 
 enable timings: false
 # When enabled, triggers in scripts will be present in timings reports.
-# Tags are listed by their names or internal groups. They should be separated by only a comma and a space (', ').
-# By default, this simply includes color and decoration applying tags.
-# This list defines the tags that Skript will process by default, without the usage of the "formatted" expression.
-safe tags: color, decorations, gradient, rainbow, reset, transition, pride, shadowColor
 # Note that this requires Paper (https://papermc.io/downloads/paper) to work; on Bukkit/Spigot this option has no effect.
 # Warning: Paper no longer supports Timings as of 1.19.4. This option has no effect on versions 1.19.4 and above.
 # When false, timings are not enabled for scripts even if you're running Paper.
+
+safe tags: color, decorations, gradient, rainbow, reset, transition, pride, shadowColor
+# This list defines the tags that Skript will process by default, without the usage of the "formatted" expression.
+# By default, this simply includes color and decoration applying tags.
+# Tags are listed by their names or internal groups. They should be separated by only a comma and a space (', ').
 
 parse links in chat messages: disabled
 # Controls how Skript will try to parse links in chat messages.
@@ -236,10 +236,10 @@ disable hooks:
 		precious stones: false
 		residence: false
 		worldguard: false
-		# Controls whether Skript should attempt to hook into the plugins listed above.
-		# If you change a setting here while the server is running, a restart is required for that change to take effect.
-		# Do note that some addons may stop Skript from hooking into a plugin, even if the plugin's hook is not disabled here.
-		
+# Controls whether Skript should attempt to hook into the plugins listed above.
+# If you change a setting here while the server is running, a restart is required for that change to take effect.
+# Do note that some addons may stop Skript from hooking into a plugin, even if the plugin's hook is not disabled here.
+
 player name regex pattern: [a-zA-Z0-9_]{1,16}
 # A regex pattern that is used to match player names.
 # This can be used if you are using Geyser, where some usernames are prefixed by a certain character.
@@ -265,38 +265,38 @@ runtime errors:
 	# Frames are the duration over which runtime errors will be collected before being sent off to console.
 	# If you find runtime errors to be annoying or clogging your console, you should first fix them!
 	# You can also lengthen this duration to reduce the amount of individual errors printed to console.
-	
+
 	# -- Errors --
 	total errors per frame: 8
 	# This controls the maximum number of individual errors that will be printed per frame.
 	# If more errors occur, they will be hidden and the frame will simply display that x number of
 	# errors occurred but were hidden this frame.
-	
+
 	errors from one line per frame: 2
 	# This controls the maximum number of errors a single line can print per frame. This is used to prevent
 	# line from clogging up the frame, like if a syntax was in a 10 iteration loop and errored every time.
 	# It's best to keep this rather low.
-	
+
 	error spam timeout limit: 4
 	# If a line prints more than this many errors in a single frame, it will be put in timeout. This means
 	# any additional errors it creates during the timeout duration will be hidden, rather than printed.
 	# This is also a defense against a syntax in a loop spamming console with errors.
-	
+
 	error timeout length: 10
 	# This is the number of frames before a line in timeout can print errors again.
 	# If you lengthen the frame duration, you may want to lower this proportionally.
-	
+
 	# -- Warnings --
 	# All the above descriptions for errors apply the same here, but for warnings instead.
-	
+
 	total warnings per frame: 8
 	warnings from one line per frame: 2
 	warning spam timeout limit: 4
 	warning timeout length: 10
-	
-	
-	# ==== Variables ====
-	
+
+
+# ==== Variables ====
+
 databases:
 	# Databases to store variables in. These can either be used as a simple one-server-storage
 	# where variables are written constantly but only read at server start,
@@ -304,56 +304,16 @@ databases:
 	#
 	# You can define as many databases as you want, just make sure to choose a distinct name for each one, and don't forget to set all options correctly.
 	#
-	# To be able to use a database you'll need to download the plugin 'SQLibrary' from https://dev.bukkit.org/projects/sqlibrary/files
-	# and install it in your server's plugin directory like other plugins.
-	#
 	# Please note that '/skript reload' will not reload this section, i.e. you'll have to restart Skript for changes to take effect.
-	
+
 	# Each database definition must be in a separate section. You can choose any name for the sections, as long as it's not already used.
-	SQLite example:
-		# An SQLite database example.
-		
-		type: disabled# change to line below to enable this database
-		# type: SQLite
-		
-		pattern: db_.*# this pattern will save all variables that start with 'db_' in this SQLite database.
-		
-		file: ./plugins/Skript/variables.db
-		# SQLite databases must end in '.db'
-		#table: variables21
-		# Usually not required, if omitted defaults to variables21 (see above for more details)
-		
-		backup interval: 0# 0 = don't create backups
-		monitor changes: false
-		monitor interval: 20 seconds
-		
-		backups to keep: -1
-		
-	MySQL example:
-		# A MySQL database example, with options unrelated to MySQL removed.
-		
-		type: disabled# change to line below to enable this database
-		# type: MySQL
-		
-		pattern: synced_.*# this pattern will save all variables that start with 'synced_' in this MySQL database.
-		
-		host: localhost
-		port: 3306
-		user: root
-		password: pass
-		database: skript
-		table: variables21
-		
-		monitor changes: true
-		monitor interval: 20 seconds
-		
 	database 1:
 		# An example database to describe all possible options.
-		
+
 		type: disabled
-		# The type of this database. Allowed values are 'CSV', 'SQLite', 'MySQL' and 'disabled'.
-		# CSV uses a text file to store the variables, while SQLite and MySQL use databases, and 'disabled' makes Skript ignore the database as if it wasn't defined at all.
-		
+		# The type of this database. Allowed values are 'CSV' and 'disabled'.
+		# CSV uses a text file to store the variables and 'disabled' makes Skript ignore the database as if it wasn't defined at all.
+
 		pattern: .*
 		# Defines which variables to save in this database.
 		# This pattern uses Regex syntax, e.g. use 'db_.*' (without the quotes) to store all variables prefixed with 'db_' in this database,
@@ -361,68 +321,54 @@ databases:
 		# Please note that variables are only stored in one database, and databases are checked from top to bottom,
 		# e.g. if a variable matches the topmost database's pattern it will be saved there and nowhere else.
 		# BTW: Patterns are checked in a separate thread, i.e. your server likely won't run slower when using complicated patterns.
-		
+
 		monitor changes: false
 		monitor interval: 20 seconds
 		# If 'monitor changes' is set to true, variables will repeatedly be checked for updates in the database (in intervals set in 'monitor interval').
 		# ! Please note that you should set 'pattern', 'monitor changes' and 'monitor interval' to the same values on all servers that access the same database!
-		
-		# == MySQL configuration ==
-		host: localhost# Where the database server is located at, e.g. 'example.com', 'localhost', or '192.168.1.100'
-		port: 3306# 3306 is MySQL's default port, i.e. you likely won't need to change this value
-		user: root
-		password: pass
-		database: skript# The database to use, the table will be created in this database.
-		table: variables21# The name of the table to create. 'variables21' is the default name, if this was to be omitted.
-		# (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
-		# == SQLite/CSV configuration ==
+
+		# == CSV configuration ==
 		file: ./plugins/Skript/variables.db
 		# Where to save the variables to. For a CSV file, the file extension '.csv' is recommended, but not required, but SQLite database files must end in '.db' (SQLibrary forces this).
 		# The file path can either be absolute (e.g. 'C:\whatever\...' [Windows] or '/usr/whatever/...' [Unix]), or relative to the server directory (e.g. './plugins/Skript/...').
-		
-		#table: variables21
-		# The name of the table to create. 'variables21' is the default name, if this was to be omitted.
-		# (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
-		# This is generally not required as the the .db file will only be used by Skript, unless you want to split different variables into different tables
-		
+
 		backup interval: 2 hours
 		# Creates a backup of the file every so often. This can be useful if you ever want to revert variables to an older state.
 		# Variables are saved constantly no matter what is set here, thus a server crash will never make you lose any variables.
 		# Set this to 0 to disable this feature.
-		
+
 		backups to keep: -1
 		# if set to a value greater than -1, Skript will ensure only that many backups are kept.
 		# Backups are removed from oldest to newest.
 		# If disabled (set to -1), no backup files will be deleted.
 		# WARNING: Setting to 0 will delete all files located in the backup directory upon plugin start/reload
-		
-		
+
 	default:
 		# The default "database" is a simple text file, with each variable on a separate line and the variable's name, type, and value separated by commas.
 		# This is the last database in this list to catch all variables that have not been saved anywhere else.
 		# You can modify this database freely, but make sure to know what you're doing if you don't want to lose any variables.
-		
+
 		type: CSV
-		
+
 		pattern: .*
-		
+
 		file: ./plugins/Skript/variables.csv
-		
+
 		backup interval: 24 hours
-		
+
 		backups to keep: 10
-		
-		
-		# PS: If you don't want some variables to be saved in any database (e.g. variables that contain an %entity% which usually despawn when the server is shut down)
-		# you can modify the last database's pattern to not match all variables, e.g. use '(?!x_).*' to match all variables that don't start with 'x_'.
-		# Be very cautious when doing this however as unsaved variables cannot be recovered after the server has been stopped.
-		# I recommend to use a single character to denote unsaved variables (similar to local variables' '_'), e.g. '-', in which case the last database's pattern should be '(?!-).*'.
-		
-		
-		
-		# ==== Settings that should not be changed ====
-		
-version: 2.15.2
+
+
+	# PS: If you don't want some variables to be saved in any database (e.g. variables that contain an %entity% which usually despawn when the server is shut down)
+	# you can modify the last database's pattern to not match all variables, e.g. use '(?!x_).*' to match all variables that don't start with 'x_'.
+	# Be very cautious when doing this however as unsaved variables cannot be recovered after the server has been stopped.
+	# I recommend to use a single character to denote unsaved variables (similar to local variables' '_'), e.g. '-', in which case the last database's pattern should be '(?!-).*'.
+
+
+
+# ==== Settings that should not be changed ====
+
+version: 2.15.3
 # DO NOT CHANGE THIS VALUE MANUALLY!
 # This saves for which version of Skript this configuration was written for.
 # If it does not match the version of the .jar file then the config will be updated automatically.
