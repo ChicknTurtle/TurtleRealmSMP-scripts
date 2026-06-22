@@ -138,10 +138,7 @@ function openWaystoneTravel(p:player, page:integer=1, current:string={_}):
         set {_world} to (world of {_loc}).getKey().value()
         replace "_" with " " in {_world}
         set {_owner} to {waystones::%loop-value%::owner}
-        if isFloodgatePlayer({_owner}) is true:
-            set {_ownerComp} to (minimessage from "<!i><white> <gray>Created by %name of {_owner}%")
-        else:
-            set {_ownerComp} to (minimessage from "<!i><white><head:%uuid of {_owner}%> <gray>Created by %name of {_owner}%")
+        set {_ownerComp} to (minimessage from "<!i><white> <gray>Created by %name of {_owner}%")
         set (component lore of {_items::%loop-iteration%}) to (minimessage from "<!i><white><sprite:items:item/compass_18> <gray>%x of {_loc}%, %y of {_loc}%, %z of {_loc}% in %proper case {_world}%"),{_ownerComp},(minimessage from "<!i><white><sprite:items:item/ender_pearl> <gray>Click to teleport")
         add (minimessage from "<!i><white><sprite:items:item/painting> <gray>Press <gold><key:key.swapOffhand> <gray>to set waystone icon to your held item") to (component lore of {_items::%loop-iteration%}) if ({_p} is {_owner})
         set (item model of {_items::%loop-iteration%}) to {waystones::%loop-value%::icon}
