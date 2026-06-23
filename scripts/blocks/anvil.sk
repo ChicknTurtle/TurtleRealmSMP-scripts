@@ -2,10 +2,11 @@
 on anvil prepare:
     # no cost stacking
     if getConfigValue("root.world.enchanting.anvil.noCostStacking") is true:
-        reset repair cost component of event-item
+        reset (repair cost component of event-item)
     # colored rename
     if getConfigValue("root.world.enchanting.anvil.coloredRename") is true:
-        set event-slot's name to (colored event-item's name)
+        event-slot's name is set
+        set (event-slot's name) to (formatted "<!i>%event-item's name%")
     # free renames
     if getConfigValue("root.world.enchanting.anvil.freeRenames") is true:
         if name of (slot 2 of event-inventory) isn't set:
