@@ -6,13 +6,26 @@ on damage:
     # check impaling
     victim is wet
     set {_direct} to (direct entity)
-    set {_weapon} to (({_direct}'s tool) ? (item of {_direct}))
-    if ({_direct} is riptiding):
-        set {_weapon} to ({-playerData::%{_direct}%::riptideitem} ? {_weapon})
+    {_direct} is a trident
+    set {_weapon} to (item of {_direct})
     set {_lvl} to (level of impaling of {_weapon})
     {_lvl} is set
     # add damage
+    add ({_lvl}*2) to damage
+
+on any damage:
+    {-playerData::%direct entity%::impalingBonusDamage} is set
+    add {-playerData::%direct entity%::impalingBonusDamage} to damage
+    delete {-playerData::%direct entity%::impalingBonusDamage}
+
+on attack attempt:
+    event.willAttack() is true
+    victim is wet
+    set {_weapon} to (player's tool)
+    set {_weapon} to ({-playerData::%{_direct}%::riptideitem} ? {_weapon}) if (player is riptiding)
+    set {_lvl} to (level of impaling of {_weapon})
+    {_lvl} is set
     set {_added} to ({_lvl}*2)
-    set {_cooldown} to (({_direct}'s attack cooldown) ? 1)^2
+    set {_cooldown} to (player's attack cooldown)^2
     set {_added} to ({_added} * {_cooldown})
-    add {_added} to damage
+    set {-playerData::%player%::impalingBonusDamage} to {_added}
