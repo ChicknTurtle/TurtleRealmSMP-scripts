@@ -5,8 +5,8 @@ on anvil prepare:
         reset (repair cost component of event-item)
     # colored rename
     if getConfigValue("root.world.enchanting.anvil.coloredRename") is true:
-        event-slot's name is set
-        set (event-slot's name) to (formatted "<!i>%event-item's name%")
+        (event-item's name) is set
+        set (event-slot's name) to "<!i>" + (formatted (event-item's name))
     # free renames
     if getConfigValue("root.world.enchanting.anvil.freeRenames") is true:
         if name of (slot 2 of event-inventory) isn't set:

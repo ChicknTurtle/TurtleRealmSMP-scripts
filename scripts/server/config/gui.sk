@@ -140,7 +140,7 @@ on custom click:
         loop (nbt tags of event-nbt) where [input isn't "DATA"]:
             set {_tagType} to (tag type of tag (loop-value) of (event-nbt))
             set {_tagType} to boolean tag if {_tagType} is byte tag else {_tagType}
-            set {configValues::%{_page}%.%loop-value%} to ({_tagType} loop-value of event-nbt)
+            setConfigValue("%{_page}%.%loop-value%", ({_tagType} loop-value of event-nbt), player)
     # go to page
     set {_toPage} to (string tag "DATA;toPage" of event-nbt)
     if {_toPage} is set:

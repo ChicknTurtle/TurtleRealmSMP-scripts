@@ -52,7 +52,7 @@ function getConfigValueSuggestions(path:string) :: strings:
         set {_options::*} to ...(try {_element}.get("options").keySet())
         return {_options::*}
 
-function setConfigValue(path:string, value:object) :: boolean:
+function setConfigValue(path:string, value:object, changer:commandsender={_}) :: boolean:
     set {_element} to getConfigElement({_path})
     if {_element} isn't set:
         return false
@@ -97,8 +97,17 @@ function setConfigValue(path:string, value:object) :: boolean:
             return false
     else:
         return false
+    return true if {configValues::%{_path}%} is {_final}
     set {configValues::%{_path}%} to {_final}
+    set {_by} to ("§r by %{_changer}%" if ({_changer} is set) else "")
+    log info "Config element §b%{_path}%§r has been set to §6%{_final}%%{_by}%"
     return true
+
+function resetConfigValue(path:string, changer:commandsender={_}):
+    {configValues::%{_path}%} is set
+    set {_by} to ("§r by %{_changer}%" if ({_changer} is set) else "")
+    log info "Config element §b%{_path}%§r has been reset%{_by}%"
+    delete {configValues::%{_path}%}
 
 function getDefaultConfigValue(path:string) :: object:
     set {_element} to getConfigElement({_path})

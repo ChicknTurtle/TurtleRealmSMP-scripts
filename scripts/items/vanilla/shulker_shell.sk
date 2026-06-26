@@ -9,6 +9,18 @@ load custom items:
         set (custom item "turtle:shulker_shell_%loop-value%") to (shulker shell)
         set (update function of "turtle:shulker_shell_%loop-value%") to (function "updateLegacyShells" in script)
 
+register recipes:
+    loop "red","orange","yellow","lime","green","cyan","light_blue","blue","purple","magenta","pink","black","gray","light_gray","white","brown":
+        set {_type} to loop-value
+        register shaped recipe:
+            id: "turtle:%{_type}%_shulker_box"
+            result: itemtype from key "minecraft:%{_type}%_shulker_box"
+            category: "misc"
+            shape: "-","#","-"
+            ingredients:
+                set ingredient of "#" to chest
+                set ingredient of "-" to (custom item "turtle:%{_type}%_shulker_shell")
+
 local function updateLegacyShells(item:item) :: item:
     set {_id} to (item id of {_item})
     regex replace "turtle:shulker_shell_([^""]+)" with "turtle:$1_shulker_shell" in {_id}
@@ -54,16 +66,3 @@ on right click:
         set blockdata tag "facing" of (block at event-block) to "up"
         play sound "minecraft:item.bottle.fill_dragonbreath" in player category at event-block
         draw (10 poof particle with particle speed 0.2) at event-block
-
-# craft into colored shulkers
-on preparing craft:
-    event-slot is a shulker box
-    set {_shells::*} to (items of event-inventory) where [input is shulker shell]
-    size of {_shells::*} is 2
-    set {_shell} to (1st element of {_shells::*})
-    (item id of {_shell}) isn't "minecraft:shulker_shell"
-    if (item id of {_shell}) isn't (item id of (2nd element of {_shells::*})):
-        set event-slot to air
-        exit trigger
-    set {_color} to dyeColorOf({_shell})
-    set event-slot to (itemtype from key "%{_color}%_shulker_box")

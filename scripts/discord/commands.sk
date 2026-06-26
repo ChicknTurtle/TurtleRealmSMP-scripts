@@ -15,6 +15,9 @@ function jdaRegisterCommands():
     create section with {_event} stored in {_callback}:
         set {_p::*} to (all players)
         set {_size} to (size of {_p::*})
+        if {_size} is 0:
+            {_event}.reply("Nobody is online...").setEphemeral(true).queue()
+            exit trigger
         set {_s} to ("" if {_size} is 1 else "s")
         set {_response} to "**%{_size}%** player%{_s}% online: "
         loop {_p::*}:
