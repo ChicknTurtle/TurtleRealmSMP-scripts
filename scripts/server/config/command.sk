@@ -63,7 +63,7 @@ brig command tree /turtle:config:
                         send "§cInvalid option for element §b%{_path}%§c: %{_value}%"
                         exit trigger
                     set {_realPath} to "root.%{_path}%"
-                    if setConfigValue({_realPath}, {_value}) is true:
+                    if setConfigValue({_realPath}, {_value}, player) is true:
                         send "§fConfig element §b%{_path}%§f has been set to: %{_value}%"
                     else:
                         send "§cInvalid value for element §b%{_path}%§c: %{_value}%"
@@ -74,5 +74,5 @@ brig command tree /turtle:config:
                 if {_element} isn't set:
                     send "§cConfig element '%{_path}%' doesn't exist."
                     exit trigger
-                delete {configValues::%{_realPath}%}
+                resetConfigValue({_realPath})
                 send "§fConfig element §b%{_path}%§f has been reset to default."

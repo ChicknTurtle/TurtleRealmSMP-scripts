@@ -21,6 +21,7 @@ on death:
     set (lore of {_item}) to "<!i>§c☠ R.I.P. %effective entity name of victim%", "<!i>   §4%{_deathMsg}%", "<!i>§e✦ §6Revive with a Golden Apple", "<!i>§3⛏ §9Smash with a pickaxe to collect drops"
     set {_nbt} to getEntityNbtToStore(victim)
     delete tag "HasStung" of {_nbt}
+    delete tag "leash" of {_nbt}
     set (compound tag "entityData" of (custom nbt of {_item})) to {_nbt}
     set (string tag "entityType" of (custom nbt of {_item})) to str(minecraft entity type of victim)
     drop {_item} at victim without velocity

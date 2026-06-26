@@ -65,7 +65,7 @@ function bonemealSingleTickBlock(block:block) :: boolean:
 function bonemealFlowerBlock(block:block) :: boolean:
     loop shuffled (blocks within ({_block} ~ vector(-1,0,-1)) and ({_block} ~ vector(1,0,1))):
         loop-block is air
-        (block tags of (block under loop-block)) contains (block tag "minecraft:dirt")
+        (block tags of (block under loop-block)) contains (block tag "minecraft:supports_vegetation")
         set loop-block to {_block}
         bonemealEffect({_block})
         return true

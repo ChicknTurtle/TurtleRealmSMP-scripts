@@ -319,7 +319,7 @@
                 "name": "Enabled",
                 "desc": "Enable multimine system",
                 "type": "boolean",
-                "default": true
+                "default": false
               },
               "timeUntilRepair": {
                 "name": "Time until repair",

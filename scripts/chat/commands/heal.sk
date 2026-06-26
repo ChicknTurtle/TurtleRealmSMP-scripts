@@ -6,13 +6,14 @@ brig command /turtle:heal:
     trigger:
         set {_entities::*} to ({_entities::*} ? player)
         loop {_entities::*}:
-            heal loop-value
-            feed loop-value
-            set saturation of loop-value to 6
+            set (health of loop-value) to (max health of loop-value)
+            loop-value is a player
+            set (hunger of loop-value) to 10
+            set (saturation of loop-value) to 6
         if size of {_entities::*} is 1:
-            send "Healed %name of first element of {_entities::*}%"
+            send formatted "Healed %name of first element of {_entities::*}%"
         else:
-            send "Healed %size of {_entities::*}% entities"
+            send formatted "Healed %size of {_entities::*}% entities"
         set {_c::1} to (text component from "Healed by ")
         set {_c::2} to playerComponent(player) ? "console"
         send components (merge components {_c::*}) to {_entities::*}

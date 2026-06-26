@@ -16,10 +16,10 @@ when ready to register custom items:
 local function updateItem(item:item) :: item:
     set {_loc} to getMirrorLoc(compound tag "mirrorLoc" of (custom nbt of {_item}))
     if {_loc} is set:
-        add "§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%§f in §d%world of {_loc}%" to {_l::*}
+        add "<!i>§fBound to: §d%floor(x-coord of {_loc})%§5,§d%floor(y-coord of {_loc})%§5,§d%floor(z-coord of {_loc})%§f in §d%world of {_loc}%" to {_l::*}
     else:
-        add "§fUnbound" to {_l::*}
-    add "§7Save a location and teleport to it from anywhere" to {_l::*}
+        add "<!i>§fUnbound" to {_l::*}
+    add "<!i>§7Save a location and teleport to it from anywhere" to {_l::*}
     set (lore of {_item}) to {_l::*}
     return {_item}
 
