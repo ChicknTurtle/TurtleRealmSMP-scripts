@@ -109,6 +109,25 @@
             "desc": "Whether debug messages should be visible in console",
             "type": "boolean",
             "default": false
+          },
+          "colors": {
+            "name": "Colors",
+            "desc": "Configure colors used in texts",
+            "item": "minecraft:cyan_dye",
+            "nodes": {
+              "loreColor": {
+                "name": "Lore color",
+                "desc": "Color of plain text in item descriptions, in minimessage format",
+                "type": "text",
+                "default": "<#b0bfce>"
+              },
+              "loreAccentColor": {
+                "name": "Lore accent color",
+                "desc": "Color of accented text in item descriptions, in minimessage format",
+                "type": "text",
+                "default": "<#66d9d9>"
+              }
+            }
           }
         }
       },

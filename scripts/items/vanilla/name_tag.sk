@@ -1,0 +1,26 @@
+
+register custom items:
+    set (custom item "minecraft:name_tag") to name tag
+    set (lore of (custom item "minecraft:name_tag")) to getLoreText("Use <accent><key:key.use> <r>to edit name")
+    add custom interact to (custom item "minecraft:name_tag")
+
+on custom interact with "minecraft:name_tag":
+    open anvil inventory to player
+    set {_inv} to (player's top inventory)
+    set {-playerData::%player%::gui} to {_inv}
+    set {-playerData::%player%::guiType} to "name_tag_edit"
+    if event-equipmentslot is main hand:
+        set (slot 0 of {_inv}) to player's tool
+        delete player's tool
+    else:
+        set (slot 0 of {_inv}) to player's offhand tool
+        delete player's offhand tool
+
+on any inventory click:
+    clicked inventory is {-playerData::%player%::gui}
+    {-playerData::%player%::guiType} is "name_tag_edit"
+    (index of clicked slot) isn't 0
+    uncancel event
+    (index of clicked slot) is 2
+    (clicked slot) isn't air
+    play sound "minecraft:ui.cartography_table.take_result" in (ui) at player to player

@@ -97,10 +97,17 @@ function setConfigValue(path:string, value:object, changer:commandsender={_}) ::
             return false
     else:
         return false
+    # exit if value is unchanged
     return true if {configValues::%{_path}%} is {_final}
+    if all:
+        getWhetherConfigValueIsDefault({_path}) is true
+        {_final} is getDefaultConfigValue({_path})
+    then:
+        return true
+    # save new value
     set {configValues::%{_path}%} to {_final}
     set {_by} to ("§r by %{_changer}%" if ({_changer} is set) else "")
-    log info "Config element §b%{_path}%§r has been set to §6%{_final}%%{_by}%"
+    log info "Config element §b%{_path}%§r has been set to §6%raw {_final}%%{_by}%"
     return true
 
 function resetConfigValue(path:string, changer:commandsender={_}):

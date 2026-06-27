@@ -1,0 +1,11 @@
+
+function getLoreText(text:string) :: text components:
+    set {_loreColor} to getConfigValue("root.server.colors.loreColor")
+    set {_loreAccentColor} to getConfigValue("root.server.colors.loreAccentColor")
+    set {_text} to "<r>%raw {_text}%"
+    replace "<newline>" with (raw "<br>") in {_text}
+    replace "<br>" in {_text} with (raw "<br><r>")
+    replace "<reset>" with (raw "<r>") in {_text}
+    replace "<r>" with (raw "<r>%raw "<!i>"%%raw {_loreColor}%") in {_text}
+    replace "<accent>" with (raw {_loreAccentColor}) in {_text}
+    return (split (minimessage from {_text}).component at "<br>") mapped using (formatted input)

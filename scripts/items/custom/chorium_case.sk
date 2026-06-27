@@ -29,7 +29,7 @@ local function updateItem(item:item) :: item:
         set (item model of {_item}) to "turtle:chorium_case_filled"
         add custom interact to {_item}
     add "<!i>§d%{_amount}%§5/{@maxAmount}" to {_l::*}
-    add "<!i>§7Capable of storing a large amount of ender pearls" to {_l::*}
+    add getLoreText("Capable of storing a large amount of ender pearls") to {_l::*}
     set (lore of {_item}) to {_l::*}
     return {_item}
 
