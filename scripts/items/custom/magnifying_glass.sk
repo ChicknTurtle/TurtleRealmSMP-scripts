@@ -4,13 +4,7 @@ when ready to register custom items:
     apply use cooldown component to (custom item "turtle:magnifying_glass"):
         seconds: 3 seconds
         group: "turtle:magnifying_glass"
-    # lore
-    set {_c::1} to (text component from "§7Use ")
-    set {_c::2} to (keybind component from "key.use")
-    set (color format of {_c::2}) to rgb(102,217,217)
-    set {_c::3} to (text component from "§7 to display info about blocks and entities")
-    set (italic format of {_c::*}) to false
-    set component lore of (custom item "turtle:magnifying_glass") to (merge components {_c::*})
+    set lore of (custom item "turtle:magnifying_glass") to getLoreText("Use <accent><key:key.use> <r>to display info about blocks and entities")
 
 when ready to load recipes:
     register shaped recipe:
